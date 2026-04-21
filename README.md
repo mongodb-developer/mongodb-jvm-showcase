@@ -1,5 +1,5 @@
 # kotlin-driver-atlas-search
-This repository demonstrates how to integrate MongoDB Atlas Search with the Kotlin Sync driver using a Spring Boot REST application. The goal is to create a solution for exploring and discovering properties similar to Airbnb, leveraging the advanced search capabilities of MongoDB Atlas.
+This repository demonstrates how to integrate MongoDB Search with the Kotlin Sync driver using a Spring Boot REST application. The goal is to create a solution for exploring and discovering properties similar to Airbnb, leveraging the advanced search capabilities of MongoDB.
 
 You can read more on:
 - [`Discover Your Ideal Airbnb: Implementing a Spring Boot & Atlas Search with Kotlin Sync Driver`](https://www.mongodb.com/developer/products/atlas/kotlin-driver-sync-with-atlas-search/)
