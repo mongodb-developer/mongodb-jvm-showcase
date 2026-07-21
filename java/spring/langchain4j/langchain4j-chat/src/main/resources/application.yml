@@ -1,0 +1,17 @@
+logging:
+  level:
+    dev.langchain4j: DEBUG
+    org.springframework: INFO
+openai:
+  api-key: ${OPENAI_API_KEY}
+  model: gpt-4.1-mini
+
+voyage:
+  api-key: ${VOYAGE_API_KEY}
+  model: voyage-3-large   # produces 1024-dimension embeddings
+
+mongodb:
+  uri: ${MONGODB_URI}
+  database: langchain4j_demo
+  collection: rainforest_docs
+  index-name: vector_index

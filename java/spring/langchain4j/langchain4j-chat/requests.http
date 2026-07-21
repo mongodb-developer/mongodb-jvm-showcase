@@ -1,0 +1,9 @@
+@host = http://localhost:8080
+
+### 1. Ask a question - RAG
+POST {{host}}/chat
+Content-Type: application/json
+
+{
+  "question": "Which rainforest animals are most dangerous and why?"
+}
