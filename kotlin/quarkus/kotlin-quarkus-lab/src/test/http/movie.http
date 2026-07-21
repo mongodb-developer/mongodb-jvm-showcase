@@ -1,0 +1,10 @@
+### FIND
+
+GET http://localhost:8080/movies
+Accept: application/json
+
+
+### TOP FREQUENT ACTORS
+GET http://localhost:8080/movies/top-frequent-actors
+Accept: application/json
+
