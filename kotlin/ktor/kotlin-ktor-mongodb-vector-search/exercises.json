@@ -1,0 +1,578 @@
+[
+ {
+    "exerciseNumber": 1,
+    "title": "Banded crunch isometric hold",
+    "description": "The banded crunch isometric hold is an exercise targeting the abdominal muscles, particularly the rectus abdominis or \"six-pack\" muscles. The band adds resistance and continuous tension to this popular exercise.",
+    "type": "Strength",
+    "bodyPart": "Abdominals",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 5.4,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 2,
+    "title": "FYR Banded Plank Jack",
+    "description": "The banded plank jack is a variation on the plank that involves moving the legs in and out for repetitions. Having a band around the thighs forces the lower body to work harder, particularly the hips and glutes. The plank jack is commonly performed as part of a bodyweight circuit, or as part of a dynamic warm-up.",
+    "type": "Strength",
+    "bodyPart": "Abdominals",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 5.5,
+    "ratingDesc": ""
+  },
+
+ 
+  {
+    "exerciseNumber": 3,
+    "title": "Banded crunch",
+    "description": "The banded crunch is an exercise targeting the abdominal muscles, particularly the rectus abdominis or \"six-pack\" muscles. The band adds resistance and continuous tension to this popular exercise.",
+    "type": "Strength",
+    "bodyPart": "Abdominals",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 5.2,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 4,
+    "title": "Crunch",
+    "description": "The crunch is a popular core exercise targeting the rectus abdominis, or \"six-pack\" muscles, as well as the obliques. It has been the centerpiece of many ab-focused workouts, due to both its simplicity and the intense burn and mind-muscle connection it produces. It can be performed for time or reps as part of the ab-focused portion of any workout.",
+    "type": "Strength",
+    "bodyPart": "Abdominals",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 5.8,
+    "ratingDesc": ""
+  },  
+  {
+    "exerciseNumber": 5,
+    "title": "Iliotibial band SMR",
+    "description": "Iliotibial band self-myofascial release (SMR) is a self-administered soft-tissue treatment for the lower body, usually using a foam roller or other \"trigger point\" massage tool. By applying pressure strategically to the IT band along the side of the upper leg, some people find they can cause this often painful and tight area to relax or \"release.\" IT band SMR is often accompanied by SMR on the glute or quad muscles, or by stretches that target the glutes or quads.",
+    "type": "Stretching",
+    "bodyPart": "Abductors",
+    "equipment": "Foam Roll",
+    "level": "Intermediate",
+    "rating": 8.2,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 6,
+    "title": "Adductor SMR",
+    "description": "Adductor self-myofascial release (SMR) is a self-administered soft-tissue treatment for the lower body, usually using a foam roller, lacrosse ball, or other \"trigger point\" massage tool. By applying pressure strategically to the adductor muscles in the inner thigh region, some people find they can cause this often painful and tight muscle to relax or \"release.\" Adductor SMR is often accompanied by SMR on the iliotibial (IT) band or glutes (TFL muscles), or by stretches that target the adductors.",
+    "type": "Stretching",
+    "bodyPart": "Adductors",
+    "equipment": "Foam Roll",
+    "level": "Beginner",
+    "rating": 4,
+    "ratingDesc": "Average"
+  },
+  
+  {
+    "exerciseNumber": 7,
+    "title": "Incline dumbbell biceps curl",
+    "description": "The incline dumbbell biceps curl is an exercise targeting the biceps and performed face up on an incline bench. This creates a vertical arm angle, which helps to isolate the biceps and limit involvement of the shoulder muscles. This curl variation is usually performed for moderate to high reps, such as 8-12 reps per set or more, as part of upper-body or arm-focused training.",
+    "type": "Strength",
+    "bodyPart": "Biceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 8,
+    "title": "Banded biceps curl in squat position",
+    "description": "The banded biceps curl in squat position is an exercise targeting the biceps, although it also works the core and lower body.",
+    "type": "Strength",
+    "bodyPart": "Biceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 9,
+    "title": "Banded Hammer Press - Gethin Variation",
+    "description": "The machine chest press is an upper body exercise targeting the pectoral muscles.",
+    "type": "Strength",
+    "bodyPart": "Biceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 10,
+    "title": "Band standing concentration curl",
+    "description": "The band standing concentration curl is a variation of a popular biceps-focused exercise utilizing a band instead of a dumbbell. It allows you to focus on one biceps at a time and really squeeze out intense peak contractions. Band concentration curls are usually performed for moderate to high reps, such as 8-12 reps per set or more, as part of an upper-body or arm-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Biceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 11,
+    "title": "Brachialis SMR",
+    "description": "Brachialis self-myofascial release (SMR) is a self-administered soft-tissue treatment for the upper body, usually using a foam roller, lacrosse ball, or other \"trigger point\" massage tool. By applying pressure strategically to the biceps or brachialis muscles of the upper arm, some people find they can cause this often painful and tight muscle to relax or \"release.\" Brachialis SMR is often accompanied by SMR on the triceps muscles or pectorals, or by stretches that target the biceps or pecs.",
+    "type": "Stretching",
+    "bodyPart": "Biceps",
+    "equipment": "Foam Roll",
+    "level": "Beginner",
+    "rating": 3.2,
+    "ratingDesc": "Average"
+  },
+
+  
+  {
+    "exerciseNumber": 12,
+    "title": "Calf SMR",
+    "description": "Calf self-myofascial release (SMR) is a self-administered soft-tissue treatment for the lower body, usually using a foam roller, lacrosse ball, or other \"trigger point\" massage tool. By applying pressure strategically to the calf muscles of the lower leg, some people find they can cause this often painful and tight muscle to relax or \"release.\" Calf SMR is often accompanied by SMR on the quadriceps muscles, or by stretches that target the calves.",
+    "type": "Stretching",
+    "bodyPart": "Calves",
+    "equipment": "Foam Roll",
+    "level": "Beginner",
+    "rating": 6,
+    "ratingDesc": "Average"
+  },
+  
+  {
+    "exerciseNumber": 13,
+    "title": "Standing barbell calf raise",
+    "description": "The standing barbell calf raise is a popular exercise to target the calf muscles of the lower leg, particularly the gastrocnemius muscle. It can be performed for time or for reps, either using a barbell or Smith machine bar if balance is a problem.",
+    "type": "Strength",
+    "bodyPart": "Calves",
+    "equipment": "Barbell",
+    "level": "Beginner",
+    "rating": 8.2,
+    "ratingDesc": "Average"
+  },
+   
+  
+  {
+    "exerciseNumber": 14,
+    "title": "Band-suspended kettlebell bench press",
+    "description": "The band-suspended kettlebell bench press is a bench press variation where kettlebells or weight plates are hung from the ends of a barbell by looped bands. The suspended weights can be in addition to normally loaded weight plates, or in the place of them. Because the instability of the weights makes the lift difficult, this bench press variety is a popular accessory movement for building the traditional bench press in powerlifting training.",
+    "type": "Strength",
+    "bodyPart": "Chest",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+
+  {
+    "exerciseNumber": 15,
+    "title": "Incline band bench press",
+    "description": "The incline band bench press is variation of the incline press, a popular upper-body exercise targeting the upper pectoral muscles. While it can be a strength-focused movement, it is usually performed for moderate to high reps, such as 8-12 reps per set or more, as part of upper-body or chest-focused training.",
+    "type": "Strength",
+    "bodyPart": "Chest",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 16,
+    "title": "Band push-up",
+    "description": "The band push-up is a progression of the popular bodyweight version of the exercise commonly used in military and tactical physical fitness tests. Adding the dynamic resistance of the band matches the strength curve of the push-up and helps build upper-body muscle and strength, emphasizing the chest, triceps, and shoulders, but also working the upper back and core.",
+    "type": "Strength",
+    "bodyPart": "Chest",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+   {
+    "exerciseNumber": 17,
+    "title": "Barbell Bench Press - Medium Grip",
+    "description": "The bench press is a compound exercise that builds strength and muscle in the chest and triceps. When many people think of listing, the bench press is often the first exercise that comes to mind",
+    "type": "Strength",
+    "bodyPart": "Chest",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 9,
+    "ratingDesc": "Average"
+  },
+ 
+  {
+    "exerciseNumber": 18,
+    "title": "Standing alternating band speed row",
+    "description": "The standing alternating band speed row is an explosive back exercise using exercise bands. It targets the muscles of the middle and upper back, including the lats (latissimus dorsi), rhomboids, and trapezius, as well as the biceps. It can be performed for time or reps either as part of a power or speed-focused portion of a workout or as a burnout at the end of a workout.",
+    "type": "Strength",
+    "bodyPart": "Forearms",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 19,
+    "title": "Band roundhouse elbow",
+    "description": "The band roundhouse elbow is an explosive rotational power exercise using exercise bands. It targets the muscles of the obliques and deep core, but also engrains full-body coordination and striking ability. It can work in an ab workout, in martial arts training, or in general strength and muscle training.",
+    "type": "Strength",
+    "bodyPart": "Forearms",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 20,
+    "title": "Palms-down wrist curl over bench",
+    "description": "The palms-down wrist curl over bench is an exercise targeting the forearms. It is usually performed for high reps, such as 10-15 reps per set or more, as part of a grip or arm-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Forearms",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 9.5,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 21,
+    "title": "Palms-up wrist curl over bench",
+    "description": "The palms-up wrist curl over bench is an exercise targeting the forearms. It is usually performed for high reps, such as 10-15 reps per set or more, as part of a grip or arm-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Forearms",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 9.4,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 22,
+    "title": "Standing behind-the-back wrist curl",
+    "description": "The standing behind-the-back wrist curl is a popular exercise to target the muscles in the forearms, wrists, and fingers. It is generally performed for moderate to high reps, such as 8-15 reps per set, and can work as isolated forearm training or as part of an arms-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Forearms",
+    "equipment": "Barbell",
+    "level": "Beginner",
+    "rating": 9.3,
+    "ratingDesc": "Average"
+  },
+ 
+   
+  {
+    "exerciseNumber": 23,
+    "title": "Piriformis SMR",
+    "description": "Piriformis self-myofascial release (SMR) is a self-administered soft-tissue treatment for the lower body, usually using a foam roller, lacrosse ball, or other \"trigger point\" massage tool. By applying pressure strategically to the piriformis muscles in the upper gluteal region, some people find they can cause this often painful and tight muscle to relax or \"release.\" Piriformis SMR is often accompanied by SMR on the iliotibial (IT) band or tensor fascia lata (TFL muscles), or by stretches that target the glutes and hips.",
+    "type": "Stretching",
+    "bodyPart": "Glutes",
+    "equipment": "Foam Roll",
+    "level": "Intermediate",
+    "rating": 6.6,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 24,
+    "title": "Barbell glute bridge",
+    "description": "The barbell glute bridge is a popular exercise targeting the muscles of the glutes and hamstrings. It can be done as a strength movement on its own, as an activation drill or warm-up for lower-body training, or as a burnout at the end of a lower-body workout.",
+    "type": "Powerlifting",
+    "bodyPart": "Glutes",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 9.4,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 25,
+    "title": "Barbell Hip Thrust",
+    "description": "The barbell hip thrust is an exercise that engages the posterior chain, particular the glutes. It involves fully extending your hips while holding a weighted barbell across the midsection.",
+    "type": "Powerlifting",
+    "bodyPart": "Glutes",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 9.1,
+    "ratingDesc": "Average"
+  },
+   
+  {
+    "exerciseNumber": 26,
+    "title": "Kettlebell thruster",
+    "description": "The kettlebell thruster is a popular kettlebell movement that combines a kettlebell front squat with a kettlebell press, while holding the bell in a goblet or bottoms-up grip. It is preceded by a clean at the start of each set, and you can perform a clean between each rep if you choose. It can be trained in traditional strength or muscle-building rep ranges, in circuit or fat-loss training, or as part of a larger kettlebell combination or complex.",
+    "type": "Strength",
+    "bodyPart": "Glutes",
+    "equipment": "Kettlebells",
+    "level": "Intermediate",
+    "rating": 8.6,
+    "ratingDesc": "Average"
+  },
+ 
+  {
+    "exerciseNumber": 27,
+    "title": "Single-arm triceps kick-back",
+    "description": "The single-arm triceps kick-back is a popular movement to increase size and strength of the triceps. It is usually performed for moderate to high reps, at least 8-12 reps, as part of an upper-body or arm-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Glutes",
+    "equipment": "Dumbbell",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },  
+   
+  {
+    "exerciseNumber": 28,
+    "title": "World's greatest stretch",
+    "description": "The world's greatest stretch is a popular movement that earned its name because it targets multiple parts of the body, including the hips, shoulders, and thoracic spine, in a single sequence. This makes it a great dynamic warm-up, post-workout stretch, or mobility work you can do anytime.",
+    "type": "Stretching",
+    "bodyPart": "Hamstrings",
+    "equipment": "Body Only",
+    "level": "Intermediate",
+    "rating": 4.4,
+    "ratingDesc": "Average"
+  },
+   
+  {
+    "exerciseNumber": 29,
+    "title": "Single-leg balance and reach",
+    "description": "The single-leg balance and reach is an exercise that focuses on lower-body strength and stability.",
+    "type": "Stretching",
+    "bodyPart": "Hamstrings",
+    "equipment": "Body Only",
+    "level": "Beginner",
+    "rating": 0,
+    "ratingDesc": ""
+  },
+  
+  {
+    "exerciseNumber": 30,
+    "title": "Band-assisted pull-up",
+    "description": "The band-assisted pull-up is a variation of the pull-up exercise in which the reps are performed with an elastic band looped around the feet or knees. This reduces weight and resistance at the bottom of the rep, while increasing it toward the top. Like other pull-up variations, it builds strength and muscle in the upper back, biceps, and core, and is often used as a way to help people boost their pull-up numbers or perform their first rep.",
+    "type": "Strength",
+    "bodyPart": "Lats",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.6,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 31,
+    "title": "Assisted Chin-Up",
+    "description": "The reverse-grip chin-up is a variation of the pull-up exercise in which the reps are performed with the palms facing toward the body, in an underhand position, with a band looped around the feet or knees. This reduces weight and resistance at the bottom of the rep, while increasing it toward the top. Like other pull-up variations, it builds strength and muscle in the upper back, biceps, and core, but it utilizes the biceps slightly more than overhand band-assisted pull-ups.",
+    "type": "Strength",
+    "bodyPart": "Lats",
+    "equipment": "Bands",
+    "level": "Beginner",
+    "rating": 0,
+    "ratingDesc": "Average"
+  },
+   
+  {
+    "exerciseNumber": 32,
+    "title": "Band good morning-",
+    "description": "The band good morning is an exercise targeting the hamstrings and glutes. It is often performed in powerlifting-style training for high reps, or in the place of barbell good mornings.",
+    "type": "Strength",
+    "bodyPart": "Lower Back",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+ 
+  {
+    "exerciseNumber": 33,
+    "title": "Band deadlift",
+    "description": "The band deadlift is a lower-body exercise that mainly targets the hamstrings while also benefiting the glutes and lats using a proper hip-hinging motion.",
+    "type": "Strength",
+    "bodyPart": "Lower Back",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 34,
+    "title": "Lower back SMR",
+    "description": "Lower back self-myofascial release (SMR) is a self-administered soft-tissue treatment, usually using a foam roller, lacrosse ball, or other \"trigger point\" massage tool. By applying pressure strategically to the quadratus lumborum or spinal erector (erector spinae) muscles of the lower back, some people find they can cause this often painful and tight area to relax or \"release.\" Lower back SMR is often accompanied by SMR on the glutes or piriformis muscles, or by stretches that target the piriformis or hips. However, some people find that SMR on the lower back can aggravate existing pain or injury, so be cautious when performing it.",
+    "type": "Stretching",
+    "bodyPart": "Lower Back",
+    "equipment": "Foam Roll",
+    "level": "Intermediate",
+    "rating": 4.5,
+    "ratingDesc": "Average"
+  },
+  
+  
+  {
+    "exerciseNumber": 35,
+    "title": "Partner side plank band row",
+    "description": "The partner side plank band row is an abdominal exercise where two partners perform side planks while pulling on the opposite ends of an exercise band. This technique can be done for time or reps in any ab-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Middle Back",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 36,
+    "title": "Band-assisted chin-up",
+    "description": "The band-assisted chin-up is a variation of the pull-up exercise in which the reps are performed with the palms facing toward the body in an underhand position, with a band looped around the feet or knees. This reduces weight and resistance at the bottom of the rep, while increasing it toward the top. Like other pull-up variations, it builds strength and muscle in the upper back, biceps, and core, but it utilizes the biceps slightly more than overhand band-assisted pull-ups.",
+    "type": "Strength",
+    "bodyPart": "Middle Back",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },   
+  {
+    "exerciseNumber": 37,
+    "title": "Band seated row",
+    "description": "The band seated row is a band alternative to the popular cable exercise and trains the muscles of the upper back, including the lats (latissimus dorsi), traps, rhomboids, and rear deltoids. It also targets the biceps to a lesser degree. The band row can work well in a variety of rep ranges, requiring a heavier band for muscle-building and strength workouts and a lighter band for weight-loss work and as an accessory movement.",
+    "type": "Strength",
+    "bodyPart": "Traps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 38,
+    "title": "Barbell shrug",
+    "description": "The barbell shrug is an exercise targeting the traps (trapezius muscles). It is popular in strength and muscle-focused upper-body training, and is often trained on a shoulder day. With the assistance of straps, it can be loaded heavily, but it is still usually performed for moderate to high reps, such as 8-10 reps per set.",
+    "type": "Strength",
+    "bodyPart": "Traps",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 8.4,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 39,
+    "title": "Barbell behind-the-back shrug",
+    "description": "The barbell behind-the-back shrug is an exercise targeting the traps. Having the bar behind you helps keep your shoulders pulled up and back, rather than rounded forward. It is popular in strength and muscle-focused upper-body training, and is often trained on a shoulder day. With the assistance of straps, it can be loaded heavily, but it is still usually performed for moderate to high reps, such as 8-10 reps per set.",
+    "type": "Strength",
+    "bodyPart": "Traps",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 8.3,
+    "ratingDesc": "Average"
+  },
+   
+  {
+    "exerciseNumber": 40,
+    "title": "Single-arm inverted row",
+    "description": "The single-arm inverted row is a bodyweight exercise targeting the muscles of the lats (latissimus dorsi) and upper back, using the bar of the Smith machine to hang and pull from. You can change the bar height to customize the difficulty level and desired angle of the row.",
+    "type": "Strength",
+    "bodyPart": "Traps",
+    "equipment": "Barbell",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+   
+   
+  {
+    "exerciseNumber": 41,
+    "title": "Single-leg depth squat",
+    "description": "The single-leg depth squat is an exercise targeting the muscles of the lower body, including the quads, glutes, and hamstrings. It is sometimes used as a substitute for the pistol squat, since it doesn't demand the same level of flexibility to perform. It is usually performed for low to moderate reps with a focus on proper form and control.",
+    "type": "Strength",
+    "bodyPart": "Quadriceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 9,
+    "ratingDesc": "Average"
+  },
+   
+  {
+    "exerciseNumber": 42,
+    "title": "Banded jump squat",
+    "description": "The banded jump squat is an explosive bodyweight squat variation performed with a band around the thighs just above the knees. This increases muscle activation in the hips and glutes, while the squat targets the quads, hamstrings, and glutes. The banded jump squat can be performed for low reps as a power-focused exercise, or for higher reps to build muscle in the lower body, challenge conditioning, and burn fat.",
+    "type": "Strength",
+    "bodyPart": "Quadriceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 43,
+    "title": "Speed Box Squat",
+    "description": "The banded barbell box squat is a strength and power exercise targeting the lower body. It is popular in powerlifting training, either performed with light weights as a power and speed exercise, or heavier for strength. It is usually performed to a box of a height that demands the squatter to decent to around parallel.",
+    "type": "Powerlifting",
+    "bodyPart": "Quadriceps",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },     
+  {
+    "exerciseNumber": 44,
+    "title": "Band Pull Apart",
+    "description": "The band pull-apart is an exercise targeting the upper back muscles, including the trapezius, rear delts, and rhomboids. The band creates dynamic tension, allowing you to really focus on contracting these muscles, making it a great activation drill prior to upper-body lifting.",
+    "type": "Strength",
+    "bodyPart": "Shoulders",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 8.2,
+    "ratingDesc": "Average"
+  },   
+  {
+    "exerciseNumber": 45,
+    "title": "Band shoulder press",
+    "description": "The band shoulder press is a deltoid exercise and an alternative to the classic dumbbell shoulder press. The dynamic tension of the band forces the core to stabilize the body and more closely matches the strength curve of the shoulder press. It can be performed in low reps, such as 5-8 reps per set, to build shoulder strength, or for higher reps to build muscle and for conditioning. It can work as the main focus of a shoulder day but is also popular as an accessory movement to the bench press or barbell military press.",
+    "type": "Strength",
+    "bodyPart": "Shoulders",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 46,
+    "title": "Band lateral raise",
+    "description": "The band lateral raise is a shoulder exercise that targets the medial or middle head of the deltoid muscle. It's a variation of the dumbbell lateral raise, a staple strength-training move. The band lateral raise is a great option for warm-up or accessory work on upper-body training days. The dynamic tension of the band provides constant tension and matches the strength curve of the movement. It is usually performed for moderate to high reps, at least 8-12 reps, as part of the upper-body or shoulder-focused portion of a workout.",
+    "type": "Strength",
+    "bodyPart": "Shoulders",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+  {
+    "exerciseNumber": 47,
+    "title": "Band upright row",
+    "description": "The band upright row is a popular movement for building stronger and bigger traps and shoulders and similar to the dumbbell upright row. Many lifters combine this move with either their back or shoulder workout, since it involves both body parts. Using the band provides dynamic resistance and is easier on the shoulder than using a barbell. It is generally performed for moderate to high reps, such as 8-12 reps per set or more.",
+    "type": "Strength",
+    "bodyPart": "Shoulders",
+    "equipment": "Bands",
+    "level": "Intermediate",
+    "rating": 7.0,
+    "ratingDesc": ""
+  },
+   
+  {
+    "exerciseNumber": 48,
+    "title": "Cable V-bar push-down",
+    "description": "The cable V-bar push-down is a popular gym exercise for targeting the triceps. It utilizes an angled bar, which can allow you to move heavier weights more comfortably than a straight bar or rope. It is usually performed for moderate to high reps, such as 8-12 reps or more per set, as part of an upper-body or arm-focused workout.",
+    "type": "Strength",
+    "bodyPart": "Triceps",
+    "equipment": "Cable",
+    "level": "Intermediate",
+    "rating": 9.1,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 49,
+    "title": "Reverse Grip Triceps Pushdown",
+    "description": "The reverse-grip cable straight-bar push-down is a twist on the popular cable straight-bar push-down. The difference has to do with how the hands are positioned holding the bar: the palms facing up rather than down. Because grip will be a limiting factor, this movement is usually performed for moderate to high reps, such as 8-12 reps per set or higher.",
+    "type": "Strength",
+    "bodyPart": "Triceps",
+    "equipment": "Cable",
+    "level": "Intermediate",
+    "rating": 9,
+    "ratingDesc": "Average"
+  },
+  {
+    "exerciseNumber": 50,
+    "title": "Kneeling cable triceps extension",
+    "description": "The kneeling cable triceps extension is a single-joint exercise meant to isolate the triceps muscles using a high pully on a cable stack and a bench. It can also be performed in a tall-kneeling stance from a low pully. It is most commonly used in muscle-building triceps or arm workouts.",
+    "type": "Strength",
+    "bodyPart": "Triceps",
+    "equipment": "Cable",
+    "level": "Intermediate",
+    "rating": 9,
+    "ratingDesc": "Average"
+  }
+]
