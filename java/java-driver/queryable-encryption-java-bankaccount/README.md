@@ -1,7 +1,7 @@
 # Queryable-Encryption-BankAccount
 
 You can learn more at the MongoDB Developer Center:
-- [`Java Meets Queryable Encryption: Developing a Secure Bank Account Application`](https://www.mongodb.com/developer/products/atlas/java-queryable-encryption/)
+- [`Java Meets Queryable Encryption: Developing a Secure Bank Account Application`](https://dev.to/ricardohsmello/java-meets-queryable-encryption-developing-a-secure-bank-account-application-40im)
 
 The BankAccount service project focuses on exploring queryable encryption to securely manage sensitive bank account information. The application will encrypt the following fields in the BankAccount entity:
 
@@ -21,18 +21,44 @@ By encrypting these fields, the service maintains the confidentiality of sensiti
 
 ## Prerequisites
 - MongoDB 8.0 ReplicaSet
-- Java 17+ 
+- Java 21+
+- [MongoDB Crypt Shared library](https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library/) (Enterprise/Atlas) downloaded locally
+
+> Maven is **not** required — the project ships with the Maven Wrapper (`mvnw`).
+
+## Configuration
+
+The application reads two values from environment variables (see `src/main/resources/application.properties`):
+
+| Variable | Description |
+| --- | --- |
+| `MONGO_URI` | MongoDB connection string |
+| `CRYPT_SHARED_LIB_PATH` | Absolute path to the `mongo_crypt_v1` shared library |
+
+Export them in your shell before running:
+
+**macOS / Linux**
+```bash
+export MONGO_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/"
+export CRYPT_SHARED_LIB_PATH="/path/to/mongo_crypt_v1.dylib"
+```
+
+**Windows (PowerShell)**
+```powershell
+$env:MONGO_URI = "mongodb+srv://<user>:<password>@<cluster>.mongodb.net/"
+$env:CRYPT_SHARED_LIB_PATH = "C:\path\to\mongo_crypt_v1.dll"
+```
 
 ## Running the application
+
+**macOS / Linux**
+```bash
+./mvnw spring-boot:run
 ```
-mvn clean install
 
-```
-
-
-```
-mvn spring-boot:run
-
+**Windows**
+```cmd
+mvnw.cmd spring-boot:run
 ```
 
 ## Endpoints
