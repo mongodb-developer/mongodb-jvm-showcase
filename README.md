@@ -1,32 +1,32 @@
-# mongodb-java-showcase
-A collection of practical examples using MongoDB with Java. This showcase includes code samples, experiments, and common patterns for working with MongoDB in different scenarios
+# MongoDB JVM Showcase
 
-# Getting Started
-## Set your connection string
-Before running, set the MONGODB_URI environment variable with your connection string:
+A curated collection of projects demonstrating how to build modern applications with MongoDB using JVM languages and frameworks.
 
-```
-export MONGODB_URI="mongodb+srv://<username>:<password>@<cluster>"
-```
+The repository includes examples written in Java, Kotlin, and other JVM languages, covering everything from basic driver usage to complete real-world use cases.
 
-## Run the application
-Use Spring Boot to start the app:
+## Repository Structure
 
-```
-./mvnw spring-boot:run
-```
+Projects are organized by programming language and primary framework.
 
-Or, if you prefer using Maven directly:
+### Java
 
-```
-mvn spring-boot:run
-```
+- **[java-driver](./java/java-driver)** – Examples using the official MongoDB Java Driver.
+- **[spring](./java/spring)** – Spring-based projects, including Spring Data, Spring AI, LangChain4j integrations, and related technologies.
+- **[quarkus](./java/quarkus)** – Quarkus projects.
+- **[use-cases](./java/use-cases)** – Complete applications demonstrating real-world scenarios.
 
-## Access the endpoints
-Once running, you can test the endpoints like:
+### Kotlin
 
-```
-GET http://localhost:8080/movies/enriched-details?plot=snow
+Projects following the same structure as the Java examples.
 
-GET http://localhost:8080/movies/by-title-year?title=Titanic&year=1997
-```
+### Other JVM Languages
+
+Additional languages such as Scala may be added over time using the same organization.
+
+## Philosophy
+
+Each project is independent and self-contained, with its own source code, documentation, build configuration, and dependencies.
+
+## Goal
+
+Provide practical, production-oriented examples that help developers build modern applications with MongoDB across the JVM ecosystem.
