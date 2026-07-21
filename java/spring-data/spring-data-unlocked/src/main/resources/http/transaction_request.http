@@ -1,0 +1,54 @@
+ ### 🟢 Create a new transaction
+POST http://localhost:8080/transactions
+Content-Type: application/json
+
+{
+  "transactionType": "Debit",
+  "amount": 0.0,
+  "currency": "BRL",
+  "status": "error",
+  "timestamp": "2025-05-21T14:00:00Z",
+  "description": "Initial test transaction",
+  "accountDetails": {
+    "originator": {
+      "accountNumber": "123456789"
+    }
+  }
+}
+
+### Get all transactions (paginated)
+GET http://localhost:8080/transactions?page=0&size=10&sortBy=id&direction=DESC
+
+### Search transactions by type and/or currency and/or status
+GET http://localhost:8080/transactions/search?type=Credit&currency=USD&status=pending
+
+### Search transactions by type
+GET http://localhost:8080/transactions/search?type=Debit
+
+### Search transactions by status
+GET http://localhost:8080/transactions/search?status=finished
+
+### Update a transaction (replace entire object)
+PUT http://localhost:8080/transactions/664fcadeeb13215736d9a701
+Content-Type: application/json
+
+{
+  "id": "682dae2a54f1a720164cfd32",
+  "transactionType": "Debit",
+  "amount": 300.00,
+  "currency": "EUR",
+  "status": "completed",
+  "timestamp": "2025-05-21T16:00:00Z",
+  "description": "Updated full transaction",
+  "accountDetails": {
+    "originator": {
+      "accountNumber": "987654321"
+    }
+  }
+}
+
+### Delete a transaction by ID
+DELETE http://localhost:8080/transactions/682dae2a54f1a720164cfd32
+
+### Export error transactions (executes aggregation)
+POST http://localhost:8080/transactions/actions/export-errors

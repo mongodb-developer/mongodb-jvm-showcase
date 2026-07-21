@@ -1,0 +1,32 @@
+### 🟢 Create a new customer
+POST http://localhost:8080/customers
+Content-Type: application/json
+
+{
+  "name": "Ricardo",
+  "email": "ricardo.mello@mongodb.com",
+  "accountNumber": "555",
+  "phone": "21000",
+  "address": {
+    "street": "Street 001",
+    "city": "BH"
+  }
+}
+
+### Retrieve all customers
+GET http://localhost:8080/customers
+
+### Find a customer by email (using query parameter)
+GET http://localhost:8080/customers/search?email=joao.silva@mongodb.com
+
+### Get total number of customers grouped by city
+GET http://localhost:8080/customers/report/total-by-city
+
+### Update the phone number of a customer (by email)
+PATCH http://localhost:8080/customers/joao.silva@mongodb.com/phone?phone=4444
+
+### Delete a customer by email
+DELETE http://localhost:8080/customers/joao.silva@mongodb.com
+
+### Explain indexes on diagnostics route
+GET http://localhost:8080/customers/diagnostics/indexes

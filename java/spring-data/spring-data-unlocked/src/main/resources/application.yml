@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: SpringShop
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: springshop
+      auto-index-creation: true
+server:
+  port: 8080
+logging:
+  level:
+    org.springframework.data.mongodb: DEBUG
+
+
+
+
