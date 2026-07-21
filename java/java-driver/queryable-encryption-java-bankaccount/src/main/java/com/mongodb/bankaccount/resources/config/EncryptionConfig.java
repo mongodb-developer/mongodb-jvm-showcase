@@ -64,6 +64,7 @@ public class EncryptionConfig {
         return MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(uri))
                 .autoEncryptionSettings(autoEncryptionSettings)
+                .applicationName("devrel-tutorial-queryable-encryption-java")
                 .build();
     }
 
