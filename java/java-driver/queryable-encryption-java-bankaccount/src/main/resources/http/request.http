@@ -1,0 +1,19 @@
+### Get request
+GET http://localhost:8080/bank
+
+### Get request toto filter balance greater than
+GET http://localhost:8080/bank/balance/greaterThan/50000
+
+### Get request toto filter balance greater than
+GET http://localhost:8080/bank/accountNumber/767361599923323
+
+### Post request
+POST http://localhost:8080/bank
+Content-Type: application/json
+
+{
+  "accountHolderName": "Ricardo Mello",
+  "accountNumber": "01487557",
+  "cardVerificationCode": 219,
+  "accountBalance": 7283.53
+}
