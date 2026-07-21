@@ -25,6 +25,7 @@ public class MongoConfig {
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
                 .readPreference(ReadPreference.nearest())
+                .applicationName("devrel-tutorial-spring-data-java")
                 .build();
         return MongoClients.create(settings);
     }
