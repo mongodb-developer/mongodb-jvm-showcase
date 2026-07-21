@@ -1,0 +1,23 @@
+@host = http://localhost:8080
+
+### Ingest data
+POST {{host}}/ingest
+Content-Type: application/json
+
+### Chat RAG - Should return Tomatoes, Garden and roses
+POST {{host}}/chat-rag
+Content-Type: application/json
+
+{
+  "message": "O que eu acabei de perguntar? ",
+  "conversationId": "00-1"
+}
+
+### Chat RAG - Should return Dog and Child
+POST {{host}}/chat-rag
+Content-Type: application/json
+
+{
+  "message": "What needs love and daily care?",
+  "conversationId": "00-1"
+}

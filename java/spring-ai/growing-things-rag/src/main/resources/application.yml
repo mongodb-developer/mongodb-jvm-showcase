@@ -1,0 +1,25 @@
+spring:
+  mongodb:
+    uri: ${MONGODB_URI}
+    database: ${MONGODB_DATABASE:spring_ai_rag}
+  ai:
+    vectorstore:
+      mongodb:
+        collection-name: ${VECTORSTORE_MONGODB_COLLECTION_NAME:knowledge_base}
+        index-name: ${VECTORSTORE_MONGODB_INDEX_NAME:spring_ai_index}
+        path-name: embedding
+        initialize-schema: true
+    openai:
+      api-key: ${OPENAI_API_KEY}
+voyage:
+  api-key: ${VOYAGE_API_KEY}
+  url: ${VOYAGE_URL:https://api.voyageai.com}
+  model: voyage-3-large
+logging:
+  level:
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: DEBUG
