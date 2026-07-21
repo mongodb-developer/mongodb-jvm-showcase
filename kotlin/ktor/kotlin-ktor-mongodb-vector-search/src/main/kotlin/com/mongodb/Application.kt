@@ -51,4 +51,9 @@ fun ApplicationCall.huggingFaceApiUrl(): String {
 
 }
 
+fun ApplicationCall.huggingFaceApiToken(): String {
+    return application.environment.config.propertyOrNull("ktor.huggingface.api.token")?.getString()
+        ?: throw RuntimeException("Missing Hugging Face API token. Set the HUGGINGFACE_TOKEN environment variable.")
+}
+
 

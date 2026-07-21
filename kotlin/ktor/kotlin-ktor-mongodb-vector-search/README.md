@@ -22,65 +22,78 @@ Together, we'll demonstrate and set up the Ktor project, implement CRUD operatio
 - [Koin - Dependency Injection framework](https://insert-koin.io/)
 - [MongoDB Kotlin Driver — Kotlin Coroutine](https://www.mongodb.com/docs/drivers/kotlin/coroutine/current/)
 
+## Prerequisites
+
+- **JDK 21+**
+- A **MongoDB Atlas** cluster ([create a free one](https://cloud.mongodb.com)) — required for Vector Search
+- A **Hugging Face token** ([create a free one](https://huggingface.co/settings/tokens)) — used to generate embeddings
+
 ## Running
 
-Follow the steps below to get the Fitness Tracker App up and running local / MongoDB Atlas.
+### 1. Set your environment variables
 
-### Local
+```bash
+export MONGO_URI="mongodb+srv://<user>:<pass>@<cluster>/?retryWrites=true&w=majority"
+export MONGO_DATABASE="my_database"
+export HUGGINGFACE_TOKEN="hf_xxx"
+```
 
-1. Clone the repository to your local machine:
+### 2. Run the app
 
-    ```bash
-    git clone https://github.com/your-username/fitness-tracker-app.git
-    cd fitness-tracker
-    ```
+```bash
+./gradlew run
+```
 
-2. Start the application using Docker Compose:
+The API starts on **http://localhost:8081**.
 
-    ```bash
-    docker-compose up -d
-    ```
+### 3. Open Swagger UI
 
-3. Compile the application jar using Gradle:
+Go to **[http://localhost:8081/swagger-ui](http://localhost:8081/swagger-ui)** to try the endpoints from your browser.
 
-   ```bash
-   ./gradlew shadowJar
-     ```
+### 4. Seed the exercises
 
-4. Run the application
-    
-   ```bash
-   java -jar -DMONGO_URI="mongodb://localhost:27017/fitness/" -DMONGO_DATABASE="my_database" build/libs
-   ```
+Run `POST /exercises/seed`. This reads the bundled `exercises.json` (~50 exercises), generates an embedding for each, and inserts them into the `exercises` collection.
 
-### MongoDB Atlas
+### 5. Create the Vector Search index
 
-1. Clone the repository to your local machine:
+In the Atlas UI (Atlas Search → Create Index → JSON editor), create an index named **`vector_index`** on the `exercises` collection:
 
-    ```bash
-    git clone https://github.com/your-username/fitness-tracker-app.git
-    cd fitness-tracker
-    ```
+```json
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "descEmbedding",
+      "numDimensions": 384,
+      "similarity": "cosine"
+    }
+  ]
+}
+```
 
-2. Compile the application jar using Gradle:
+### 6. Search for similar exercises
 
-   ```bash
-   ./gradlew shadowJar
-     ```
+Run `POST /exercises/processRequest` with a phrase describing what you want. The app converts it into a vector and returns the closest exercises **by meaning**, not by keyword:
 
-4. Run the application
-    
-   ```bash
-    java -jar -DMONGO_URI="mongodb+srv://<username>:<password>@<cluster>/?retryWrites=true&w=majority" -DMONGO_DATABASE="my_database" build/libs
-   
-   ```
-### Swagger UI
+```json
+{ "input": "exercises to strengthen my core and abs" }
+```
 
-To explore the API documentation and interact with the Fitness Tracker App, you can use Swagger. Open your web browser and navigate to:
+## API Endpoints
 
- http://localhost:8080/swagger-ui/
-  
+| Method   | Path                             | Description                                        |
+|----------|----------------------------------|----------------------------------------------------|
+| `POST`   | `/fitness`                       | Create a fitness record                            |
+| `GET`    | `/fitness/{id?}`                 | Get a fitness record by id (or list all)           |
+| `GET`    | `/fitness/exerciseType/{type?}`  | Get fitness records by exercise type               |
+| `DELETE` | `/fitness/{id?}`                 | Delete a fitness record by id                      |
+| `POST`   | `/exercises/seed`                | Seed the `exercises` collection from `exercises.json` (generates embeddings) |
+| `POST`   | `/exercises/processRequest`      | Vector Search — find exercises similar to a phrase |
 
-![OpenAPI](https://i.ibb.co/r0vm3FL/swagger-git.png)
+## Swagger UI
+
+To explore the API documentation and try the endpoints from your browser, navigate to:
+
+[http://localhost:8081/swagger-ui](http://localhost:8081/swagger-ui)
 
 

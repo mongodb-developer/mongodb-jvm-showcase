@@ -99,6 +99,41 @@ paths:
               example: []
         '400':
           description: Bad request
+  /exercises/seed:
+    post:
+      summary: Seed the exercises collection from exercises.json
+      description: |
+        Loads the bundled `exercises.json`, generates the `descEmbedding` vector for each
+        exercise via the Hugging Face Inference API, and inserts the documents into the
+        `exercises` collection. Required before using Vector Search.
+      responses:
+        '201':
+          description: Exercises seeded successfully
+          content:
+            text/plain:
+              example: Seeded 50 exercises
+        '502':
+          description: Failed to generate an embedding via Hugging Face
+        '500':
+          description: exercises.json not found on the classpath
+  /exercises/processRequest:
+    post:
+      summary: Find exercises similar to a phrase (Vector Search)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SentenceRequest'
+      responses:
+        '202':
+          description: Similar exercises found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExercisesResponse'
 components:
   schemas:
     Fitness:
@@ -165,3 +200,27 @@ components:
         - endTime
         - notes
         - details
+
+    SentenceRequest:
+      type: object
+      properties:
+        input:
+          type: string
+          example: exercises to strengthen the abs
+      required:
+        - input
+
+    ExercisesResponse:
+      type: object
+      properties:
+        exerciseNumber:
+          type: integer
+          format: int32
+        title:
+          type: string
+        description:
+          type: string
+        bodyPart:
+          type: string
+        type:
+          type: string

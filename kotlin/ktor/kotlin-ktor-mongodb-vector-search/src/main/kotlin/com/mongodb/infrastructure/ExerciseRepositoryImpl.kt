@@ -1,5 +1,6 @@
 package com.mongodb.infrastructure
 
+import com.mongodb.MongoException
 import com.mongodb.domain.entity.Exercises
 import com.mongodb.domain.ports.ExercisesRepository
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
@@ -30,6 +31,18 @@ class ExercisesRepositoryImpl(
             )
 
         return result.toList()
+    }
+
+    override suspend fun insertMany(exercises: List<Exercises>): Int {
+        if (exercises.isEmpty()) return 0
+        try {
+            val result = mongoDatabase.getCollection<Exercises>(EXERCISES_COLLECTION).insertMany(exercises)
+            return result.insertedIds.size
+        } catch (e: MongoException) {
+            System.err.println("Unable to insert exercises due to an error: $e")
+        }
+
+        return 0
     }
 }
 

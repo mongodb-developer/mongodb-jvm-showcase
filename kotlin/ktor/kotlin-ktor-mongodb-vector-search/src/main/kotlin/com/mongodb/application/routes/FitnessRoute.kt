@@ -1,5 +1,7 @@
 package com.mongodb.application.routes
 
+import com.mongodb.application.request.FitnessRequest
+import com.mongodb.application.request.toDomain
 import com.mongodb.domain.ports.FitnessRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -42,15 +44,10 @@ fun Route.fitnessRoutes() {
         }
 
         post {
-            val fitness = call.receive<String>()
-            println(fitness)
+            val fitness = call.receive<FitnessRequest>()
+            val insertedId = repository.insertOne(fitness.toDomain())
+            call.respond(HttpStatusCode.Created, "Created fitness with id $insertedId")
         }
-//        post {
-//            val fitness = call.receive<FitnessRequest>()
-//            val insertedId = repository.insertOne(fitness.toDomain())
-//            call.respond(HttpStatusCode.Created, "Created fitness with id $insertedId")
-//
-//        }
 
         delete("/{id?}") {
             val id = call.parameters["id"] ?: return@delete call.respondText(
@@ -73,7 +70,7 @@ fun Route.fitnessRoutes() {
                 status = HttpStatusCode.BadRequest
             )
 
-            val updated = repository.updateOne(ObjectId(id), call.receive())
+            val updated = repository.updateOne(ObjectId(id), call.receive<FitnessRequest>().toDomain())
 
             call.respondText(
                 text = if (updated == 1L) "Fitness updated successfully" else "Fitness not found",

@@ -1,7 +1,11 @@
 package com.mongodb.application.routes
 
+import com.google.gson.Gson
+import com.mongodb.application.request.ExerciseSeed
 import com.mongodb.application.request.SentenceRequest
+import com.mongodb.application.request.toDomain
 import com.mongodb.domain.ports.ExercisesRepository
+import com.mongodb.huggingFaceApiToken
 import com.mongodb.huggingFaceApiUrl
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -23,7 +27,7 @@ fun Route.exercisesRoutes() {
         post {
             val sentence = call.receive<SentenceRequest>()
 
-            val response = requestSentenceTransform(sentence.input, call.huggingFaceApiUrl())
+            val response = requestSentenceTransform(sentence.input, call.huggingFaceApiUrl(), call.huggingFaceApiToken())
 
             if (response.status.isSuccess()) {
                 val embedding = sentence.convertResponse(response.body())
@@ -33,15 +37,42 @@ fun Route.exercisesRoutes() {
             }
         }
     }
-}
-suspend fun requestSentenceTransform(input: String, huggingFaceURL: String): HttpResponse {
-    return HttpClient(CIO).use { client ->
 
-        val response = client.post(huggingFaceURL) {
-            val content = TextContent(input, ContentType.Text.Plain)
-            setBody(content)
+    route("/exercises/seed") {
+        post {
+            val json = object {}.javaClass.getResourceAsStream("/exercises.json")?.bufferedReader()?.use { it.readText() }
+                ?: return@post call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "exercises.json not found on the classpath"
+                )
+
+            val seeds = Gson().fromJson(json, Array<ExerciseSeed>::class.java).toList()
+            val huggingFaceURL = call.huggingFaceApiUrl()
+            val huggingFaceToken = call.huggingFaceApiToken()
+
+            val exercises = seeds.map { seed ->
+                val response = requestSentenceTransform(seed.description, huggingFaceURL, huggingFaceToken)
+                if (!response.status.isSuccess()) {
+                    return@post call.respond(
+                        HttpStatusCode.BadGateway,
+                        "Failed to generate embedding for '${seed.title}': ${response.status}"
+                    )
+                }
+                val embedding = SentenceRequest(seed.description).convertResponse(response.body())
+                seed.toDomain(embedding)
+            }
+
+            val inserted = repository.insertMany(exercises)
+            call.respond(HttpStatusCode.Created, "Seeded $inserted exercises")
         }
-
-        response
+    }
+}
+suspend fun requestSentenceTransform(input: String, huggingFaceURL: String, token: String): HttpResponse {
+    return HttpClient(CIO).use { client ->
+        client.post(huggingFaceURL) {
+            header(HttpHeaders.Authorization, "Bearer $token")
+            val body = Gson().toJson(mapOf("inputs" to input))
+            setBody(TextContent(body, ContentType.Application.Json))
+        }
     }
 }

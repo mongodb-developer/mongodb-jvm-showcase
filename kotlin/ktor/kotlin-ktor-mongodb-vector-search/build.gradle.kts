@@ -22,6 +22,12 @@ kotlin {
     jvmToolchain(21)
 }
 
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    // Merge META-INF/services files so all Ktor ConfigLoaders (HOCON + YAML)
+    // survive the fat-jar packaging; otherwise application.conf is never read.
+    mergeServiceFiles()
+}
+
 repositories {
     mavenCentral()
 }
