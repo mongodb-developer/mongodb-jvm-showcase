@@ -1,6 +1,10 @@
 # kotlin-quarkus-lab
 
-A REST API lab project built with Kotlin and Quarkus, using MongoDB as the database. The application exposes endpoints to query movies from the `sample_mflix` dataset.
+You can read the full tutorial:
+
+- [`Building a Kotlin Application with Quarkus and MongoDB: A Step-by-Step Guide`](https://dev.to/mongodb/building-a-kotlin-application-with-quarkus-and-mongodb-a-step-by-step-guide-231l) 
+
+## A REST API lab project built with Kotlin and Quarkus, using MongoDB as the database. The application exposes endpoints to query movies from the `sample_mflix` dataset.
 
 ## Tech Stack
 
