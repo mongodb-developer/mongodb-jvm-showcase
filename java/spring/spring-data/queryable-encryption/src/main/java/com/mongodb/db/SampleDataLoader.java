@@ -4,6 +4,7 @@ import com.mongodb.domain.Employee;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class SampleDataLoader {
 
     @Bean
+    @Order(2)
     public CommandLineRunner loadSampleEmployees(EmployeeRepository employeeRepository) {
         return args -> {
             if (employeeRepository.count() == 0) {

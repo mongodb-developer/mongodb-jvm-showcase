@@ -10,6 +10,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.MongoJsonSchemaCreator;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -31,6 +32,7 @@ import com.mongodb.domain.Employee;
 import com.mongodb.domain.LocalCMKService;
 
 @Configuration
+@Order(1)
 public class MongoEncryptionConfiguration implements ApplicationRunner {
 
     private final AppProperties appProperties;
