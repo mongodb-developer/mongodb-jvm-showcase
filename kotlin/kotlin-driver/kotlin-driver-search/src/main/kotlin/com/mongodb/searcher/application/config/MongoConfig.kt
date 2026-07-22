@@ -1,5 +1,7 @@
 package com.mongodb.searcher.application.config
 
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.MongoClient
 import com.mongodb.kotlin.client.MongoDatabase
 import org.springframework.beans.factory.annotation.Value
@@ -17,7 +19,11 @@ class MongoConfig {
 
     @Bean
     fun getMongoClient(): MongoClient {
-        return MongoClient.create(uri)
+        val settings = MongoClientSettings.builder()
+            .applicationName("devrel-tutorial-kotlin-search")
+            .applyConnectionString(ConnectionString(uri))
+            .build()
+        return MongoClient.create(settings)
     }
 
     @Bean
