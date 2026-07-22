@@ -1,32 +1,30 @@
 # MongoDB JVM Showcase
 
-A curated collection of projects demonstrating how to build modern applications with MongoDB using JVM languages and frameworks.
+A collection of example projects showing how to use MongoDB with JVM languages and frameworks.
 
-The repository includes examples written in Java, Kotlin, and other JVM languages, covering everything from basic driver usage to complete real-world use cases.
+Each project is independent and self-contained, with its own source code, documentation, and build configuration.
 
 ## Repository Structure
 
-Projects are organized by programming language and primary framework.
+Projects are organized by language (**Java** and **Kotlin**), and inside each language they follow the same structure, grouped by driver or framework:
 
-### Java
+- **`java-driver` / `kotlin-driver`** – Examples using the official MongoDB drivers directly (CRUD, aggregations, Atlas Search, encryption, etc.).
+- **`spring`** – Spring-based projects, including Spring Data, Spring AI, and LangChain4j integrations.
+- **`quarkus`** – Quarkus projects.
+- **`ktor`** – Ktor projects (Kotlin).
 
-- **[java-driver](./java/java-driver)** – Examples using the official MongoDB Java Driver.
-- **[spring](./java/spring)** – Spring-based projects, including Spring Data, Spring AI, LangChain4j integrations, and related technologies.
-- **[quarkus](./java/quarkus)** – Quarkus projects.
-- **[use-cases](./java/use-cases)** – Complete applications demonstrating real-world scenarios.
+```
+.
+├── java/
+│   ├── java-driver/
+│   ├── spring/
+│   └── quarkus/
+└── kotlin/
+    ├── kotlin-driver/
+    ├── ktor/
+    └── quarkus/
+```
 
-### Kotlin
+## Contributing
 
-Projects following the same structure as the Java examples.
-
-### Other JVM Languages
-
-Additional languages such as Scala may be added over time using the same organization.
-
-## Philosophy
-
-Each project is independent and self-contained, with its own source code, documentation, build configuration, and dependencies.
-
-## Goal
-
-Provide practical, production-oriented examples that help developers build modern applications with MongoDB across the JVM ecosystem.
+This project is a work in progress and we'd love to improve it. Contributions, new examples, and suggestions to make this README and the projects better are welcome!
