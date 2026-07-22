@@ -8,12 +8,12 @@ This project is part of the “Beyond Keywords” article series:
 
 where we explore how to go beyond simple keyword search and build smarter applications with MongoDB and Spring.
 
-It started with semantic search using vector search and Voyage AI embeddings, then evolved to include pre-filters for more precise results, caching strategies to save on embedding generation, and finally Hybrid Search — combining Atlas Search (full-text) with vector search through $rankFusion.
+It started with semantic search using vector search and Voyage AI embeddings, then evolved to include pre-filters for more precise results, caching strategies to save on embedding generation, and finally Hybrid Search — combining MongoDB Search (full-text) with vector search through $rankFusion.
 
 The project demonstrates:
 
 - Vector Search with pre-filters (e.g., genres, year, IMDb rating).
-- Atlas Search with compound queries, filters, and should clauses.
+- MongoDB Search with compound queries, filters, and should clauses.
 - Caching strategies to avoid unnecessary embedding calls.
 - Hybrid Search that merges vector similarity and keyword matching.
 
@@ -60,9 +60,9 @@ Your local connection string will be something like `mongodb://localhost:28000/?
 
 ### 3. Create the Search indexes
 
-On the `sample_mflix.embedded_movies` collection, create the two indexes below (Atlas UI: `Atlas Search > Create Search Index`, or via `mongosh`).
+On the `sample_mflix.embedded_movies` collection, create the two indexes below (Atlas UI: `MongoDB Search > Create Search Index`, or via `mongosh`).
 
-**Full-text search index** (Atlas Search):
+**Full-text search index** (MongoDB Search):
 
 ```json
 {

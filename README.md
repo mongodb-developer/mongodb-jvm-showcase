@@ -8,7 +8,7 @@ Each project is independent and self-contained, with its own source code, docume
 
 Projects are organized by language (**Java** and **Kotlin**), and inside each language they follow the same structure, grouped by driver or framework:
 
-- **`java-driver` / `kotlin-driver`** – Examples using the official MongoDB drivers directly (CRUD, aggregations, Atlas Search, encryption, etc.).
+- **`java-driver` / `kotlin-driver`** – Examples using the official MongoDB drivers directly (CRUD, aggregations, MongoDB Search, encryption, etc.).
 - **`spring`** – Spring-based projects, split by technology:
   - **`spring-data`** – Spring Data MongoDB.
   - **`spring-ai`** – Spring AI (RAG, vector search, etc.).

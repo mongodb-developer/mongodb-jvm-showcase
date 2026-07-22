@@ -56,7 +56,7 @@ Run `POST /exercises/seed`. This reads the bundled `exercises.json` (~50 exercis
 
 ### 5. Create the Vector Search index
 
-In the Atlas UI (Atlas Search → Create Index → JSON editor), create an index named **`vector_index`** on the `exercises` collection:
+In the Atlas UI (MongoDB Search → Create Index → JSON editor), create an index named **`vector_index`** on the `exercises` collection:
 
 ```json
 {

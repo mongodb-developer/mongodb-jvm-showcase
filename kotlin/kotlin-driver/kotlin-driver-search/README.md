@@ -1,6 +1,6 @@
 # kotlin-driver-search
 
-MongoDB Atlas Search with the Kotlin Sync driver in a Spring Boot REST app — an Airbnb-style property search.
+MongoDB Search with the Kotlin Sync driver in a Spring Boot REST app — an Airbnb-style property search.
 
 Article: [Discover Your Ideal Airbnb: Implementing a Spring Boot & MongoDB Search with Kotlin Sync Driver](https://foojay.io/today/discover-your-ideal-airbnb-implementing-a-spring-boot-mongodb-search-with-kotlin-sync-driver/)
 
@@ -9,11 +9,11 @@ Article: [Discover Your Ideal Airbnb: Implementing a Spring Boot & MongoDB Searc
 ## Prerequisites
 
 - Java 21+
-- A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/?utm_campaign=devrel&utm_source=third-party-content&utm_medium=cta&utm_content=driver-kotlin-search&utm_term=ricardo.mello) cluster with the `sample_airbnb` dataset and an Atlas Search index on the `summary` field.
+- A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/?utm_campaign=devrel&utm_source=third-party-content&utm_medium=cta&utm_content=driver-kotlin-search&utm_term=ricardo.mello) cluster with the `sample_airbnb` dataset and an MongoDB Search index on the `summary` field.
 
-## Create the Atlas Search index
+## Create the MongoDB Search index
 
-In the Atlas UI, go to **Atlas Search → Create Search Index** and create an index with:
+In the Atlas UI, go to **MongoDB Search → Create Search Index** and create an index with:
 
 - **Database and Collection:** `sample_airbnb` → `listingsAndReviews`
 - **Index Name:** `searchPlaces`
@@ -43,7 +43,7 @@ Then just point the app at it:
 export MONGODB_URI="mongodb://localhost:28000/?directConnection=true"
 ```
 
-> ⚠️ **You still need to create the `searchPlaces` index** (see the section above). The cli-lab imports the data, but the Atlas Search index is not created automatically — the app won't return results without it.
+> ⚠️ **You still need to create the `searchPlaces` index** (see the section above). The cli-lab imports the data, but the MongoDB Search index is not created automatically — the app won't return results without it.
 
 ## Run
 
