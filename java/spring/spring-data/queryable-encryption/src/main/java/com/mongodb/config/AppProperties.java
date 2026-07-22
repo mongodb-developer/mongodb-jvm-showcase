@@ -11,6 +11,7 @@ public class AppProperties {
 	protected String keyVaultNamespace;
 	protected String encryptedDatabaseName;
 	protected String encryptedCollectionName;
+	protected String applicationName;
 
 	public String getUri() {
 		return uri;
@@ -36,8 +37,16 @@ public class AppProperties {
 		this.keyVaultNamespace = keyVaultNamespace;
 	}
 
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
+
 	public String getEncryptedDatabaseName() {
 		return encryptedDatabaseName;
+	}
+
+	public String getApplicationName() {
+		return applicationName;
 	}
 
 	public void setEncryptedDatabaseName(String encryptedDatabaseName) {

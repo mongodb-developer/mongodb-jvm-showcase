@@ -103,6 +103,7 @@ public class MongoEncryptionConfiguration implements ApplicationRunner {
         return MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(appProperties.uri))
                 .autoEncryptionSettings(getAutoEncryptionSettings())
+                .applicationName(appProperties.getApplicationName())
                 .uuidRepresentation(UuidRepresentation.STANDARD)
                 .build();
     }

@@ -5,6 +5,7 @@ app:
     keyVaultNamespace: encryption.__keyVault
     encryptedDatabaseName: hrsystem
     encryptedCollectionName: employees
+    applicationName: devrel-tutorial-java-qe-springdata
 logging:
   level:
     org.springframework.data.mongodb: DEBUG
