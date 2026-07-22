@@ -1,0 +1,71 @@
+logging:
+  level:
+    org.mongodb.driver.protocol.command: DEBUG
+spring:
+  application:
+    name: fraud-detection
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    streams:
+      application-id: fraud-detection-streams
+      properties:
+        commit.interval.ms: 100
+        cache.max.bytes.buffering: 0
+        state.dir: /tmp/kafka-streams-fraud
+        default.deserialization.exception.handler: com.devnexus.frauddetection.infrastructure.streams.handler.DlqDeserializationExceptionHandler
+        dlq.topic.name: ${app.kafka.topics.dlq}
+      auto-startup: true
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  mongodb:
+    uri: ${MONGODB_URI}
+    database: fraud-detection
+
+server:
+  port: 8081
+
+app:
+  kafka:
+    topics:
+      transactions: transactions
+      suspicious: transactions-suspicious
+      to-score: transactions-to-score
+      dlq: transactions-dlq
+    consumers:
+      suspicious:
+        group-id: transaction-suspicious-consumer
+        value-type: com.devnexus.frauddetection.domain.model.SuspiciousAlert
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+        delegate-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        use-type-headers: "false"
+        trusted-packages: com.devnexus.frauddetection.domain.model
+      to-score:
+        group-id: fraud-detection-to-score-consumer
+        value-type: com.devnexus.frauddetection.domain.model.Transaction
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+        delegate-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        use-type-headers: "false"
+        trusted-packages: com.devnexus.frauddetection.domain.model
+  generator:
+    enabled: false
+    interval-ms: 1000
+  fraud:
+    rules:
+      max-travel-speed-kmh: 900.0
+      max-transactions-per-window: 3
+      velocity-window-minutes: 1
+    vector:
+      top-k: 5
+      num-candidates: 50
+      similarity-threshold: 0.95
+  embedding:
+    voyage:
+      api-key: ${VOYAGEAI_API_KEY}
+      model: voyage-finance-2
+      base-url: https://api.voyageai.com
+      output-dimension: 1024

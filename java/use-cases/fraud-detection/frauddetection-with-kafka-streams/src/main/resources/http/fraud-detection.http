@@ -1,0 +1,69 @@
+### Fraud Detection API - IntelliJ HTTP Client
+
+### Variables
+@baseUrl = http://localhost:8081
+
+### 1. Transaction in Sao Paulo - Coffee Shop
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+
+{
+  "transactionId": "TXN-001",
+  "userId": "USR-12345",
+  "merchant": "Starbucks",
+  "city": "Sao Paulo",
+  "transactionAmount": 25.50,
+  "transactionTime": "{{$isoTimestamp}}",
+  "cardNumber": "4444-5555-6666-7777",
+  "latitude": -23.5489,
+  "longitude": -46.6388
+}
+
+### 2. Suspicious Transaction in New York (same card, impossible travel)
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+
+{
+  "transactionId": "TXN-003",
+  "userId": "USR-12345",
+  "merchant": "Apple Store",
+  "city": "New York",
+  "transactionAmount": 2499.00,
+  "transactionTime": "{{$isoTimestamp}}",
+  "cardNumber": "4444-5555-6666-7777",
+  "latitude": 40.7580,
+  "longitude": -73.9855
+}
+
+### 4. Vector search test = trigger a fraud by matching similar fraud transactions
+
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+
+{
+  "transactionId": "TXN-99",
+  "userId": "USR-90001",
+  "merchant": "Money Exchange",
+  "city": "New York",
+  "transactionAmount": 1850.00,
+  "transactionTime": "2026-02-20T02:15:00Z",
+  "cardNumber": "4999-1234-5678-9001",
+  "latitude": 40.7128,
+  "longitude": -74.0060
+}
+
+### 5. Vector search test - Not fraud
+POST {{baseUrl}}/api/transactions
+Content-Type: application/json
+
+{
+  "transactionId": "TXN-DEMO-OK-001",
+  "userId": "USR-90002",
+  "merchant": "Starbucks",
+  "city": "Seattle",
+  "transactionAmount": 12.40,
+  "transactionTime": "2026-02-20T15:30:00Z",
+  "cardNumber": "4888-1111-2222-3332",
+  "latitude": 47.6101,
+  "longitude": -122.2015
+}

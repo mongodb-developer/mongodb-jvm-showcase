@@ -9,20 +9,29 @@ Each project is independent and self-contained, with its own source code, docume
 Projects are organized by language (**Java** and **Kotlin**), and inside each language they follow the same structure, grouped by driver or framework:
 
 - **`java-driver` / `kotlin-driver`** – Examples using the official MongoDB drivers directly (CRUD, aggregations, Atlas Search, encryption, etc.).
-- **`spring`** – Spring-based projects, including Spring Data, Spring AI, and LangChain4j integrations.
+- **`spring`** – Spring-based projects, split by technology:
+  - **`spring-data`** – Spring Data MongoDB.
+  - **`spring-ai`** – Spring AI (RAG, vector search, etc.).
+  - **`langchain4j`** – LangChain4j integrations.
 - **`quarkus`** – Quarkus projects.
 - **`ktor`** – Ktor projects (Kotlin).
+- **`use-cases`** – Complete, runnable applications solving real-world scenarios (e.g. fraud detection, movie recommendation).
 
 ```
 .
 ├── java/
 │   ├── java-driver/
 │   ├── spring/
-│   └── quarkus/
+│   │   ├── spring-data/
+│   │   ├── spring-ai/
+│   │   └── langchain4j/
+│   ├── quarkus/
+│   └── use-cases/
 └── kotlin/
     ├── kotlin-driver/
     ├── ktor/
-    └── quarkus/
+    ├── quarkus/
+    └── use-cases/
 ```
 
 ## Contributing

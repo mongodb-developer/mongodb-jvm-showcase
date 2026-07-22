@@ -1,0 +1,147 @@
+// Usage:
+// mongosh "$MONGODB_URI" --file scripts/seed-fraud-patterns-100.mongosh
+
+const DB_NAME = "fraud-detection";
+const COLL_NAME = "fraud_patterns";
+const TOTAL_DOCS = 100;
+const CLEAR_EXISTING = false;
+
+const PATTERNS = [
+  {
+    ruleId: "CRYPTO_LATE_NIGHT",
+    description: "Late-night high-value crypto purchase",
+    merchants: ["Crypto Exchange", "Digital Assets Hub", "Coin Market"],
+    cities: [
+      { name: "New York", lat: 40.7128, lon: -74.0060 },
+      { name: "London", lat: 51.5072, lon: -0.1276 },
+      { name: "Miami", lat: 25.7617, lon: -80.1918 }
+    ],
+    minAmount: 800,
+    maxAmount: 3000,
+    hours: [0, 1, 2, 3, 4]
+  },
+  {
+    ruleId: "HIGH_VALUE_ELECTRONICS",
+    description: "High-value electronics cross-border pattern",
+    merchants: ["Online Electronics", "Tech Mega Store", "Premium Gadgets"],
+    cities: [
+      { name: "Tokyo", lat: 35.6762, lon: 139.6503 },
+      { name: "Singapore", lat: 1.3521, lon: 103.8198 },
+      { name: "Los Angeles", lat: 34.0522, lon: -118.2437 }
+    ],
+    minAmount: 1200,
+    maxAmount: 4500,
+    hours: [8, 9, 10, 11, 12]
+  },
+  {
+    ruleId: "CARD_TESTING_MICRO_BURST",
+    description: "Repeated small card tests in short time",
+    merchants: ["Gas Station", "Quick Mart", "Parking Meter"],
+    cities: [
+      { name: "Sao Paulo", lat: -23.5505, lon: -46.6333 },
+      { name: "Chicago", lat: 41.8781, lon: -87.6298 },
+      { name: "Mexico City", lat: 19.4326, lon: -99.1332 }
+    ],
+    minAmount: 1,
+    maxAmount: 30,
+    hours: [6, 7, 8, 9, 10]
+  },
+  {
+    ruleId: "LUXURY_REPEAT_PURCHASE",
+    description: "Rapid repeated high-value luxury purchases",
+    merchants: ["Luxury Boutique", "Designer Store", "Fine Jewelry"],
+    cities: [
+      { name: "Paris", lat: 48.8566, lon: 2.3522 },
+      { name: "Milan", lat: 45.4642, lon: 9.1900 },
+      { name: "Dubai", lat: 25.2048, lon: 55.2708 }
+    ],
+    minAmount: 1500,
+    maxAmount: 7000,
+    hours: [13, 14, 15, 16, 17]
+  },
+  {
+    ruleId: "TRAVEL_BOOKING_SPIKE",
+    description: "Unusual airline and hotel booking spike",
+    merchants: ["Airline Tickets", "Hotel Booking", "Travel Agency"],
+    cities: [
+      { name: "Madrid", lat: 40.4168, lon: -3.7038 },
+      { name: "New Delhi", lat: 28.6139, lon: 77.2090 },
+      { name: "San Francisco", lat: 37.7749, lon: -122.4194 }
+    ],
+    minAmount: 500,
+    maxAmount: 2500,
+    hours: [18, 19, 20, 21, 22]
+  }
+];
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomInt(min, maxInclusive) {
+  return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+}
+
+function randomAmount(min, max) {
+  const v = min + Math.random() * (max - min);
+  return v.toFixed(2);
+}
+
+function randomCardNumber() {
+  const p1 = randomInt(4000, 4999);
+  const p2 = randomInt(1000, 9999);
+  const p3 = randomInt(1000, 9999);
+  const p4 = randomInt(1000, 9999);
+  return `${p1}-${p2}-${p3}-${p4}`;
+}
+
+function randomTxTime(hours) {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - randomInt(0, 30));
+  d.setUTCHours(pick(hours), randomInt(0, 59), randomInt(0, 59), 0);
+  return d;
+}
+
+const dbRef = db.getSiblingDB(DB_NAME);
+const coll = dbRef.getCollection(COLL_NAME);
+
+if (CLEAR_EXISTING) {
+  coll.deleteMany({});
+}
+
+const docs = [];
+
+for (let i = 1; i <= TOTAL_DOCS; i++) {
+  const pattern = PATTERNS[(i - 1) % PATTERNS.length];
+  const city = pick(pattern.cities);
+  const merchant = pick(pattern.merchants);
+  const amount = randomAmount(pattern.minAmount, pattern.maxAmount);
+  const txTime = randomTxTime(pattern.hours);
+
+  docs.push({
+    fraud: true,
+    transaction: {
+      transactionId: `FP-TXN-${String(i).padStart(4, "0")}`,
+      userId: `USR-${String(randomInt(100, 999))}`,
+      merchant: merchant,
+      city: city.name,
+      transactionAmount: NumberDecimal(amount),
+      transactionTime: txTime,
+      cardNumber: randomCardNumber(),
+      latitude: city.lat,
+      longitude: city.lon
+    },
+    ruleId: pattern.ruleId,
+    description: pattern.description,
+    detectedAt: new Date(),
+    embedding: null
+  });
+}
+
+coll.insertMany(docs);
+
+printjson({
+  inserted: docs.length,
+  collection: `${DB_NAME}.${COLL_NAME}`,
+  totalInCollection: coll.countDocuments({})
+});

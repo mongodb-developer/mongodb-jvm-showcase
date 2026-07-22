@@ -1,0 +1,148 @@
+// Usage:
+// mongosh "$MONGODB_URI" --file scripts/seed-nonfraud-patterns-100.mongosh
+
+const DB_NAME = "fraud-detection";
+const COLL_NAME = "fraud_patterns";
+const TOTAL_DOCS = 100;
+const CLEAR_EXISTING = false;
+
+const NORMAL_PATTERNS = [
+  {
+    ruleId: "NORMAL_COFFEE_COMMUTE",
+    description: "Daily small coffee purchase during commute",
+    merchants: ["Starbucks", "Local Cafe", "Coffee Shop"],
+    cities: [
+      { name: "Seattle", lat: 47.6101, lon: -122.2015 },
+      { name: "Sao Paulo", lat: -23.5505, lon: -46.6333 },
+      { name: "Austin", lat: 30.2672, lon: -97.7431 }
+    ],
+    minAmount: 4,
+    maxAmount: 18,
+    hours: [6, 7, 8, 9]
+  },
+  {
+    ruleId: "NORMAL_GROCERY_WEEKLY",
+    description: "Regular grocery shopping pattern",
+    merchants: ["Whole Foods", "Trader Joe's", "Target"],
+    cities: [
+      { name: "Austin", lat: 30.2672, lon: -97.7431 },
+      { name: "Chicago", lat: 41.8781, lon: -87.6298 },
+      { name: "London", lat: 51.5072, lon: -0.1276 }
+    ],
+    minAmount: 35,
+    maxAmount: 220,
+    hours: [10, 11, 12, 13, 14, 15, 16]
+  },
+  {
+    ruleId: "NORMAL_FUEL_PURCHASE",
+    description: "Typical gas station purchase",
+    merchants: ["Shell", "BP", "Texaco"],
+    cities: [
+      { name: "Miami", lat: 25.7617, lon: -80.1918 },
+      { name: "Dallas", lat: 32.7767, lon: -96.7970 },
+      { name: "Los Angeles", lat: 34.0522, lon: -118.2437 }
+    ],
+    minAmount: 25,
+    maxAmount: 95,
+    hours: [7, 8, 9, 17, 18, 19]
+  },
+  {
+    ruleId: "NORMAL_RESTAURANT_EVENING",
+    description: "Common restaurant dinner spending",
+    merchants: ["Casual Restaurant", "Family Grill", "Downtown Bistro"],
+    cities: [
+      { name: "New York", lat: 40.7128, lon: -74.0060 },
+      { name: "Madrid", lat: 40.4168, lon: -3.7038 },
+      { name: "Mexico City", lat: 19.4326, lon: -99.1332 }
+    ],
+    minAmount: 20,
+    maxAmount: 140,
+    hours: [18, 19, 20, 21, 22]
+  },
+  {
+    ruleId: "NORMAL_ECOMMERCE_SMALL",
+    description: "Low to medium regular e-commerce orders",
+    merchants: ["Amazon", "Mercado Livre", "Online Retail"],
+    cities: [
+      { name: "San Francisco", lat: 37.7749, lon: -122.4194 },
+      { name: "Toronto", lat: 43.65107, lon: -79.347015 },
+      { name: "Manchester", lat: 53.4808, lon: -2.2426 }
+    ],
+    minAmount: 15,
+    maxAmount: 180,
+    hours: [9, 10, 11, 12, 13, 14, 15, 16, 17]
+  }
+];
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomInt(min, maxInclusive) {
+  return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
+}
+
+function randomAmount(min, max) {
+  const v = min + Math.random() * (max - min);
+  return v.toFixed(2);
+}
+
+function randomCardNumber() {
+  const p1 = randomInt(4000, 4999);
+  const p2 = randomInt(1000, 9999);
+  const p3 = randomInt(1000, 9999);
+  const p4 = randomInt(1000, 9999);
+  return `${p1}-${p2}-${p3}-${p4}`;
+}
+
+function randomTxTime(hours) {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - randomInt(0, 45));
+  d.setUTCHours(pick(hours), randomInt(0, 59), randomInt(0, 59), 0);
+  return d;
+}
+
+const dbRef = db.getSiblingDB(DB_NAME);
+const coll = dbRef.getCollection(COLL_NAME);
+
+if (CLEAR_EXISTING) {
+  coll.deleteMany({});
+}
+
+const docs = [];
+
+for (let i = 1; i <= TOTAL_DOCS; i++) {
+  const pattern = NORMAL_PATTERNS[(i - 1) % NORMAL_PATTERNS.length];
+  const city = pick(pattern.cities);
+  const merchant = pick(pattern.merchants);
+  const amount = randomAmount(pattern.minAmount, pattern.maxAmount);
+  const txTime = randomTxTime(pattern.hours);
+
+  docs.push({
+    fraud: false,
+    transaction: {
+      transactionId: `NFP-TXN-${String(i).padStart(4, "0")}`,
+      userId: `USR-${String(randomInt(100, 999))}`,
+      merchant: merchant,
+      city: city.name,
+      transactionAmount: NumberDecimal(amount),
+      transactionTime: txTime,
+      cardNumber: randomCardNumber(),
+      latitude: city.lat,
+      longitude: city.lon
+    },
+    ruleId: pattern.ruleId,
+    description: pattern.description,
+    detectedAt: new Date(),
+    embedding: null
+  });
+}
+
+coll.insertMany(docs);
+
+printjson({
+  inserted: docs.length,
+  fraudFlag: false,
+  collection: `${DB_NAME}.${COLL_NAME}`,
+  totalInCollection: coll.countDocuments({})
+});
