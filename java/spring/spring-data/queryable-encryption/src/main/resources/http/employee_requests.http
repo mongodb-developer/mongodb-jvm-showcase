@@ -1,0 +1,23 @@
+### Post request - Create a new employee
+POST http://localhost:8080/employees
+Content-Type: application/json
+
+{
+  "name": "New employee",
+  "pin": "098",
+  "ssn": 7,
+  "age": 44,
+  "salary": 2100
+}
+
+### Get request - Find All employees
+GET http://localhost:8080/employees
+
+### Get request - Find By SSN
+GET http://localhost:8080/employees/ssn/1
+
+### Get request - Find All employees where age is less than 30
+GET http://localhost:8080/employees/filter/age-less-than?age=30
+
+### Get request - Find All employee where salary is greater than 3500
+GET http://localhost:8080/employees/filter/salary-greater-than?salary=3500
