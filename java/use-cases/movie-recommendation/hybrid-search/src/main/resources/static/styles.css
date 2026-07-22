@@ -1,0 +1,22 @@
+body { padding-bottom: 4rem; }
+.search-card { position: sticky; top: 0; z-index: 100; }
+
+.movie-card { transition: transform .2s ease, box-shadow .2s ease; }
+.movie-card:hover { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,.2); }
+
+.movie-poster { height: 360px; object-fit: cover; border-radius: .5rem .5rem 0 0; }
+.movie-title { font-size: 1rem; font-weight: 600; margin-bottom: .25rem; }
+.movie-meta { font-size: .85rem; color: #6c757d; margin-bottom: .5rem; }
+
+.movie-plot { font-size: .9rem; color: #495057; line-height: 1.3em;
+    max-height: 2.6em; overflow: hidden; text-overflow: ellipsis; }
+
+.genre-chip { display:inline-block; font-size:.75rem; background:#f1f3f5; color:#495057;
+    border-radius:999px; padding:.15rem .5rem; margin:0 .25rem .25rem 0; }
+.genre-more { background:#e9ecef; color:#6c757d; }
+
+.movie-cast { font-size:.8rem; color:#6c757d; margin-top:.5rem; }
+.movie-cast strong { color:#495057; font-weight:600; margin-right:.25rem; }
+
+.modal-poster { max-height:420px; object-fit:cover; }
+#modalGenres .genre-chip { font-size:.7rem; }

@@ -1,0 +1,23 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: sample_mflix
+mongodb:
+  application-name: devrel-tutorial-java-hybridsearch
+voyage:
+  api-key: ${VOYAGE_API_KEY}
+  base-url: https://api.voyageai.com/v1
+  model: voyage-3-large
+  output-dimension: 2048
+  vector-index-name: vector_index
+  vector-collection-name: embedded_movies
+  vector-field: plot_embedding_voyage_3_large
+  top-k: 8
+  num-candidates: 160
+logging:
+  level:
+    org.springframework.data:
+          mongodb: DEBUG
+
+

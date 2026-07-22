@@ -27,6 +27,8 @@ Projects are organized by language (**Java** and **Kotlin**), and inside each la
 │   │   └── langchain4j/
 │   ├── quarkus/
 │   └── use-cases/
+│       ├── fraud-detection/
+│       └── movie-recommendation/
 └── kotlin/
     ├── kotlin-driver/
     ├── ktor/

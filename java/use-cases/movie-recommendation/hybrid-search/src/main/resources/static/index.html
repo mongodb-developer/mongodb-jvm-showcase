@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <title>Movie Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand fw-semibold" href="#">🎬 Movie Search</a>
+        <span class="navbar-text small text-muted ms-auto">
+      Powered by Spring, Voyage AI & MongoDB Vector Search
+    </span>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div class="card shadow-sm search-card mb-4">
+        <div class="card-body">
+            <form id="search-form" class="row g-2">
+                <label for="q" class="form-label mb-1">Search term</label>
+                <div class="input-group">
+                    <input id="q" name="query" class="form-control" type="text" placeholder="e.g., pyramids space travel" required>
+                    <button id="btn-search" class="btn btn-primary" type="submit">Search</button>
+                </div>
+
+                <div class="mt-2 d-flex justify-content-between">
+                    <a class="link-secondary small" data-bs-toggle="collapse" href="#filters">Advanced filters</a>
+                    <small id="status" class="text-muted"></small>
+                </div>
+
+                <div class="collapse mt-3" id="filters">
+                    <div class="border rounded p-3 bg-body-tertiary">
+                        <div class="row g-4">
+                            <div class="col-lg-8">
+                                <label class="form-label">Genres</label>
+                                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-1">
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Sci-Fi"><span class="form-check-label">Sci-Fi</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Action"><span class="form-check-label">Action</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Adventure"><span class="form-check-label">Adventure</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Animation"><span class="form-check-label">Animation</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Biography"><span class="form-check-label">Biography</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Comedy"><span class="form-check-label">Comedy</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Crime"><span class="form-check-label">Crime</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Documentary"><span class="form-check-label">Documentary</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Drama"><span class="form-check-label">Drama</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Family"><span class="form-check-label">Family</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Fantasy"><span class="form-check-label">Fantasy</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Film-Noir"><span class="form-check-label">Film-Noir</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="History"><span class="form-check-label">History</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Horror"><span class="form-check-label">Horror</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Music"><span class="form-check-label">Music</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Musical"><span class="form-check-label">Musical</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Mystery"><span class="form-check-label">Mystery</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Romance"><span class="form-check-label">Romance</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Short"><span class="form-check-label">Short</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Sport"><span class="form-check-label">Sport</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Thriller"><span class="form-check-label">Thriller</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="War"><span class="form-check-label">War</span></label></div>
+                                    <div class="col"><label class="form-check"><input class="form-check-input genre" type="checkbox" value="Western"><span class="form-check-label">Western</span></label></div>
+                                </div>
+
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="excludeGenres">
+                                    <label class="form-check-label" for="excludeGenres">Exclude selected genres</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label class="form-label">Release year</label>
+                                <div class="input-group input-group-sm mb-2">
+                                    <input type="number" min="1900" max="2100" id="yearFrom" class="form-control" placeholder="2010">
+                                    <span class="input-group-text">–</span>
+                                    <input type="number" min="1900" max="2100" id="yearTo" class="form-control" placeholder="2024">
+                                </div>
+
+                                <label class="form-label">Minimum IMDb rating</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">★</span>
+                                    <input type="number" min="0" max="10" step="0.1" id="minIMDbRating" class="form-control" placeholder="7.0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="alerts"></div>
+    <div id="active-filters" class="mb-2"></div>
+    <div id="results" class="row g-3"></div>
+</main>
+
+<div class="modal fade" id="movieModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="movieModalLabel">Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <img id="modalPoster" class="img-fluid rounded modal-poster" alt="Poster">
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="modalTitle"></h4>
+                        <div id="modalMeta" class="text-muted small mb-2"></div>
+                        <div id="modalGenres" class="mb-2"></div>
+                        <div id="modalCast" class="mb-2"></div>
+                        <p id="modalPlot"></p>
+                        <div id="modalExtra" class="text-muted small mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

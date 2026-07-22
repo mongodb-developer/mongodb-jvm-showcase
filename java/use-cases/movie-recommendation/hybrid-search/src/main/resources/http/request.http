@@ -1,0 +1,14 @@
+### POST
+POST http://localhost:8080/movies/search
+Content-Type: application/json
+
+{
+  "query": "a ship that sinks at night after hitting an iceberg",
+  "minIMDbRating": 5,
+  "yearFrom": 1980,
+  "yearTo": 2003,
+  "genres": [
+    "Drama", "Action"
+  ],
+  "excludeGenres": false
+}
