@@ -8,7 +8,6 @@ This repository is a collection of small, self-contained example projects showin
 
 - Browse the existing projects to get a feel for the structure and style.
 - For small fixes (typos, docs, minor bugs), feel free to open a pull request directly.
-- For anything larger — a new example project or a significant change — please [open an issue](../../issues) first so we can discuss the idea before you invest time in it.
 
 ## Repository structure
 
@@ -42,7 +41,6 @@ If your example uses a framework that doesn't have a folder yet, create one foll
 ## Contribution guidelines
 
 - Keep examples **small and focused** — each project should demonstrate one idea clearly.
-- Aim for **production-inspired** code: sensible structure, error handling, and configuration, without unnecessary complexity.
 - Prefer clarity over cleverness. These projects are meant to be read and learned from.
 - Match the style and conventions of the surrounding code and existing projects.
 
