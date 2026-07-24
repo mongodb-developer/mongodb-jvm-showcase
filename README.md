@@ -36,6 +36,3 @@ Projects are organized by language (**Java** and **Kotlin**), and inside each la
     └── use-cases/
 ```
 
-## Contributing
-
-This project is a work in progress and we'd love to improve it. Contributions, new examples, and suggestions to make this README and the projects better are welcome!
