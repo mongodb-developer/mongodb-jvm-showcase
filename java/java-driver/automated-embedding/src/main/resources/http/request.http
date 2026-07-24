@@ -1,0 +1,11 @@
+### Semantic search over the auto-embedded 'content' field.
+GET http://localhost:8080/articles/search?q=How to organize a Java application in modules&limit=1
+Accept: application/json
+
+### Database related
+GET http://localhost:8080/articles/search?q=How to work with high data distribution??&limit=1
+Accept: application/json
+
+### Kotlin related articles.
+GET http://localhost:8080/articles/search?q=Kotlin and MongoDB&limit=1
+Accept: application/json
