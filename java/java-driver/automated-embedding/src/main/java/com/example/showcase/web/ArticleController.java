@@ -20,9 +20,10 @@ public class ArticleController {
 	}
 
 	@GetMapping("/search")
-	public List<Document> search(@RequestParam String q,
-								 @RequestParam(defaultValue = "5") int limit) {
+	public List<Document> search(@RequestParam("q") String q,
+								 @RequestParam(name = "limit", defaultValue = "5") int limit) {
 
 		return articleService.semanticSearch(q, limit);
 	}
+
 }
