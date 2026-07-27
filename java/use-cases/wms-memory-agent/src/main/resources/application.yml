@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: wms-memory-agent
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017}
+    database: wms-memory-agent
+  data:
+    mongodb:
+      auto-index-creation: true
+devrel:
+  application:
+    track-name: devrel-usecase-java-wms-memory-agent
