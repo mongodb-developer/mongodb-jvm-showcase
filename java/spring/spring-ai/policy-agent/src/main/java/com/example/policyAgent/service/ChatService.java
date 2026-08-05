@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ChatService {
@@ -80,13 +79,9 @@ public class ChatService {
 				))
 				.toList();
 
-		List<SummaryConversation> chunks =
-				summaryConversationRepository.findByConversationIdOrderBySequenceAsc(conversationId);
-
-		String summary = chunks.isEmpty() ? null : chunks.stream()
-				.map(chunk -> "[messages %d-%d]\n%s".formatted(
-						chunk.getFromMessage(), chunk.getToMessage(), chunk.getSummary()))
-				.collect(Collectors.joining("\n\n"));
+		String summary = summaryConversationRepository.findByConversationId(conversationId)
+				.map(SummaryConversation::getSummary)
+				.orElse(null);
 
 		return new ConversationHistory(conversationId, summary, messages);
 	}

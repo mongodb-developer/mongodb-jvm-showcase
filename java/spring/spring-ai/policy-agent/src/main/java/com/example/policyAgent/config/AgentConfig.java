@@ -98,10 +98,13 @@ public class AgentConfig {
         - Do not offer unrelated actions.
         """;
 	@Bean
-	public ChatMemory chatMemory(MongoChatMemoryRepository mongoChatMemoryRepository) {
+	public ChatMemory chatMemory(
+			MongoChatMemoryRepository mongoChatMemoryRepository,
+			MemoryProperties memoryProperties
+	) {
 		return MessageWindowChatMemory.builder()
 				.chatMemoryRepository(mongoChatMemoryRepository)
-				.maxMessages(20)
+				.maxMessages(memoryProperties.maxMessages())
 				.build();
 	}
 
@@ -122,15 +125,25 @@ public class AgentConfig {
 	public ChatClient summaryChatClient(OpenAiChatModel model) {
 		return ChatClient.builder(model)
 				.defaultSystem("""
-						You are responsible for compacting conversation history.
+						You are responsible for maintaining a single running summary
+						of a conversation.
 
-						You receive one contiguous excerpt of a conversation.
-						Summarize only that excerpt, concisely, in English.
+						You receive the previous summary and the new messages that
+						have not been summarized yet. Return the updated summary that
+						replaces the previous one entirely, in English.
+
+						How to update:
+						- Preserve the important facts from the previous summary.
+						- Add new decisions, facts and pending items from the new messages.
+						- Merge related information instead of listing it twice.
+						- If the previous summary and the new messages conflict,
+						  keep the most recent information and drop the outdated one.
+						- Drop nothing that is still relevant, even if it is old.
 
 						Preserve:
 						- User information, such as names and dates.
 						- The user's goals and questions.
-						- Important conclusions from the conversation.
+						- Important conclusions and decisions.
 						- Pending questions or actions.
 						- Exact dates, quantities and identifiers.
 
@@ -141,9 +154,8 @@ public class AgentConfig {
 						- Company policy information is not authoritative in this summary.
 						- When mentioning a policy, clarify that it must be verified
 						  using the official company documents.
-						- Summarize only the excerpt you received.
-						- Do not refer to earlier or later parts of the conversation.
-						- Return only the summary text.
+						- Return only the updated summary text.
+						- Do not mention the summarization process or the previous summary.
 						- Use short and clear paragraphs.
 						- Do not add titles, labels or bullet points.""")
 				.build();

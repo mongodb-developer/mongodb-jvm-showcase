@@ -2,9 +2,10 @@ package com.example.policyAgent.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "summary")
-public record SummaryProperties(
+@ConfigurationProperties(prefix = "agent.memory")
+public record MemoryProperties(
+		int maxMessages,
 		int maxTokens,
-		int turnsToKeep
+		int keepTokens
 ) {
 }

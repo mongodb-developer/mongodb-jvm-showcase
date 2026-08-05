@@ -1,6 +1,6 @@
 package com.example.policyAgent.advisor;
 
-import com.example.policyAgent.config.SummaryProperties;
+import com.example.policyAgent.config.MemoryProperties;
 import com.example.policyAgent.model.SummaryConversation;
 import com.example.policyAgent.repository.SummaryConversationRepository;
 import com.example.policyAgent.service.TokenService;
@@ -36,21 +36,23 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 	private static final String SUMMARY_BLOCK = """
 
 
-			## Earlier conversation summaries
+			## Earlier conversation summary
 
-			These are a faithful record of the earlier part of this conversation, in
-			chronological order. Treat what the user said here as true, and use it to
-			answer questions about the user or about what was already discussed.
-			They are not a source of company policy: any policy mentioned here must
+			This is a faithful record of the earlier part of this conversation.
+			Treat what the user said here as true, and use it to answer questions
+			about the user or about what was already discussed.
+			It is not a source of company policy: any policy mentioned here must
 			be confirmed by the retrieved documents.
 
-			%s""";
+			<conversation-summary>
+			%s
+			</conversation-summary>""";
 
 	private final ChatMemory chatMemory;
 	private final ChatMemoryRepository chatMemoryRepository;
 	private final ChatClient summaryClient;
 	private final SummaryConversationRepository summaryConversationRepository;
-	private final SummaryProperties summaryProperties;
+	private final MemoryProperties memoryProperties;
 	private final TokenService tokenService;
 
 	public MessageCompactingAdvisor(
@@ -58,14 +60,14 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 			ChatMemoryRepository chatMemoryRepository,
 			@Qualifier("summaryChatClient") ChatClient summaryClient,
 			SummaryConversationRepository summaryConversationRepository,
-			SummaryProperties summaryProperties,
+			MemoryProperties memoryProperties,
 			TokenService tokenService
 	) {
 		this.chatMemory = chatMemory;
 		this.chatMemoryRepository = chatMemoryRepository;
 		this.summaryClient = summaryClient;
 		this.summaryConversationRepository = summaryConversationRepository;
-		this.summaryProperties = summaryProperties;
+		this.memoryProperties = memoryProperties;
 		this.tokenService = tokenService;
 	}
 
@@ -79,25 +81,13 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 		checkAndCompact(conversationId);
 
 		return callAdvisorChain.nextCall(
-				withSummaryInSystemPrompt(chatClientRequest, loadSummaries(conversationId)));
+				withSummaryInSystemPrompt(chatClientRequest, loadSummary(conversationId)));
 	}
 
-	private @Nullable String loadSummaries(String conversationId) {
-
-		List<SummaryConversation> chunks =
-				summaryConversationRepository.findByConversationIdOrderBySequenceAsc(conversationId);
-
-		if (chunks.isEmpty()) {
-			return null;
-		}
-
-		return chunks.stream()
-				.map(chunk -> """
-						<conversation-summary messages="%d-%d">
-						%s
-						</conversation-summary>""".formatted(
-						chunk.getFromMessage(), chunk.getToMessage(), chunk.getSummary()))
-				.collect(Collectors.joining("\n\n"));
+	private @Nullable String loadSummary(String conversationId) {
+		return summaryConversationRepository.findByConversationId(conversationId)
+				.map(SummaryConversation::getSummary)
+				.orElse(null);
 	}
 
 	private ChatClientRequest withSummaryInSystemPrompt(ChatClientRequest request, @Nullable String summary) {
@@ -123,7 +113,7 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 			return;
 		}
 
-		int splitPosition = findStartOfRecentTurns(messages, summaryProperties.turnsToKeep());
+		int splitPosition = findSplitByTokenBudget(messages, memoryProperties.keepTokens());
 
 		if (splitPosition == 0) {
 			return;
@@ -132,38 +122,51 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 		List<Message> oldMessages = messages.subList(0, splitPosition);
 		List<Message> recentMessages = messages.subList(splitPosition, messages.size());
 
-		SummaryConversation lastChunk = summaryConversationRepository
-				.findFirstByConversationIdOrderBySequenceDesc(conversationId)
+		SummaryConversation existing = summaryConversationRepository
+				.findByConversationId(conversationId)
 				.orElse(null);
 
-		int sequence = lastChunk == null ? 1 : lastChunk.getSequence() + 1;
-		int fromMessage = lastChunk == null ? 1 : lastChunk.getToMessage() + 1;
-		int toMessage = fromMessage + oldMessages.size() - 1;
+		String previousSummary = existing == null ? null : existing.getSummary();
+		String summary = summarize(previousSummary, oldMessages);
 
-		String summary = summarize(oldMessages);
+		SummaryConversation toSave;
 
-		logger.info("Compacted conversation {}: chunk {} covering messages {}-{}",
-				conversationId, sequence, fromMessage, toMessage);
+		if (existing == null) {
+			toSave = new SummaryConversation(conversationId, summary, oldMessages.size());
+		}
+		else {
+			existing.update(summary, oldMessages.size());
+			toSave = existing;
+		}
 
-		summaryConversationRepository.save(new SummaryConversation(
-				conversationId, sequence, fromMessage, toMessage, summary
-		));
+		logger.info("Compacted conversation {}: summary now covers {} messages",
+				conversationId, toSave.getMessagesSummarized());
+
+		summaryConversationRepository.save(toSave);
 
 		chatMemoryRepository.saveAll(conversationId, new ArrayList<>(recentMessages));
 	}
 
-	private String summarize(List<Message> oldMessages) {
+	private String summarize(@Nullable String previousSummary, List<Message> oldMessages) {
 
 		String transcript = oldMessages.stream()
 				.map(message -> "%s: %s".formatted(message.getMessageType(), message.getText()))
 				.collect(Collectors.joining("\n\n"));
 
+		String previousBlock = previousSummary == null || previousSummary.isBlank()
+				? "(none, this is the first summary of this conversation)"
+				: previousSummary;
+
 		return summaryClient.prompt()
 				.user("""
-						<conversation-messages>
+						<previous-summary>
 						%s
-						</conversation-messages>
-						""".formatted(transcript))
+						</previous-summary>
+
+						<new-messages>
+						%s
+						</new-messages>
+						""".formatted(previousBlock, transcript))
 				.call()
 				.content();
 	}
@@ -175,20 +178,34 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 
 		logger.info("Token count: {}", tokenCount);
 
-		return tokenCount > summaryProperties.maxTokens();
+		return tokenCount > memoryProperties.maxTokens();
 	}
 
-	private int findStartOfRecentTurns(List<Message> messages, int turnsToKeep) {
-		int userTurnsFound = 0;
+	private int findSplitByTokenBudget(List<Message> messages, int keepTokens) {
+		int tokenCount = 0;
+		int splitPosition = messages.size();
 
 		for (int index = messages.size() - 1; index >= 0; index--) {
+			tokenCount += tokenService.count(messages.get(index).getText());
+
+			if (tokenCount > keepTokens) {
+				break;
+			}
 
 			if (messages.get(index).getMessageType() == MessageType.USER) {
-				userTurnsFound++;
+				splitPosition = index;
+			}
+		}
 
-				if (userTurnsFound == turnsToKeep) {
-					return index;
-				}
+		return splitPosition == messages.size()
+				? findLastUserMessage(messages)
+				: splitPosition;
+	}
+
+	private int findLastUserMessage(List<Message> messages) {
+		for (int index = messages.size() - 1; index >= 0; index--) {
+			if (messages.get(index).getMessageType() == MessageType.USER) {
+				return index;
 			}
 		}
 

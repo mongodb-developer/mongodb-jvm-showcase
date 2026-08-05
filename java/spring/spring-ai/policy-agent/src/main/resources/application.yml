@@ -16,9 +16,11 @@ spring:
 #          mongo:
 #            create-indices: true
 #            ttl: 0
-summary:
-  max-tokens: 300 #increase this number for Real World use-case
-  turns-to-keep: 2
+agent:
+  memory:
+    max-messages: 200 #hard cap for the window, must stay high enough to never bind before max-tokens
+    max-tokens: 1500 #compacting is triggered when the retained window goes over this
+    keep-tokens: 500 #token budget for the recent messages kept after compacting
 devrel:
   application:
     track-name: devrel-tutorial-java-agent
