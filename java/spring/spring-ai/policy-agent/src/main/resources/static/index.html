@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>HR Policy Agent</title>
+	<style>
+		:root {
+			--bg: #0f1115;
+			--panel: #171a21;
+			--border: #262b36;
+			--text: #e6e8ee;
+			--muted: #8b93a7;
+			--user: #2f6feb;
+			--accent: #3fb950;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			height: 100vh;
+			display: flex;
+			flex-direction: column;
+			background: var(--bg);
+			color: var(--text);
+			font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		}
+
+		header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 12px 20px;
+			background: var(--panel);
+			border-bottom: 1px solid var(--border);
+		}
+
+		header h1 {
+			margin: 0;
+			font-size: 15px;
+			font-weight: 600;
+		}
+
+		.conversation-id {
+			margin-left: auto;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			font-size: 12px;
+			color: var(--muted);
+		}
+
+		.conversation-id input {
+			width: 32ch;
+			padding: 5px 8px;
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			background: var(--bg);
+			color: var(--text);
+			font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+			font-size: 12px;
+		}
+
+		.conversation-id input:focus { outline: none; border-color: var(--user); }
+
+		.summary {
+			align-self: stretch;
+			padding: 10px 14px;
+			border: 1px dashed var(--border);
+			border-radius: 10px;
+			background: #14171d;
+			color: var(--muted);
+			font-size: 13px;
+			white-space: pre-wrap;
+		}
+
+		.summary b { color: var(--accent); font-weight: 600; }
+
+		button {
+			padding: 7px 14px;
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			background: #21262d;
+			color: var(--text);
+			font-size: 13px;
+			cursor: pointer;
+		}
+
+		button:hover:not(:disabled) { border-color: #3d444d; }
+		button:disabled { opacity: .5; cursor: default; }
+
+		#messages {
+			flex: 1;
+			overflow-y: auto;
+			padding: 20px;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		.msg {
+			max-width: 68ch;
+			padding: 10px 14px;
+			border-radius: 12px;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
+
+		.msg.user {
+			align-self: flex-end;
+			background: var(--user);
+			border-bottom-right-radius: 3px;
+		}
+
+		.msg.assistant {
+			align-self: flex-start;
+			background: var(--panel);
+			border: 1px solid var(--border);
+			border-bottom-left-radius: 3px;
+		}
+
+		.msg.error {
+			align-self: flex-start;
+			background: #3d1d1d;
+			border: 1px solid #6e2b2b;
+			color: #ffb4b4;
+			font-size: 13px;
+		}
+
+		.msg.pending { color: var(--muted); font-style: italic; }
+
+		.empty {
+			margin: auto;
+			color: var(--muted);
+			text-align: center;
+			font-size: 14px;
+		}
+
+		form {
+			display: flex;
+			gap: 10px;
+			padding: 14px 20px;
+			background: var(--panel);
+			border-top: 1px solid var(--border);
+		}
+
+		textarea {
+			flex: 1;
+			resize: none;
+			padding: 10px 12px;
+			border: 1px solid var(--border);
+			border-radius: 8px;
+			background: var(--bg);
+			color: var(--text);
+			font: inherit;
+			max-height: 140px;
+		}
+
+		textarea:focus { outline: none; border-color: var(--user); }
+
+		.layout {
+			flex: 1;
+			display: flex;
+			min-height: 0;
+		}
+
+		aside {
+			width: 250px;
+			flex-shrink: 0;
+			display: flex;
+			flex-direction: column;
+			background: var(--panel);
+			border-right: 1px solid var(--border);
+		}
+
+		aside header {
+			justify-content: space-between;
+			border-bottom: 1px solid var(--border);
+		}
+
+		aside h2 {
+			margin: 0;
+			font-size: 12px;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: .5px;
+			color: var(--muted);
+		}
+
+		#conversations {
+			flex: 1;
+			overflow-y: auto;
+			padding: 8px;
+		}
+
+		.conversation {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			padding: 8px 10px;
+			border-radius: 8px;
+			cursor: pointer;
+		}
+
+		.conversation:hover { background: #1f242c; }
+		.conversation.active { background: #1f2937; box-shadow: inset 2px 0 0 var(--user); }
+
+		.conversation.busy .conversation-preview::after {
+			content: ' ⏳';
+			font-size: 11px;
+		}
+
+		.conversation-text { flex: 1; min-width: 0; }
+
+		.conversation-preview {
+			font-size: 13px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.conversation-key {
+			font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+			font-size: 11px;
+			color: var(--muted);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.delete {
+			padding: 2px 6px;
+			border: none;
+			background: none;
+			color: var(--muted);
+			font-size: 14px;
+			line-height: 1;
+			opacity: 0;
+		}
+
+		.conversation:hover .delete { opacity: 1; }
+		.delete:hover { color: #ff8484; }
+
+		main {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			min-width: 0;
+		}
+	</style>
+</head>
+<body>
+
+<header>
+	<h1>HR Policy Agent</h1>
+	<label class="conversation-id">
+		conversationId:
+		<input id="cid" spellcheck="false" title="Paste an id and press Enter to load that conversation">
+	</label>
+</header>
+
+<div class="layout">
+
+	<aside>
+		<header>
+			<h2>Conversations</h2>
+			<button type="button" id="new-chat" title="Start a new conversation">+ New</button>
+		</header>
+		<div id="conversations"></div>
+	</aside>
+
+	<main>
+		<div id="messages">
+			<p class="empty">Ask something about the company policies.<br>e.g. "How many vacation days do I have?"</p>
+		</div>
+
+		<form id="chat-form">
+			<textarea id="input" rows="1" placeholder="Type your message… (Enter to send, Shift+Enter for a new line)" autofocus></textarea>
+			<button type="submit" id="send">Send</button>
+		</form>
+	</main>
+
+</div>
+
+<script>
+	const STORAGE_KEY = 'policyAgent.conversationId';
+
+	const messagesEl = document.getElementById('messages');
+	const formEl = document.getElementById('chat-form');
+	const inputEl = document.getElementById('input');
+	const sendEl = document.getElementById('send');
+	const cidEl = document.getElementById('cid');
+	const listEl = document.getElementById('conversations');
+
+	let conversationId =
+		new URLSearchParams(location.search).get('conversationId')
+		|| localStorage.getItem(STORAGE_KEY)
+		|| crypto.randomUUID();
+
+	const awaitingAnswer = new Set();
+
+	function setConversationId(id) {
+		conversationId = id;
+		cidEl.value = id;
+		localStorage.setItem(STORAGE_KEY, id);
+		markConversations();
+		updateComposer();
+	}
+
+	function updateComposer() {
+		const busy = awaitingAnswer.has(conversationId);
+		inputEl.disabled = busy;
+		sendEl.disabled = busy;
+		sendEl.textContent = busy ? 'Waiting…' : 'Send';
+	}
+
+	function setAwaiting(id, waiting) {
+		waiting ? awaitingAnswer.add(id) : awaitingAnswer.delete(id);
+		markConversations();
+		updateComposer();
+	}
+
+	function newConversationId() {
+		setConversationId(crypto.randomUUID());
+		messagesEl.innerHTML = '<p class="empty">New conversation started.</p>';
+	}
+
+	function openConversation(id) {
+		if (id === conversationId) return;
+		setConversationId(id);
+		loadHistory();
+	}
+
+	function markConversations() {
+		listEl.querySelectorAll('.conversation').forEach(el => {
+			el.classList.toggle('active', el.dataset.id === conversationId);
+			el.classList.toggle('busy', awaitingAnswer.has(el.dataset.id));
+		});
+	}
+
+	async function loadConversations() {
+		try {
+			const response = await fetch('/api/chat');
+			if (!response.ok) return;
+
+			listEl.innerHTML = '';
+
+			(await response.json()).forEach(conversation => {
+				const el = document.createElement('div');
+				el.className = 'conversation';
+				el.dataset.id = conversation.conversationId;
+				el.addEventListener('click', () => openConversation(conversation.conversationId));
+
+				const text = document.createElement('div');
+				text.className = 'conversation-text';
+
+				const preview = document.createElement('div');
+				preview.className = 'conversation-preview';
+				preview.textContent = conversation.preview;
+
+				const key = document.createElement('div');
+				key.className = 'conversation-key';
+				key.textContent = conversation.conversationId;
+
+				text.append(preview, key);
+
+				const remove = document.createElement('button');
+				remove.type = 'button';
+				remove.className = 'delete';
+				remove.textContent = '✕';
+				remove.title = 'Delete this conversation';
+				remove.addEventListener('click', event => {
+					event.stopPropagation();
+					deleteConversation(conversation.conversationId);
+				});
+
+				el.append(text, remove);
+				listEl.appendChild(el);
+			});
+
+			markConversations();
+		} catch (error) {
+			console.error('Could not load conversations', error);
+		}
+	}
+
+	async function deleteConversation(id) {
+		if (!confirm(`Delete conversation ${id}?\nIts messages and summary will be removed.`)) return;
+
+		await fetch(`/api/chat/${encodeURIComponent(id)}`, {method: 'DELETE'});
+
+		if (id === conversationId) {
+			newConversationId();
+		}
+
+		loadConversations();
+	}
+
+	cidEl.addEventListener('keydown', event => {
+		if (event.key !== 'Enter') return;
+		event.preventDefault();
+
+		const id = cidEl.value.trim();
+		if (id) openConversation(id);
+	});
+
+	async function loadHistory() {
+		messagesEl.innerHTML = '<p class="empty">Loading…</p>';
+
+		try {
+			const response = await fetch(`/api/chat/${encodeURIComponent(conversationId)}`);
+
+			if (!response.ok) {
+				messagesEl.innerHTML = '';
+				addMessage(`Could not load history (${response.status}).`, 'error');
+				return;
+			}
+
+			const history = await response.json();
+			messagesEl.innerHTML = '';
+
+			if (history.summary) {
+				const el = document.createElement('div');
+				el.className = 'summary';
+				el.innerHTML = '<b>Summary of earlier messages</b>\n\n';
+				el.append(history.summary);
+				messagesEl.appendChild(el);
+			}
+
+			history.messages.forEach(message =>
+				addMessage(message.text, message.role === 'user' ? 'user' : 'assistant'));
+
+			if (!history.summary && history.messages.length === 0) {
+				messagesEl.innerHTML =
+					'<p class="empty">Ask something about the company policies.<br>'
+					+ 'e.g. "How many vacation days do I have?"</p>';
+			}
+
+			if (awaitingAnswer.has(conversationId)) {
+				addMessage('typing…', 'assistant pending');
+			}
+		} catch (error) {
+			messagesEl.innerHTML = '';
+			addMessage('Network error while loading history: ' + error.message, 'error');
+		}
+	}
+
+	function addMessage(text, kind) {
+		messagesEl.querySelector('.empty')?.remove();
+
+		const el = document.createElement('div');
+		el.className = 'msg ' + kind;
+		el.textContent = text;
+		messagesEl.appendChild(el);
+		messagesEl.scrollTop = messagesEl.scrollHeight;
+		return el;
+	}
+
+	function clearPendingBubbles() {
+		messagesEl.querySelectorAll('.msg.pending').forEach(el => el.remove());
+	}
+
+	document.getElementById('new-chat').addEventListener('click', () => {
+		newConversationId();
+		inputEl.focus();
+	});
+
+	inputEl.addEventListener('keydown', event => {
+		if (event.key === 'Enter' && !event.shiftKey) {
+			event.preventDefault();
+			formEl.requestSubmit();
+		}
+	});
+
+	inputEl.addEventListener('input', () => {
+		inputEl.style.height = 'auto';
+		inputEl.style.height = inputEl.scrollHeight + 'px';
+	});
+
+	formEl.addEventListener('submit', async event => {
+		event.preventDefault();
+
+		const message = inputEl.value.trim();
+		if (!message) return;
+
+		const sentTo = conversationId;
+
+		if (awaitingAnswer.has(sentTo)) return;
+
+		addMessage(message, 'user');
+		inputEl.value = '';
+		inputEl.style.height = 'auto';
+
+		setAwaiting(sentTo, true);
+		addMessage('typing…', 'assistant pending');
+
+		try {
+			const response = await fetch('/api/chat', {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({message, conversationId: sentTo})
+			});
+
+			const body = await response.text();
+
+			if (conversationId === sentTo) {
+				clearPendingBubbles();
+
+				if (response.ok) {
+					addMessage(body, 'assistant');
+				} else {
+					addMessage(`Error ${response.status}: ${body || 'no details'}`, 'error');
+				}
+			}
+
+			if (response.ok) loadConversations();
+		} catch (error) {
+			if (conversationId === sentTo) {
+				clearPendingBubbles();
+				addMessage('Network error: ' + error.message, 'error');
+			}
+		} finally {
+			setAwaiting(sentTo, false);
+			if (conversationId === sentTo) inputEl.focus();
+		}
+	});
+
+	setConversationId(conversationId);
+	loadConversations();
+	loadHistory();
+</script>
+
+</body>
+</html>

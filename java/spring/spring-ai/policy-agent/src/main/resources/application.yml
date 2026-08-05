@@ -1,0 +1,24 @@
+spring:
+  mongodb:
+    uri: ${MONGODB_URI}
+    database: policy_agent
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+    vectorstore:
+      mongodb:
+        collection-name: policy_kb
+        index-name: vectorstore_index
+        initialize-schema: true
+#    chat:
+#      memory:
+#        repository:
+#          mongo:
+#            create-indices: true
+#            ttl: 0
+summary:
+  max-tokens: 300 #increase this number for Real World use-case
+  turns-to-keep: 2
+devrel:
+  application:
+    track-name: devrel-tutorial-java-agent

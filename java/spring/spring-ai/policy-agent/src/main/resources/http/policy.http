@@ -1,0 +1,7 @@
+POST http://localhost:8080/api/chat
+Content-Type: application/json
+
+{
+  "message": "I forgot to log my hours, what should I do?",
+  "conversationId": "001"
+}
