@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
 
+	private final JTokkitTokenCountEstimator tokenCountEstimator = new JTokkitTokenCountEstimator();
+
 	public int count(String message) {
-		JTokkitTokenCountEstimator jTokkitTokenCountEstimator = new JTokkitTokenCountEstimator();
-		return jTokkitTokenCountEstimator.estimate(message);
+		return tokenCountEstimator.estimate(message);
 	}
 }
