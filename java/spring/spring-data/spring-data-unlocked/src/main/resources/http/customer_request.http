@@ -30,3 +30,27 @@ DELETE http://localhost:8080/customers/joao.silva@mongodb.com
 
 ### Explain indexes on diagnostics route
 GET http://localhost:8080/customers/diagnostics/indexes
+
+### A1. Customer 1001 exists
+GET http://localhost:8080/customers/search?email=joao.silva@email.com
+
+### A2. WITHOUT @Transactional, fail after the delete - expect HTTP 500
+POST http://localhost:8080/customers/1001/without-transaction?failBeforeRecreating=true
+
+### A4. Put customer 1001 back so part B starts from the same state
+POST http://localhost:8080/customers
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao.silva@email.com",
+  "accountNumber": "1001",
+  "phone": "1199990001",
+  "address": {
+    "street": "Rua das Flores",
+    "city": "São Paulo"
+  }
+}
+
+### B1. WITH @Transactional, same failure - expect HTTP 500
+POST http://localhost:8080/customers/1001/with-transaction?failBeforeRecreating=true

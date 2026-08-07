@@ -4,7 +4,15 @@ import com.mongodb.domain.model.Customer;
 import com.mongodb.domain.model.CustomersByCity;
 import com.mongodb.domain.service.CustomerService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -52,6 +60,22 @@ public class CustomerController {
     public ResponseEntity<Void> deleteCustomerByEmail(@PathVariable String email) {
         customerService.deleteByEmail(email);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{accountNumber}/with-transaction")
+    public ResponseEntity<String> deleteAndRecreateWithTransaction(
+            @PathVariable String accountNumber,
+            @RequestParam(defaultValue = "false") boolean failBeforeRecreating) {
+        return ResponseEntity.ok(
+                customerService.deleteAndRecreateCustomerWithTransaction(accountNumber, failBeforeRecreating));
+    }
+
+    @PostMapping("/{accountNumber}/without-transaction")
+    public ResponseEntity<String> deleteAndRecreateWithoutTransaction(
+            @PathVariable String accountNumber,
+            @RequestParam(defaultValue = "false") boolean failBeforeRecreating) {
+        return ResponseEntity.ok(
+                customerService.deleteAndRecreateCustomerWithoutTransaction(accountNumber, failBeforeRecreating));
     }
 
 }
