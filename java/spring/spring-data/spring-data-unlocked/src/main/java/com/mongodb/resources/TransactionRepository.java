@@ -2,7 +2,11 @@ package com.mongodb.resources;
 
 import com.mongodb.domain.model.CustomerOriginatorDetail;
 import com.mongodb.domain.model.Transaction;
-import org.springframework.data.mongodb.repository.*;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.ReadPreference;
+import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,8 +17,6 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     @ReadPreference("nearest")
     List<Transaction> findByTransactionType(String type);
 
-    List<Transaction> findByAmountGreaterThan(double amount);
-    void deleteByTransactionType(String type);
     List<Transaction> findByTransactionTypeAndCurrency(String type, String currency);
 
     @Query(

@@ -12,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -78,16 +79,16 @@ class CustomerServiceTest {
     @Test
     void shouldReturnIndexExplanationJson() {
         // Arrange
-        MongoOperations mongoOperations = mock(MongoOperations.class);
+        MongoTemplate mongoTemplate = mock(MongoTemplate.class);
         MongoCollection<Document> collection = mock(MongoCollection.class);
         FindIterable<Document> findIterable = mock(FindIterable.class);
         Document explanation = new Document("queryPlanner", new Document("index", "email_1"));
 
-        when(mongoOperations.getCollection("customer")).thenReturn(collection);
+        when(mongoTemplate.getCollection("customer")).thenReturn(collection);
         when(collection.find(any(Document.class))).thenReturn(findIterable);
         when(findIterable.explain()).thenReturn(explanation);
 
-        CustomerService customerService = new CustomerService(mongoOperations);
+        CustomerService customerService = new CustomerService(mongoTemplate);
 
         // Act
         String result = customerService.getCustomerIndexExplanation();
@@ -98,20 +99,20 @@ class CustomerServiceTest {
 
     @Test
     void shouldBulkInsertWhenDatabaseIsEmpty() {
-        MongoOperations mongoOperations = mock(MongoOperations.class);
+        MongoTemplate mongoTemplate = mock(MongoTemplate.class);
         BulkOperations bulkOps = mock(BulkOperations.class);
         BulkWriteResult result = mock(BulkWriteResult.class);
 
         Customer customer = new Customer("Test", "test@email.com", "001", "12345", new Customer.Address("Street", "City"));
         List<Customer> customerList = List.of(customer);
 
-        when(mongoOperations.findAll(Customer.class)).thenReturn(List.of());
-        when(mongoOperations.bulkOps(BulkOperations.BulkMode.ORDERED, Customer.class)).thenReturn(bulkOps);
+        when(mongoTemplate.findAll(Customer.class)).thenReturn(List.of());
+        when(mongoTemplate.bulkOps(BulkOperations.BulkMode.ORDERED, Customer.class)).thenReturn(bulkOps);
         when(bulkOps.insert(customerList)).thenReturn(bulkOps);
         when(bulkOps.execute()).thenReturn(result);
         when(result.getInsertedCount()).thenReturn(1);
 
-        CustomerService service = new CustomerService(mongoOperations);
+        CustomerService service = new CustomerService(mongoTemplate);
 
         int inserted = service.bulkCustomerSample(customerList);
 
