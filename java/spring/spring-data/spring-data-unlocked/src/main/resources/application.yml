@@ -11,7 +11,8 @@ server:
 logging:
   level:
     org.springframework.data.mongodb: DEBUG
-
-
+devrel:
+  application:
+    track-name: devrel-tutorial-java-springshop
 
 
