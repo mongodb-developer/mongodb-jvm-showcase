@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record MemoryProperties(
 		int maxMessages,
 		int maxTokens,
-		int keepTokens
+		int keepTokens,
+		String summaryModel
 ) {
 }

@@ -35,7 +35,6 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 
 	private static final String SUMMARY_BLOCK = """
 
-
 			## Earlier conversation summary
 
 			This is a faithful record of the earlier part of this conversation.
@@ -78,16 +77,8 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 				.getOrDefault(ChatMemory.CONVERSATION_ID, DEFAULT_CONVERSATION_ID);
 
 		// Compact first, so a chunk created now is already part of what goes to the model.
-		checkAndCompact(conversationId);
-
 		return callAdvisorChain.nextCall(
-				withSummaryInSystemPrompt(chatClientRequest, loadSummary(conversationId)));
-	}
-
-	private @Nullable String loadSummary(String conversationId) {
-		return summaryConversationRepository.findByConversationId(conversationId)
-				.map(SummaryConversation::getSummary)
-				.orElse(null);
+				withSummaryInSystemPrompt(chatClientRequest, compactIfNeeded(conversationId)));
 	}
 
 	private ChatClientRequest withSummaryInSystemPrompt(ChatClientRequest request, @Nullable String summary) {
@@ -105,28 +96,29 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 		return request.mutate().prompt(augmentedPrompt).build();
 	}
 
-	private void checkAndCompact(String conversationId) {
-
-		List<Message> messages = chatMemory.get(conversationId);
-
-		if (!isMaxTokensReached(messages)) {
-			return;
-		}
-
-		int splitPosition = findSplitByTokenBudget(messages, memoryProperties.keepTokens());
-
-		if (splitPosition == 0) {
-			return;
-		}
-
-		List<Message> oldMessages = messages.subList(0, splitPosition);
-		List<Message> recentMessages = messages.subList(splitPosition, messages.size());
+	private @Nullable String compactIfNeeded(String conversationId) {
 
 		SummaryConversation existing = summaryConversationRepository
 				.findByConversationId(conversationId)
 				.orElse(null);
 
 		String previousSummary = existing == null ? null : existing.getSummary();
+
+		List<Message> messages = chatMemory.get(conversationId);
+
+		if (!isMaxTokensReached(messages)) {
+			return previousSummary;
+		}
+
+		int splitPosition = findSplitByTokenBudget(messages, memoryProperties.keepTokens());
+
+		if (splitPosition == 0) {
+			return previousSummary;
+		}
+
+		List<Message> oldMessages = messages.subList(0, splitPosition);
+		List<Message> recentMessages = messages.subList(splitPosition, messages.size());
+
 		String summary = summarize(previousSummary, oldMessages);
 
 		SummaryConversation toSave;
@@ -145,6 +137,8 @@ public class MessageCompactingAdvisor implements CallAdvisor {
 		summaryConversationRepository.save(toSave);
 
 		chatMemoryRepository.saveAll(conversationId, new ArrayList<>(recentMessages));
+
+		return summary;
 	}
 
 	private String summarize(@Nullable String previousSummary, List<Message> oldMessages) {

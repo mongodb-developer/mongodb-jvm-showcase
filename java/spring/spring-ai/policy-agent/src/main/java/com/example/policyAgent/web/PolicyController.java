@@ -3,6 +3,7 @@ package com.example.policyAgent.web;
 import com.example.policyAgent.model.ChatRequest;
 import com.example.policyAgent.model.ConversationHistory;
 import com.example.policyAgent.model.ConversationListItem;
+import com.example.policyAgent.service.AgentService;
 import com.example.policyAgent.service.ChatService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +20,17 @@ import java.util.List;
 public class PolicyController {
 
 	private final ChatService chatService;
+	private final AgentService agentService;
 
-	public PolicyController(ChatService chatService) {
+	public PolicyController(ChatService chatService, AgentService agentService) {
 		this.chatService = chatService;
+		this.agentService = agentService;
 	}
 
 	@PostMapping("/chat")
 	public String chat(@RequestBody ChatRequest chatRequest) {
-		return chatService.chat(chatRequest);
+
+		return agentService.call(chatRequest);
 	}
 
 	@GetMapping("/chat")
