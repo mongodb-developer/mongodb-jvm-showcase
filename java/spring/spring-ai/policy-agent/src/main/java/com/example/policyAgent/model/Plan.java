@@ -1,6 +1,8 @@
 package com.example.policyAgent.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -11,27 +13,76 @@ public class Plan {
 	@Id
 	private String id;
 	private String context;
+	@JsonIgnore
 	private Status status;
 	private List<Task> tasks;
 
-	public Plan(String context, Status status, List<Task> tasks) {
+	@PersistenceCreator
+	public Plan() {
+	}
+
+	public Plan(String context, List<Task> tasks) {
 		this.context = context;
-		this.status = status;
 		this.tasks = tasks;
 	}
 
-	public record Task(String objective, Status status) {}
+	public static class Task {
+
+		private String objective;
+		@JsonIgnore
+		private Status status;
+		@JsonIgnore
+		private String result;
+
+		public Task() {
+		}
+
+		public Task(String objective) {
+			this.objective = objective;
+		}
+
+		public String getObjective() {
+			return objective;
+		}
+
+		public Status getStatus() {
+			return status;
+		}
+
+		public void setStatus(Status status) {
+			this.status = status;
+		}
+
+		public String getResult() {
+			return result;
+		}
+
+		public void setResult(String result) {
+			this.result = result;
+		}
+	}
 
 	public enum Status {
-		CREATED, RUNNING, COMPLETED
+		CREATED, RUNNING, COMPLETED, FAILED, SKIPPED
 	}
 
 	public String getId() {
 		return id;
 	}
 
+	public String getContext() {
+		return context;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
 	public List<Task> getTasks() {
 		return tasks;
 	}
 }
-

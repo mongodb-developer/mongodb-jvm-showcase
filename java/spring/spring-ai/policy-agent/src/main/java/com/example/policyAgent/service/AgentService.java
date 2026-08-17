@@ -13,17 +13,20 @@ public class AgentService {
 	private final ChatService chatService;
 	private final ChatClient chatClientPlanDecision;
 	private final ChatClient chatClientPlanCreation;
+	private final ChatClient chatClientPlanSynthesis;
 	private final PlanService planService;
 
 	AgentService(
 			ChatService chatService,
 			@Qualifier("chatClientPlanDecision") ChatClient chatClientPlanDecision,
 			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation,
+			@Qualifier("chatClientPlanSynthesis") ChatClient chatClientPlanSynthesis,
 			PlanService planService
 	) {
 		this.chatService = chatService;
 		this.chatClientPlanDecision = chatClientPlanDecision;
 		this.chatClientPlanCreation = chatClientPlanCreation;
+		this.chatClientPlanSynthesis = chatClientPlanSynthesis;
 		this.planService = planService;
 	}
 
@@ -34,22 +37,56 @@ public class AgentService {
 			return chatService.chat(chatRequest);
 		}
 
-		Plan plan = createPlan(planDecision.reason());
+		Plan plan = createPlan(chatRequest.message());
 
-		var result = executePlan(plan);
-
-		return result;
+		return executePlan(plan);
 
 	}
 
 	private String executePlan(Plan plan) {
 
+		plan.setStatus(Plan.Status.RUNNING);
+		planService.save(plan);
+
+		boolean failed = false;
+
 		for (var task : plan.getTasks()) {
-			planService.executeTask(task);
+			if (failed) {
+				task.setStatus(Plan.Status.SKIPPED);
+				continue;
+			}
+			failed = ! planService.executeTask(plan, task);
 		}
 
-		return "test";
+		plan.setStatus(failed ? Plan.Status.FAILED : Plan.Status.COMPLETED);
+		planService.save(plan);
 
+		return synthesize(plan);
+
+	}
+
+	private String synthesize(Plan plan) {
+		StringBuilder prompt = new StringBuilder();
+		prompt.append("Original user request:\n")
+				.append(plan.getContext())
+				.append("\n\nTask results:\n");
+
+		for (var task : plan.getTasks()) {
+			prompt.append("- ")
+					.append(task.getObjective())
+					.append(" [")
+					.append(task.getStatus())
+					.append("]: ")
+					.append(task.getStatus() == Plan.Status.SKIPPED
+							? "not executed because a previous task failed"
+							: task.getResult())
+					.append("\n");
+		}
+
+		return chatClientPlanSynthesis
+				.prompt(prompt.toString())
+				.call()
+				.content();
 	}
 
 	private PlanDecision getPlanDecision(String message) {
