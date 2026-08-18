@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/inventory")
@@ -22,13 +25,28 @@ public class InventoryController {
 
 	@PostMapping
 	public ResponseEntity<Inventory> create(@RequestBody Inventory inventory) {
-		return ResponseEntity.ok(inventoryService.save(inventory));
+		Inventory created = inventoryService.save(inventory);
+
+		return ResponseEntity
+				.created(URI.create("/inventory/" + created.productCode()))
+				.body(created);
 	}
 
-	@GetMapping("/add/{productCode}/{quantity}")
-	public ResponseEntity<String> add(@PathVariable String productCode, @PathVariable int quantity) {
+	@GetMapping("/{productCode}")
+	public ResponseEntity<Inventory> findByProductCode(@PathVariable String productCode) {
+		Inventory inventory = inventoryService.findByProductCode(productCode);
+
+		if (inventory == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		return ResponseEntity.ok(inventory);
+	}
+
+	@PostMapping("/{productCode}/movements")
+	public ResponseEntity<Void> add(@PathVariable String productCode, @RequestParam int quantity) {
 		inventoryService.add(productCode, quantity);
 
-		return ResponseEntity.ok("Inventory updated successfully");
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -14,3 +14,11 @@ Content-Type: application/json
     }
   ]
 }
+
+### Check
+POST http://localhost:8080/inbound-invoice/NF-1002/check
+Content-Type: application/json
+
+### Complete
+POST http://localhost:8080/inbound-invoice/NF-1002/complete
+Content-Type: application/json
