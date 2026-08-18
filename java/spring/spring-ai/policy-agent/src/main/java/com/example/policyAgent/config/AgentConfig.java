@@ -104,6 +104,9 @@ public class AgentConfig {
 		- Do not execute or anticipate the remaining tasks of the plan.
 		- Use the results of the previous tasks as established facts.
 		- Use the available tools whenever they can provide real information.
+		- Company rules come from the retrieved policy documents. When the
+		  task is to check a rule, answer from those documents and treat
+		  the task as completed.
 		- Never invent company policy, dates, deadlines or approvals.
 		- Return only the outcome of this task, in a few short sentences.
 		- Do not add titles, labels or introductions.
@@ -265,12 +268,14 @@ public class AgentConfig {
 	@Bean("chatClientPlanExecution")
 	public ChatClient chatClientExecution(
 			OpenAiChatModel openAiChatModel,
+			VectorStore vectorStore,
 			VacationToolService vacationToolService,
 			EmailToolService emailToolService
 	) {
 		return ChatClient
 				.builder(openAiChatModel)
 				.defaultSystem(PROMPT_PLAN_EXECUTION_TEMPLATE)
+				.defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore).build())
 				.defaultTools(vacationToolService, emailToolService)
 				.build();
 	}

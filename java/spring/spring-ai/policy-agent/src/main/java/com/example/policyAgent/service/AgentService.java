@@ -5,8 +5,13 @@ import com.example.policyAgent.model.InputClassification;
 import com.example.policyAgent.model.Plan;
 import com.example.policyAgent.model.PlanDecision;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AgentService {
@@ -17,9 +22,11 @@ public class AgentService {
 	private final ChatClient chatClientPlanSynthesis;
 	private final ChatClient chatClientInputClassification;
 	private final PlanService planService;
+	private final ChatMemory chatMemory;
 
 	AgentService(
 			ChatService chatService,
+			ChatMemory chatMemory,
 			@Qualifier("chatClientPlanDecision") ChatClient chatClientPlanDecision,
 			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation,
 			@Qualifier("chatClientPlanSynthesis") ChatClient chatClientPlanSynthesis,
@@ -27,6 +34,7 @@ public class AgentService {
 			PlanService planService
 	) {
 		this.chatClientInputClassification = chatClientInputClassification;
+		this.chatMemory = chatMemory;
 		this.chatService = chatService;
 		this.chatClientPlanDecision = chatClientPlanDecision;
 		this.chatClientPlanCreation = chatClientPlanCreation;
@@ -46,7 +54,7 @@ public class AgentService {
 			}
 
 			plan.addUserInput(chatRequest.message());
-			return executePlan(plan);
+			return remember(chatRequest, executePlan(plan));
 		}
 
 		var planDecision = getPlanDecision(chatRequest.message());
@@ -57,8 +65,17 @@ public class AgentService {
 
 		Plan plan = createPlan(chatRequest.message(), chatRequest.conversationId());
 
-		return executePlan(plan);
+		return remember(chatRequest, executePlan(plan));
 
+	}
+
+	private String remember(ChatRequest chatRequest, String answer) {
+		chatMemory.add(chatRequest.conversationId(), List.of(
+				new UserMessage(chatRequest.message()),
+				new AssistantMessage(answer)
+		));
+
+		return answer;
 	}
 
 	private String executePlan(Plan plan) {
