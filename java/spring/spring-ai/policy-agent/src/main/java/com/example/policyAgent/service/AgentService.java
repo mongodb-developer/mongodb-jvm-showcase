@@ -1,6 +1,7 @@
 package com.example.policyAgent.service;
 
 import com.example.policyAgent.model.ChatRequest;
+import com.example.policyAgent.model.InputClassification;
 import com.example.policyAgent.model.Plan;
 import com.example.policyAgent.model.PlanDecision;
 import org.springframework.ai.chat.client.ChatClient;
@@ -14,6 +15,7 @@ public class AgentService {
 	private final ChatClient chatClientPlanDecision;
 	private final ChatClient chatClientPlanCreation;
 	private final ChatClient chatClientPlanSynthesis;
+	private final ChatClient chatClientInputClassification;
 	private final PlanService planService;
 
 	AgentService(
@@ -21,8 +23,10 @@ public class AgentService {
 			@Qualifier("chatClientPlanDecision") ChatClient chatClientPlanDecision,
 			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation,
 			@Qualifier("chatClientPlanSynthesis") ChatClient chatClientPlanSynthesis,
+			@Qualifier("chatClientInputClassification") ChatClient chatClientInputClassification,
 			PlanService planService
 	) {
+		this.chatClientInputClassification = chatClientInputClassification;
 		this.chatService = chatService;
 		this.chatClientPlanDecision = chatClientPlanDecision;
 		this.chatClientPlanCreation = chatClientPlanCreation;
@@ -35,6 +39,12 @@ public class AgentService {
 
 		if (waitingPlan.isPresent()) {
 			Plan plan = waitingPlan.get();
+			String pendingQuestion = pendingQuestion(plan);
+
+			if (! answersPendingQuestion(pendingQuestion, chatRequest.message())) {
+				return chatService.chat(chatRequest) + "\n\n" + pendingQuestion;
+			}
+
 			plan.addUserInput(chatRequest.message());
 			return executePlan(plan);
 		}
@@ -73,7 +83,7 @@ public class AgentService {
 		planService.save(plan);
 
 		if (outcome == Plan.Status.WAITING_INPUT) {
-			return askUser(plan);
+			return pendingQuestion(plan);
 		}
 
 		return synthesize(plan);
@@ -116,15 +126,29 @@ public class AgentService {
 				context
 		).call().entity(Plan.class);
 
-		return planService.create(plan, conversationId);
+		return planService.create(plan, conversationId, context);
 	}
 
-	private String askUser(Plan plan) {
+	private String pendingQuestion(Plan plan) {
 		return plan.getTasks().stream()
 				.filter(task -> task.getStatus() == Plan.Status.WAITING_INPUT)
 				.map(Plan.Task::getResult)
 				.findFirst()
 				.orElseThrow();
+	}
+
+	private boolean answersPendingQuestion(String pendingQuestion, String message) {
+		var classification = chatClientInputClassification
+				.prompt("""
+						Question asked to the user:
+						%s
+
+						Message sent by the user:
+						%s""".formatted(pendingQuestion, message))
+				.call()
+				.entity(InputClassification.class);
+
+		return classification.answersPendingQuestion();
 	}
 
 

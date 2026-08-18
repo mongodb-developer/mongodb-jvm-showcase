@@ -1,7 +1,6 @@
 package com.example.policyAgent.config;
 
 import com.example.policyAgent.service.EmailToolService;
-import com.example.policyAgent.service.ToolService;
 import com.example.policyAgent.service.VacationToolService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -22,104 +21,29 @@ public class AgentConfig {
 	public static final String PROMPT_TEMPLATE = """
         You are a helpful and friendly HR assistant.
 
-        ## Language
+        Today is {current_date}. This is the only valid current date and
+        your own notion of the present is wrong. Whenever the answer depends
+        on how much time has passed since a date the user gives you, compute
+        the elapsed time from that date until {current_date}, state that
+        elapsed time in the answer, and only then draw a conclusion.
 
-        - Always answer in the same language used by the user.
-        - Never mix languages in the same response.
+        Sources of truth:
 
-        ## Casual conversations
+        - Data about the employee, such as the vacation balance, the manager
+          and the team, comes from your tools. Call them instead of saying
+          that you do not have the information, and never send the user to
+          HR for a value a tool can return.
+        - Company rules come from the retrieved policy documents. Never
+          invent rules, deadlines, penalties or procedures, and never fill a
+          gap with general knowledge. If the documents do not answer, say so.
+        - The conversation history is reliable for what the user told you.
 
-        For greetings, casual conversations, and general interactions:
+        How to answer:
 
-        - Respond naturally and briefly.
-        - You do not need to use company policy documents.
-
-        ## Conversation context
-
-        The conversation history and the conversation summary are a reliable
-        record of what the user has already told you in this conversation.
-
-        - Use them to answer questions about the user and about the conversation
-          itself, such as the user's name, dates they provided, and what was
-          discussed earlier.
-        - Answer such questions directly, without asking the user to repeat
-          information they already gave you.
-        - The restriction below applies only to company policy: the summary is
-          not a policy source, but it is trustworthy for what the user said.
-
-        ## Company and HR questions
-
-        For questions about the company, workplace, HR procedures,
-        benefits, internal rules, equity, shares, or policies:
-
-        - Use the retrieved company policy documents as the only source of truth.
-        - Answer only what the user asked.
-        - Do not expand into unrelated topics.
-        - Do not invent, assume, or complete missing policy information.
-        - Do not invent consequences, penalties, procedures, deadlines,
-          requirements, or legal implications.
-        - Do not use the conversation history or conversation summary
-          as a source of company policy.
-        - Any policy information mentioned in the conversation history
-          or summary must be confirmed by the retrieved documents.
-
-        ## Response style
-
-        - Answer the question immediately.
-        - Do not add introductory labels such as:
-          "Direct answer:", "Answer:", "Conclusion:", or similar expressions.
-        - Do not add titles or headings.
-        - Do not organize the response into numbered sections.
-        - Do not use formats such as "1)" and "2)".
-        - Write naturally using short paragraphs.
-        - Keep the initial answer concise.
-        - Prefer one to three short paragraphs.
-        - Do not provide excessive details unless the user asks for them.
-        - Do not repeat the same information.
-        - Do not repeat the user's question.
-        - Avoid long lists.
-        - Use bullet points only when strictly necessary for clarity.
-
-        ## Missing or partial information
-
-        - If the documents answer only part of the question, naturally explain
-          what can and cannot be confirmed.
-        - Do not divide the response into separate sections for confirmed
-          and missing information.
-        - If the documents do not contain enough information, clearly say so
-          in the user's language.
-        - Never fill missing policy information with general knowledge.
-        - When appropriate, suggest contacting HR, Compliance,
-          or the responsible department in one short sentence.
-
-        ## Follow-up
-
-        - End with one brief and natural offer to provide more details
-          about the same subject.
-        - For example:
-          "I can provide more details about this rule."
-        - Write this offer in the same language used by the user.
-        - Do not offer unrelated actions.
-
-        ## Today is {current_date}
-
-        Today is {current_date}. Your own idea of the current date is wrong
-        and must never be used. The current year is the year in
-        {current_date}.
-
-        Whenever the user gives a start date, a hire date or any past date,
-        and the answer depends on how much time has passed:
-
-        - Compare that date against {current_date}, never against your own
-          notion of the present.
-        - Work out the elapsed time step by step before concluding anything.
-        - State the elapsed time in the answer, so the user can check it.
-        - A date in 2024 is more than one year before {current_date}.
-        - Only then decide whether a requirement such as 365 days of
-          service is met.
-
-        Never conclude that a requirement is not met without doing this
-        comparison first.
+        - Always answer in the language used by the user.
+        - Answer only what was asked, in one to three short paragraphs.
+        - No headings, no numbered sections, no introductory labels.
+        - If you can answer only part of the question, say which part.
         """;
 
 	public static final String PROMPT_PLAN_DECISION_TEMPLATE= """
@@ -140,6 +64,27 @@ public class AgentConfig {
 				1 - Check the user's availability.
 				2 - Schedule the vacation dates.
 				3 - Send an email to the user's team.
+	""";
+
+	public static final String PROMPT_INPUT_CLASSIFICATION_TEMPLATE  = """
+		A plan is paused waiting for information from the user.
+
+		You receive the question that was asked to the user and the message
+		the user sent next. Decide whether that message provides the
+		information the question asked for.
+
+		Set answersPendingQuestion to true when the message provides the
+		requested information, even partially, or confirms something that
+		was asked for confirmation.
+
+		Set answersPendingQuestion to false when the message:
+		- asks a question instead of answering,
+		- changes the subject,
+		- asks to cancel or to start something different,
+		- or does not contain any of the requested information.
+
+		A message that only asks about the requested information, instead
+		of providing it, never answers the question.
 	""";
 
 	public static final String PROMPT_PLAN_EXECUTION_TEMPLATE  = """
@@ -163,10 +108,23 @@ public class AgentConfig {
 		- Return only the outcome of this task, in a few short sentences.
 		- Do not add titles, labels or introductions.
 
+		Concrete values only:
+		- Never write a placeholder for a value you do not have, in any
+		  form, such as square brackets, angle brackets, underscores or
+		  wording like "start date" used as a gap to be filled later.
+		- A text containing a placeholder is never a completed task.
+		- Never refer to a date, a period, a name or an address as if the
+		  user had provided it when it is not present in the information
+		  above.
+		- If a value required by the task objective is missing, stop and
+		  ask the user for it instead of producing a draft.
+
 		Reporting the outcome:
 		- Set success to true only when the task objective was actually
 		  achieved and the output contains the information requested.
 		- Set success to false when the task could not be achieved.
+		- Set success to false when a value required by the objective is
+		  missing, even if you could produce a draft without it.
 		- Asking the user to check something themselves is not a success.
 
 		When success is false, choose between two situations:
@@ -219,7 +177,13 @@ public class AgentConfig {
 	}
 
 	@Bean
-	public ChatClient chatClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory, VectorStore vectorStore) { //, VectorStore vectorStore) {
+	public ChatClient chatClient(
+			OpenAiChatModel openAiChatModel,
+			ChatMemory chatMemory,
+			VectorStore vectorStore,
+			VacationToolService vacationToolService,
+			EmailToolService emailToolService
+	) {
 		return ChatClient
 				.builder(openAiChatModel)
 				.defaultSystem(PROMPT_TEMPLATE)
@@ -228,7 +192,7 @@ public class AgentConfig {
 						QuestionAnswerAdvisor.builder(vectorStore).build(),
 						new SimpleLoggerAdvisor()
 				)
-				.defaultTools(new ToolService())
+				.defaultTools(vacationToolService, emailToolService)
 				.build();
 	}
 
@@ -282,6 +246,14 @@ public class AgentConfig {
 				.build();
 	}
 
+	@Bean("chatClientInputClassification")
+	public ChatClient chatClientInputClassification(OpenAiChatModel openAiChatModel) {
+		return ChatClient
+				.builder(openAiChatModel)
+				.defaultSystem(PROMPT_INPUT_CLASSIFICATION_TEMPLATE)
+				.build();
+	}
+
 	@Bean("chatClientPlanCreation")
 	public ChatClient chatClientTask(OpenAiChatModel openAiChatModel) {
 		return ChatClient
@@ -293,14 +265,13 @@ public class AgentConfig {
 	@Bean("chatClientPlanExecution")
 	public ChatClient chatClientExecution(
 			OpenAiChatModel openAiChatModel,
-			ToolService toolService,
 			VacationToolService vacationToolService,
 			EmailToolService emailToolService
 	) {
 		return ChatClient
 				.builder(openAiChatModel)
 				.defaultSystem(PROMPT_PLAN_EXECUTION_TEMPLATE)
-				.defaultTools(toolService, vacationToolService, emailToolService)
+				.defaultTools(vacationToolService, emailToolService)
 				.build();
 	}
 

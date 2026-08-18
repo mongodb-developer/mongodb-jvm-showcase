@@ -16,6 +16,8 @@ public class Plan {
 	private String id;
 	@JsonIgnore
 	private String conversationId;
+	@JsonIgnore
+	private String userRequest;
 	private String context;
 	@JsonIgnore
 	private Status status;
@@ -82,6 +84,14 @@ public class Plan {
 
 	public void setConversationId(String conversationId) {
 		this.conversationId = conversationId;
+	}
+
+	public String getUserRequest() {
+		return userRequest;
+	}
+
+	public void setUserRequest(String userRequest) {
+		this.userRequest = userRequest;
 	}
 
 	public List<String> getUserInputs() {

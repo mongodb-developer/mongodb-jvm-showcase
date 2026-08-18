@@ -1,5 +1,7 @@
 package com.example.policyAgent.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.util.UUID;
 @Service
 public class EmailToolService {
 
+	private final Logger logger = LoggerFactory.getLogger(EmailToolService.class);
 	public record Contact(String name, String email, String role) {}
 
 	public record SentEmail(String messageId, String recipient, String status) {}
@@ -34,6 +37,7 @@ public class EmailToolService {
 			@ToolParam(description = "Subject of the email") String subject,
 			@ToolParam(description = "Body of the email") String body
 	) {
+		logger.info("### Sending email to {} with subject {} and body {}", recipient, subject, body);
 		return new SentEmail(UUID.randomUUID().toString(), recipient, "SENT");
 	}
 }

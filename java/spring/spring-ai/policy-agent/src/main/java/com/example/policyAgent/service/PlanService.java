@@ -24,8 +24,9 @@ public class PlanService {
 		this.chatClientPlanExecution = chatClientPlanExecution;
 	}
 
-	public Plan create(Plan plan, String conversationId) {
+	public Plan create(Plan plan, String conversationId, String userRequest) {
 		plan.setConversationId(conversationId);
+		plan.setUserRequest(userRequest);
 		plan.setStatus(Plan.Status.CREATED);
 		plan.getTasks().forEach(task -> task.setStatus(Plan.Status.CREATED));
 		return planRepository.save(plan);
@@ -65,6 +66,11 @@ public class PlanService {
 
 	private String buildTaskPrompt(Plan plan, Plan.Task currentTask) {
 		StringBuilder prompt = new StringBuilder();
+		prompt.append("Original message from the user. Any question you ask "
+						+ "must be written in the same language as this message:\n")
+				.append(plan.getUserRequest())
+				.append("\n\n");
+
 		prompt.append("Overall goal of the plan:\n")
 				.append(plan.getContext())
 				.append("\n\n");
