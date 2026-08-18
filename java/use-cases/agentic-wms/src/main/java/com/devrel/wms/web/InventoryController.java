@@ -27,6 +27,8 @@ public class InventoryController {
 
 	@GetMapping("/add/{productCode}/{quantity}")
 	public ResponseEntity<String> add(@PathVariable String productCode, @PathVariable int quantity) {
-		return ResponseEntity.ok(inventoryService.add(productCode, quantity));
+		inventoryService.add(productCode, quantity);
+
+		return ResponseEntity.ok("Inventory updated successfully");
 	}
 }

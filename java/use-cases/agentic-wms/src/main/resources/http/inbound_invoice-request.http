@@ -1,0 +1,16 @@
+POST http://localhost:8080/inbound-invoice
+Content-Type: application/json
+
+{
+  "number": "NF-1002",
+  "items": [
+    {
+      "productCode": "03",
+      "quantity": 50
+    },
+    {
+      "productCode": "04",
+      "quantity": 150
+    }
+  ]
+}
