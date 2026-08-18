@@ -41,9 +41,11 @@ flowchart TD
 
     RESUME -->|no| DECIDE{Requires<br/>a plan?}
     DECIDE -->|no| CHAT[Direct answer<br/>history + RAG + tools]
+    CHAT -.-> TOOLS[(Tools)]
+    RUN -.-> TOOLS
     DECIDE -->|yes| CREATE[Break into tasks]
 
-    CREATE --> RUN[Execute one task]
+    CREATE --> RUN[Execute one task<br/>RAG + tools + previous results]
     RUN --> OUT{Outcome}
 
     OUT -->|completed| NEXT{More tasks?}
