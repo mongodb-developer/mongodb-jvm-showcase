@@ -24,4 +24,12 @@ public class ProductService {
 		return save;
 	}
 
+	public Product findById(String id) {
+		return productRepository.findById(id).orElse(null);
+	}
+
+	public Product findByCode(String code) {
+		return productRepository.findByCode(code).orElse(null);
+	}
+
 }
