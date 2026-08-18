@@ -1,4 +1,0 @@
-### Find all
-GET http://localhost:8080/api/inbound
-Accept: application/json
-
