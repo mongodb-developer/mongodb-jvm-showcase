@@ -31,13 +31,21 @@ public class AgentService {
 	}
 
 	public String call(ChatRequest chatRequest) {
+		var waitingPlan = planService.findWaitingInput(chatRequest.conversationId());
+
+		if (waitingPlan.isPresent()) {
+			Plan plan = waitingPlan.get();
+			plan.addUserInput(chatRequest.message());
+			return executePlan(plan);
+		}
+
 		var planDecision = getPlanDecision(chatRequest.message());
 
 		if (! planDecision.requiresPlan()) {
 			return chatService.chat(chatRequest);
 		}
 
-		Plan plan = createPlan(chatRequest.message());
+		Plan plan = createPlan(chatRequest.message(), chatRequest.conversationId());
 
 		return executePlan(plan);
 
@@ -48,18 +56,25 @@ public class AgentService {
 		plan.setStatus(Plan.Status.RUNNING);
 		planService.save(plan);
 
-		boolean failed = false;
+		Plan.Status outcome = Plan.Status.COMPLETED;
 
 		for (var task : plan.getTasks()) {
-			if (failed) {
+			if (task.getStatus() == Plan.Status.COMPLETED) {
+				continue;
+			}
+			if (outcome != Plan.Status.COMPLETED) {
 				task.setStatus(Plan.Status.SKIPPED);
 				continue;
 			}
-			failed = ! planService.executeTask(plan, task);
+			outcome = planService.executeTask(plan, task);
 		}
 
-		plan.setStatus(failed ? Plan.Status.FAILED : Plan.Status.COMPLETED);
+		plan.setStatus(outcome);
 		planService.save(plan);
+
+		if (outcome == Plan.Status.WAITING_INPUT) {
+			return askUser(plan);
+		}
 
 		return synthesize(plan);
 
@@ -96,12 +111,20 @@ public class AgentService {
 				.entity(PlanDecision.class);
 	}
 
-	private Plan createPlan(String context) {
+	private Plan createPlan(String context, String conversationId) {
 		Plan plan = chatClientPlanCreation.prompt(
 				context
 		).call().entity(Plan.class);
 
-		return planService.create(plan);
+		return planService.create(plan, conversationId);
+	}
+
+	private String askUser(Plan plan) {
+		return plan.getTasks().stream()
+				.filter(task -> task.getStatus() == Plan.Status.WAITING_INPUT)
+				.map(Plan.Task::getResult)
+				.findFirst()
+				.orElseThrow();
 	}
 
 

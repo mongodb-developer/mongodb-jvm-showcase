@@ -7,6 +7,9 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 @Service
 public class PlanService {
 
@@ -21,7 +24,8 @@ public class PlanService {
 		this.chatClientPlanExecution = chatClientPlanExecution;
 	}
 
-	public Plan create(Plan plan) {
+	public Plan create(Plan plan, String conversationId) {
+		plan.setConversationId(conversationId);
 		plan.setStatus(Plan.Status.CREATED);
 		plan.getTasks().forEach(task -> task.setStatus(Plan.Status.CREATED));
 		return planRepository.save(plan);
@@ -31,29 +35,32 @@ public class PlanService {
 		return planRepository.save(plan);
 	}
 
-	public Plan findById(String id) {
-		return planRepository.findById(id).orElseThrow();
+	public Optional<Plan> findWaitingInput(String conversationId) {
+		return planRepository.findFirstByConversationIdAndStatus(conversationId, Plan.Status.WAITING_INPUT);
 	}
 
-	public boolean executeTask(Plan plan, Plan.Task task) {
+	public Plan.Status executeTask(Plan plan, Plan.Task task) {
 		task.setStatus(Plan.Status.RUNNING);
 		planRepository.save(plan);
 
 		TaskExecution execution;
 		try {
 			execution = chatClientPlanExecution
-					.prompt(buildTaskPrompt(plan, task))
+					.prompt()
+					.system(system -> system.param("current_date", LocalDate.now()))
+					.user(buildTaskPrompt(plan, task))
 					.call()
 					.entity(TaskExecution.class);
 		} catch (Exception exception) {
-			execution = new TaskExecution(false, "The task could not be executed: " + exception.getMessage());
+			execution = new TaskExecution(false, false,
+					"The task could not be executed: " + exception.getMessage());
 		}
 
 		task.setResult(execution.output());
-		task.setStatus(execution.success() ? Plan.Status.COMPLETED : Plan.Status.FAILED);
+		task.setStatus(execution.toStatus());
 		planRepository.save(plan);
 
-		return execution.success();
+		return task.getStatus();
 	}
 
 	private String buildTaskPrompt(Plan plan, Plan.Task currentTask) {
@@ -68,7 +75,7 @@ public class PlanService {
 			if (task == currentTask) {
 				break;
 			}
-			if (task.getResult() != null) {
+			if (task.getStatus() == Plan.Status.COMPLETED) {
 				prompt.append("- ")
 						.append(task.getObjective())
 						.append(": ")
@@ -79,6 +86,11 @@ public class PlanService {
 		}
 		if (!hasPrevious) {
 			prompt.append("- none, this is the first task\n");
+		}
+
+		if (!plan.getUserInputs().isEmpty()) {
+			prompt.append("\nInformation already provided by the user:\n");
+			plan.getUserInputs().forEach(input -> prompt.append("- ").append(input).append("\n"));
 		}
 
 		prompt.append("\nTask to execute now:\n")

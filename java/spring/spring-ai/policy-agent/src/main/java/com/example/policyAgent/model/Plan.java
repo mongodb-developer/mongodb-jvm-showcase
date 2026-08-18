@@ -5,17 +5,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "plan")
 public class Plan {
 
 	@Id
+	@JsonIgnore
 	private String id;
+	@JsonIgnore
+	private String conversationId;
 	private String context;
 	@JsonIgnore
 	private Status status;
 	private List<Task> tasks;
+	@JsonIgnore
+	private List<String> userInputs = new ArrayList<>();
 
 	@PersistenceCreator
 	public Plan() {
@@ -63,11 +69,27 @@ public class Plan {
 	}
 
 	public enum Status {
-		CREATED, RUNNING, COMPLETED, FAILED, SKIPPED
+		CREATED, RUNNING, COMPLETED, FAILED, SKIPPED, WAITING_INPUT
 	}
 
 	public String getId() {
 		return id;
+	}
+
+	public String getConversationId() {
+		return conversationId;
+	}
+
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
+	}
+
+	public List<String> getUserInputs() {
+		return userInputs;
+	}
+
+	public void addUserInput(String userInput) {
+		this.userInputs.add(userInput);
 	}
 
 	public String getContext() {

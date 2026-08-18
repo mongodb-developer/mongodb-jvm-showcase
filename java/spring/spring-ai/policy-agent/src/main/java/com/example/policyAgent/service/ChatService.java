@@ -6,17 +6,14 @@ import com.example.policyAgent.model.ConversationHistory;
 import com.example.policyAgent.model.ConversationListItem;
 import com.example.policyAgent.model.SummaryConversation;
 import com.example.policyAgent.repository.SummaryConversationRepository;
-import com.mongodb.client.ClientSession;
-import com.mongodb.client.MongoClient;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -44,6 +41,7 @@ public class ChatService {
 	public String chat(ChatRequest chatRequest) {
 
 		return chatClient.prompt()
+				.system(system -> system.param("current_date", LocalDate.now()))
 				.user(chatRequest.message())
 				.advisors(advisor -> advisor
 						.param(ChatMemory.CONVERSATION_ID, chatRequest.conversationId())
