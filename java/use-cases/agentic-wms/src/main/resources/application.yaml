@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: agentic-wms
+  mongodb:
+    uri: ${MONGODB_URI}
+    database: agentic-wms
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
