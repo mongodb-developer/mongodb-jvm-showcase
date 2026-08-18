@@ -1,0 +1,24 @@
+POST http://localhost:8080/outbound-invoice
+Content-Type: application/json
+
+{
+  "number": "NF-2001",
+  "items": [
+    {
+      "productCode": "03",
+      "quantity": 10
+    },
+    {
+      "productCode": "04",
+      "quantity": 20
+    }
+  ]
+}
+
+### Check
+POST http://localhost:8080/outbound-invoice/NF-2001/check
+Content-Type: application/json
+
+### Execute
+POST http://localhost:8080/outbound-invoice/NF-2001/execute
+Content-Type: application/json

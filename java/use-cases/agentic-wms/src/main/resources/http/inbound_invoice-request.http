@@ -6,11 +6,11 @@ Content-Type: application/json
   "items": [
     {
       "productCode": "03",
-      "quantity": 50
+      "quantity": 200
     },
     {
       "productCode": "04",
-      "quantity": 150
+      "quantity": 200
     }
   ]
 }
