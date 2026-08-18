@@ -69,6 +69,8 @@ public class InboundInvoiceService {
 
 		inboundInvoiceRepository
 				.save(changeInboundStatus(inbound, InboundInvoice.InvoiceStatus.COMPLETED));
+
+		logger.info("Invoice {} completed", number);
 	}
 
 	private InboundInvoice getInbound(String number) {
