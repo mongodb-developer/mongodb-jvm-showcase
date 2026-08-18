@@ -10,3 +10,7 @@ spring:
   data:
     mongodb:
       auto-index-creation: true
+
+logging:
+  level:
+    org.springframework.data.mongodb.core: DEBUG
