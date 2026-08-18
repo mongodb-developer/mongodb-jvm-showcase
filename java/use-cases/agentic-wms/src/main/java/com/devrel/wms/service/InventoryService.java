@@ -1,6 +1,7 @@
 package com.devrel.wms.service;
 
 import com.devrel.wms.entity.Inventory;
+import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.repository.InventoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class InventoryService {
 		}
 
 		if (inventoryRepository.add(productCode, quantity) == 0) {
-			throw new IllegalStateException(
+			throw new ConflictException(
 					"Insufficient stock or unknown product code: " + productCode);
 		}
 

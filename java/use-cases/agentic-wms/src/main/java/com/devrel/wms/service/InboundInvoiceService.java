@@ -1,6 +1,8 @@
 package com.devrel.wms.service;
 
 import com.devrel.wms.entity.InboundInvoice;
+import com.devrel.wms.exception.ConflictException;
+import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.InboundInvoiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +47,11 @@ public class InboundInvoiceService {
 		InboundInvoice invoice = getInbound(number);
 
 		if (invoice.items().isEmpty()) {
-			throw new RuntimeException("Invoice is empty: " + number);
+			throw new IllegalArgumentException("Invoice is empty: " + number);
 		}
 
 		invoice.items().forEach(item -> {
-			if (item.quantity() <= 0) throw new RuntimeException("Invalid quantity: " + item.quantity());
+			if (item.quantity() <= 0) throw new IllegalArgumentException("Invalid quantity: " + item.quantity());
 		});
 
 		inboundInvoiceRepository.save(changeInboundStatus(invoice, InboundInvoice.InvoiceStatus.RECEIVED));
@@ -60,7 +62,7 @@ public class InboundInvoiceService {
 		InboundInvoice inbound = getInbound(number);
 
 		if (inbound.status() != InboundInvoice.InvoiceStatus.RECEIVED) {
-			throw new RuntimeException("Invoice is not received: " + number);
+			throw new ConflictException("Invoice is not received: " + number);
 		}
 
 		inbound.items().forEach(item -> inventoryService.add(item.productCode(), item.quantity()));
@@ -71,7 +73,7 @@ public class InboundInvoiceService {
 
 	private InboundInvoice getInbound(String number) {
 		return inboundInvoiceRepository.findByNumber(number)
-				.orElseThrow(() -> new RuntimeException("Invoice not found: " + number));
+				.orElseThrow(() -> new NotFoundException("Invoice not found: " + number));
 	}
 
 
