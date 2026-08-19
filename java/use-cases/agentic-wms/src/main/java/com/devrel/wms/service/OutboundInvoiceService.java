@@ -7,9 +7,11 @@ import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.OutboundInvoiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,13 +22,18 @@ public class OutboundInvoiceService {
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
 
+	private ChatClient chatClient;
+
 	OutboundInvoiceService(
 			OutboundInvoiceRepository outboundInvoiceRepository,
 			InventoryService inventoryService,
-			StockMovementService stockMovementService) {
+			StockMovementService stockMovementService,
+			ChatClient chatClient
+	) {
 		this.outboundInvoiceRepository = outboundInvoiceRepository;
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
+		this.chatClient = chatClient;
 	}
 
 	public OutboundInvoice save(OutboundInvoice outboundInvoice) {
@@ -90,7 +97,23 @@ public class OutboundInvoiceService {
 		outboundInvoiceRepository
 				.save(changeOutboundStatus(outbound, OutboundInvoice.InvoiceStatus.COMPLETED));
 
-		logger.info("Invoice {} completed", number);
+		String response = chatClient
+				.prompt()
+				.system(system -> system
+						.param("current_date", LocalDateTime.now()))
+				.user("""
+                Outbound invoice %s has just been completed.
+
+                Analyze this invoice and determine whether any product requires replenishment.
+                Use the available tools autonomously.
+                Do not ask the user for additional information.
+                If replenishment is necessary, create it.
+                If not, take no action.
+                """.formatted(number))
+				.call()
+				.content();
+
+		logger.info("Invoice {} completed. Content: {} ", number, response);
 	}
 
 	private OutboundInvoice getOutbound(String number) {
