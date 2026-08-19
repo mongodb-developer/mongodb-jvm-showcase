@@ -1,0 +1,7 @@
+### Find stock movements by product code
+GET http://localhost:8080/stock-movements/product/03
+Content-Type: application/json
+
+### Find stock movements by invoice number
+GET http://localhost:8080/stock-movements/invoice/NF-1002
+Content-Type: application/json
