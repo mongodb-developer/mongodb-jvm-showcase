@@ -1,0 +1,21 @@
+POST http://localhost:8080/replenishment
+Content-Type: application/json
+
+
+{
+  "items": [
+    { "productCode": "01", "quantity": 100 },
+    { "productCode": "02", "quantity": 50 }
+  ],
+  "status": "PENDING",
+  "message": "Low stock detected based on recent outbound movements. Replenishment recommended."
+}
+
+
+### Find By Id
+GET http://localhost:8080/replenishment/6a84c74c9cd67a896c32c951
+Content-Type: application/json
+
+###
+GET http://localhost:8080/replenishment/productCode/02
+Content-Type: application/json

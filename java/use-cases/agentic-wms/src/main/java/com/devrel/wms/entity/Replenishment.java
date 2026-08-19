@@ -1,0 +1,26 @@
+package com.devrel.wms.entity;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
+
+@Document(collection = "replenishments")
+public record Replenishment(
+        @Id String id,
+        List<ReplenishmentItem> items,
+        String message,
+        Status status
+) {
+    public enum Status {
+        PENDING,
+        APPROVED,
+        REJECTED,
+        COMPLETED
+    }
+
+    public record ReplenishmentItem(
+            String productCode,
+            Integer quantity
+    ) {}
+}
