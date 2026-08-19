@@ -3,6 +3,10 @@ Content-Type: application/json
 
 {
   "number": "NF-1002",
+  "depositor": {
+    "id": "RICAS",
+    "name": "Ricas Ltda"
+  },
   "items": [
     {
       "productCode": "01",

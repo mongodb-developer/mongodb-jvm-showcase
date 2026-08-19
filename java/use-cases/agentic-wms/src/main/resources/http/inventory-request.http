@@ -4,21 +4,44 @@ Content-Type: application/json
 
 {
   "productCode": "01",
+  "depositor": {
+    "id": "RICAS",
+    "name": "Ricas Ltda"
+  },
   "quantity": 10
 }
 
-### Find inventory by product code
-GET http://localhost:8080/inventory/04
+### Find inventory by product code. One entry per depositor
+GET http://localhost:8080/inventory/01
+Content-Type: application/json
+
+### Find inventory by product code and depositor
+GET http://localhost:8080/inventory/01/depositor/RICAS
 Content-Type: application/json
 
 ### Increase stock
 POST http://localhost:8080/inventory/01/movements?quantity=5
 Content-Type: application/json
 
+{
+  "id": "RICAS",
+  "name": "Ricas Ltda"
+}
+
 ### Decrease stock
 POST http://localhost:8080/inventory/01/movements?quantity=-5
 Content-Type: application/json
 
+{
+  "id": "RICAS",
+  "name": "Ricas Ltda"
+}
+
 ### Decrease more than available. Expected to fail
 POST http://localhost:8080/inventory/01/movements?quantity=-9999
 Content-Type: application/json
+
+{
+  "id": "RICAS",
+  "name": "Ricas Ltda"
+}

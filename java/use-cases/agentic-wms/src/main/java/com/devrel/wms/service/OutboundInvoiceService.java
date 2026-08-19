@@ -56,6 +56,7 @@ public class OutboundInvoiceService {
 		return new OutboundInvoice(
 				outboundInvoice.id(),
 				outboundInvoice.number(),
+				outboundInvoice.depositor(),
 				outboundInvoice.items(),
 				status
 		);
@@ -84,7 +85,7 @@ public class OutboundInvoiceService {
 		}
 
 		outbound.items().forEach(item -> {
-			inventoryService.add(item.productCode(), -item.quantity());
+			inventoryService.add(item.productCode(), outbound.depositor(), -item.quantity());
 
 			stockMovementService.register(
 					item.productCode(),

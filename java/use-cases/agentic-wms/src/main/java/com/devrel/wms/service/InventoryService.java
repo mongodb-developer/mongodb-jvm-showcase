@@ -1,5 +1,6 @@
 package com.devrel.wms.service;
 
+import com.devrel.wms.entity.Depositor;
 import com.devrel.wms.entity.Inventory;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.repository.InventoryRepository;
@@ -37,29 +38,40 @@ public class InventoryService {
 		return inventoryRepository.findAll();
 	}
 
-	public Inventory findByProductCode(String productCode) {
-		return inventoryRepository.findByProductCode(productCode).orElse(null);
+	public List<Inventory> findByProductCode(String productCode) {
+		return inventoryRepository.findByProductCode(productCode);
 	}
 
-	public void add(String productCode, int quantity) {
+	public Inventory findByProductCodeAndDepositor(String productCode, String depositorId) {
+		return inventoryRepository.findByProductCodeAndDepositorId(productCode, depositorId).orElse(null);
+	}
+
+	public void add(String productCode, Depositor depositor, int quantity) {
+		if (depositor == null || depositor.id() == null) {
+			throw new IllegalArgumentException("Depositor is required for product code: " + productCode);
+		}
+
 		if (quantity >= 0) {
 			mongoTemplate.upsert(
-					new Query(Criteria.where("productCode").is(productCode)),
-					new Update().inc("quantity", quantity),
+					new Query(Criteria.where("productCode").is(productCode)
+							.and("depositor.id").is(depositor.id())),
+					new Update().inc("quantity", quantity).setOnInsert("depositor.name", depositor.name()),
 					Inventory.class
 			);
 
-			logger.info("Inventory for product code {} increased by {}", productCode, quantity);
+			logger.info("Inventory for product code {} and depositor {} increased by {}",
+					productCode, depositor.id(), quantity);
 
 			return;
 		}
 
-		if (inventoryRepository.add(productCode, quantity) == 0) {
-			throw new ConflictException(
-					"Insufficient stock or unknown product code: " + productCode);
+		if (inventoryRepository.add(productCode, depositor.id(), quantity) == 0) {
+			throw new ConflictException("Insufficient stock for product code " + productCode
+					+ " and depositor " + depositor.id());
 		}
 
-		logger.info("Inventory for product code {} decreased by {}", productCode, -quantity);
+		logger.info("Inventory for product code {} and depositor {} decreased by {}",
+				productCode, depositor.id(), -quantity);
 	}
 
 }

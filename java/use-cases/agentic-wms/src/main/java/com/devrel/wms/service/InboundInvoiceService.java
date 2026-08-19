@@ -49,6 +49,7 @@ public class InboundInvoiceService {
 		return new InboundInvoice(
 				inboundInvoice.id(),
 				inboundInvoice.number(),
+				inboundInvoice.depositor(),
 				inboundInvoice.items(),
 				status
 		);
@@ -78,7 +79,7 @@ public class InboundInvoiceService {
 		}
 
 		inbound.items().forEach(item -> {
-			inventoryService.add(item.productCode(), item.quantity());
+			inventoryService.add(item.productCode(), inbound.depositor(), item.quantity());
 
 			stockMovementService.register(
 					item.productCode(),

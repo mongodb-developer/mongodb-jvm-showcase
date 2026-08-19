@@ -52,10 +52,10 @@ public class ReplenishmentTool {
 	}
 
 	@Tool(description = """
-    	Get the current inventory quantity for a product.
+    	Get the current inventory quantity for a product, one entry per depositor.
     	Use this tool when you need to know the current available stock.
     """)
-	public Inventory getInventoryByProductCode(
+	public List<Inventory> getInventoryByProductCode(
 			@ToolParam(description = "Unique product code") String productCode) {
 		logger.info("##TOOL## - Calling Inventory Product Code for product {}", productCode);
 		return inventoryService.findByProductCode(productCode);

@@ -11,6 +11,7 @@ public record InboundInvoice(
         @Id String id,
 		@Indexed(unique = true)
         String number,
+        Depositor depositor,
         List<InvoiceItem> items,
         InvoiceStatus status
 ) {

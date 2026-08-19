@@ -262,7 +262,7 @@
 			<button class="btn ghost" onclick="document.getElementById('i-filter').value='';loadInventory()">Clear</button>
 		</div>
 		<table>
-			<thead><tr><th>Product code</th><th>Product name</th><th class="num">Quantity</th></tr></thead>
+			<thead><tr><th>Product code</th><th>Product name</th><th>Depositor</th><th class="num">Quantity</th></tr></thead>
 			<tbody id="i-body"></tbody>
 		</table>
 	</div>
@@ -275,6 +275,14 @@
 			<div class="field">
 				<label>Number</label>
 				<input id="in-number" placeholder="NF-1002">
+			</div>
+			<div class="field">
+				<label>Depositor id</label>
+				<input id="in-dep-id" placeholder="RICAS">
+			</div>
+			<div class="field">
+				<label>Depositor name</label>
+				<input id="in-dep-name" placeholder="Ricas Ltda">
 			</div>
 		</div>
 		<div class="items-editor" id="in-items"></div>
@@ -300,7 +308,7 @@
 			<button class="btn ghost" onclick="loadInbound()">Refresh</button>
 		</div>
 		<table>
-			<thead><tr><th>Number</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+			<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
 			<tbody id="in-body"></tbody>
 		</table>
 	</div>
@@ -313,6 +321,14 @@
 			<div class="field">
 				<label>Number</label>
 				<input id="out-number" placeholder="NF-2001">
+			</div>
+			<div class="field">
+				<label>Depositor id</label>
+				<input id="out-dep-id" placeholder="RICAS">
+			</div>
+			<div class="field">
+				<label>Depositor name</label>
+				<input id="out-dep-name" placeholder="Ricas Ltda">
 			</div>
 		</div>
 		<div class="items-editor" id="out-items"></div>
@@ -338,7 +354,7 @@
 			<button class="btn ghost" onclick="loadOutbound()">Refresh</button>
 		</div>
 		<table>
-			<thead><tr><th>Number</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+			<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
 			<tbody id="out-body"></tbody>
 		</table>
 	</div>
@@ -444,6 +460,7 @@ function rows(tbody, list, columns, render) {
 
 const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + '</span>';
 const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
+const depositorLabel = depositor => depositor ? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.id) + ')</span>' : '-';
 
 function addItemLine(containerId) {
 	const line = document.createElement('div');
@@ -493,17 +510,17 @@ async function loadInventory() {
 	let list;
 
 	if (code) {
-		const response = await fetch('/inventory/' + encodeURIComponent(code));
-		list = response.ok ? [await response.json()] : [];
+		list = await api('/inventory/' + encodeURIComponent(code));
 	} else {
 		list = await api('/inventory');
 	}
 
 	const names = await productNames();
 
-	rows('i-body', list, 3, inventory =>
+	rows('i-body', list, 4, inventory =>
 		'<tr><td>' + esc(inventory.productCode) + '</td>' +
 		'<td>' + esc(names.get(inventory.productCode) || '-') + '</td>' +
+		'<td>' + depositorLabel(inventory.depositor) + '</td>' +
 		'<td class="num">' + esc(inventory.quantity) + '</td></tr>');
 }
 
@@ -515,6 +532,7 @@ async function productNames() {
 
 function invoiceRow(invoice, kind, executeLabel, executePath) {
 	return '<tr><td>' + esc(invoice.number) + '</td>' +
+		'<td>' + depositorLabel(invoice.depositor) + '</td>' +
 		'<td>' + itemsLabel(invoice.items) + '</td>' +
 		'<td>' + badge(invoice.status) + '</td>' +
 		'<td><button class="btn ghost sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'check\')">Check</button> ' +
@@ -531,24 +549,28 @@ async function loadInbound() {
 	const status = document.getElementById('in-filter').value;
 	const list = (await api('/inbound-invoice')).filter(i => !status || i.status === status);
 
-	rows('in-body', list, 4, invoice => invoiceRow(invoice, 'inbound', 'Complete', 'complete'));
+	rows('in-body', list, 5, invoice => invoiceRow(invoice, 'inbound', 'Complete', 'complete'));
 }
 
 async function loadOutbound() {
 	const status = document.getElementById('out-filter').value;
 	const list = (await api('/outbound-invoice')).filter(i => !status || i.status === status);
 
-	rows('out-body', list, 4, invoice => invoiceRow(invoice, 'outbound', 'Execute', 'execute'));
+	rows('out-body', list, 5, invoice => invoiceRow(invoice, 'outbound', 'Execute', 'execute'));
 }
 
 async function createInvoice(kind) {
 	const prefix = kind === 'inbound' ? 'in' : 'out';
 	const number = document.getElementById(prefix + '-number').value.trim();
+	const depositorId = document.getElementById(prefix + '-dep-id').value.trim();
+	const depositorName = document.getElementById(prefix + '-dep-name').value.trim();
 	const items = readItems(prefix + '-items');
 
 	if (!number || items.length === 0) return notify('Number and at least one item are required', 'err', 'Invalid input');
 
-	await post('/' + kind + '-invoice', { number, items });
+	const depositor = depositorId ? { id: depositorId, name: depositorName } : null;
+
+	await post('/' + kind + '-invoice', { number, depositor, items });
 	notify('Invoice ' + number + ' created', 'ok', 'Success');
 	document.getElementById(prefix + '-number').value = '';
 	document.getElementById(prefix + '-items').innerHTML = '';

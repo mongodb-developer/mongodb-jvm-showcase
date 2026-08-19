@@ -1,5 +1,6 @@
 package com.devrel.wms.web;
 
+import com.devrel.wms.entity.Depositor;
 import com.devrel.wms.entity.Inventory;
 import com.devrel.wms.service.InventoryService;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +40,15 @@ public class InventoryController {
 	}
 
 	@GetMapping("/{productCode}")
-	public ResponseEntity<Inventory> findByProductCode(@PathVariable String productCode) {
-		Inventory inventory = inventoryService.findByProductCode(productCode);
+	public ResponseEntity<List<Inventory>> findByProductCode(@PathVariable String productCode) {
+		return ResponseEntity.ok(inventoryService.findByProductCode(productCode));
+	}
+
+	@GetMapping("/{productCode}/depositor/{depositorId}")
+	public ResponseEntity<Inventory> findByProductCodeAndDepositor(
+			@PathVariable String productCode,
+			@PathVariable String depositorId) {
+		Inventory inventory = inventoryService.findByProductCodeAndDepositor(productCode, depositorId);
 
 		if (inventory == null) {
 			return ResponseEntity.notFound().build();
@@ -50,8 +58,11 @@ public class InventoryController {
 	}
 
 	@PostMapping("/{productCode}/movements")
-	public ResponseEntity<Void> add(@PathVariable String productCode, @RequestParam int quantity) {
-		inventoryService.add(productCode, quantity);
+	public ResponseEntity<Void> add(
+			@PathVariable String productCode,
+			@RequestBody Depositor depositor,
+			@RequestParam int quantity) {
+		inventoryService.add(productCode, depositor, quantity);
 
 		return ResponseEntity.noContent().build();
 	}
