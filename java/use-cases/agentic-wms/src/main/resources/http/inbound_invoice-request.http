@@ -5,6 +5,14 @@ Content-Type: application/json
   "number": "NF-1002",
   "items": [
     {
+      "productCode": "01",
+      "quantity": 200
+    },
+    {
+      "productCode": "02",
+      "quantity": 200
+    },
+    {
       "productCode": "03",
       "quantity": 200
     },

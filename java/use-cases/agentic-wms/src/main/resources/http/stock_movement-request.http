@@ -3,5 +3,5 @@ GET http://localhost:8080/stock-movements/product/03
 Content-Type: application/json
 
 ### Find stock movements by invoice number
-GET http://localhost:8080/stock-movements/invoice/NF-1002
+GET http://localhost:8080/stock-movements/invoice/NF-2002
 Content-Type: application/json
