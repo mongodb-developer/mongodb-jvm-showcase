@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic WMS</title>
+<style>
+	:root {
+		--bg: #10151a;
+		--panel: #18212b;
+		--panel-2: #1f2a36;
+		--border: #2b3947;
+		--text: #e6edf3;
+		--muted: #8b9aa9;
+		--accent: #00ed64;
+		--accent-dark: #00684a;
+		--danger: #ff6b6b;
+		--warn: #ffc107;
+		--info: #4dabf7;
+	}
+
+	* { box-sizing: border-box; }
+
+	body {
+		margin: 0;
+		background: var(--bg);
+		color: var(--text);
+		font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	}
+
+	header {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 16px 24px;
+		background: var(--panel);
+		border-bottom: 1px solid var(--border);
+	}
+
+	header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+	header .leaf { color: var(--accent); font-size: 20px; }
+	header .spacer { flex: 1; }
+	header .status { color: var(--muted); font-size: 12px; }
+
+	nav {
+		display: flex;
+		gap: 4px;
+		padding: 0 24px;
+		background: var(--panel);
+		border-bottom: 1px solid var(--border);
+		overflow-x: auto;
+	}
+
+	nav button {
+		background: none;
+		border: none;
+		border-bottom: 2px solid transparent;
+		color: var(--muted);
+		padding: 12px 16px;
+		font-size: 14px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+
+	nav button:hover { color: var(--text); }
+	nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+	main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+	section { display: none; }
+	section.active { display: block; }
+
+	.card {
+		background: var(--panel);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 16px;
+		margin-bottom: 20px;
+	}
+
+	.card h2 {
+		font-size: 14px;
+		margin: 0 0 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: .5px;
+		color: var(--muted);
+	}
+
+	.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+
+	.field { display: flex; flex-direction: column; gap: 4px; }
+	.field label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+
+	input, select {
+		background: var(--panel-2);
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		color: var(--text);
+		padding: 8px 10px;
+		font-size: 14px;
+		min-width: 140px;
+	}
+
+	input:focus, select:focus { outline: none; border-color: var(--accent); }
+
+	button.btn {
+		background: var(--accent);
+		color: #001e2b;
+		border: none;
+		border-radius: 6px;
+		padding: 8px 14px;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	button.btn:hover { background: #00c957; }
+	button.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+	button.btn.ghost:hover { background: var(--panel-2); }
+	button.btn.sm { padding: 5px 10px; font-size: 12px; }
+
+	table { width: 100%; border-collapse: collapse; }
+	th {
+		text-align: left;
+		font-size: 11px;
+		text-transform: uppercase;
+		color: var(--muted);
+		padding: 8px;
+		border-bottom: 1px solid var(--border);
+	}
+	td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+	tr:last-child td { border-bottom: none; }
+	td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); }
+	td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+	.badge {
+		display: inline-block;
+		padding: 3px 9px;
+		border-radius: 20px;
+		font-size: 11px;
+		font-weight: 600;
+		border: 1px solid;
+	}
+	.badge.PENDING { color: var(--warn); border-color: var(--warn); }
+	.badge.RECEIVED, .badge.APPROVED { color: var(--info); border-color: var(--info); }
+	.badge.COMPLETED { color: var(--accent); border-color: var(--accent); }
+	.badge.FAILED, .badge.REJECTED { color: var(--danger); border-color: var(--danger); }
+	.badge.INBOUND { color: var(--accent); border-color: var(--accent); }
+	.badge.OUTBOUND { color: var(--warn); border-color: var(--warn); }
+
+	.empty { color: var(--muted); text-align: center; padding: 28px; font-size: 13px; }
+
+	.items-editor { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+	.items-editor .item-line { display: flex; gap: 8px; align-items: center; }
+	.items-editor input { min-width: 0; }
+
+	#toast {
+		position: fixed;
+		right: 24px;
+		bottom: 24px;
+		max-width: 420px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		z-index: 50;
+	}
+
+	.toast {
+		padding: 12px 16px;
+		border-radius: 8px;
+		border-left: 3px solid;
+		background: var(--panel-2);
+		box-shadow: 0 8px 24px rgba(0,0,0,.4);
+		font-size: 13px;
+	}
+	.toast.ok { border-color: var(--accent); }
+	.toast.err { border-color: var(--danger); }
+	.toast strong { display: block; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+	<span class="leaf">&#9679;</span>
+	<h1>Agentic WMS</h1>
+	<span class="spacer"></span>
+	<span class="status" id="status"></span>
+</header>
+
+<nav id="tabs">
+	<button data-tab="products" class="active">Products</button>
+	<button data-tab="inventory">Inventory</button>
+	<button data-tab="inbound">Inbound Invoices</button>
+	<button data-tab="outbound">Outbound Invoices</button>
+	<button data-tab="movements">Stock Movements</button>
+	<button data-tab="replenishment">Replenishment</button>
+</nav>
+
+<main>
+
+<section id="products" class="active">
+	<div class="card">
+		<h2>New product</h2>
+		<div class="row">
+			<div class="field">
+				<label>Code</label>
+				<input id="p-code" placeholder="01">
+			</div>
+			<div class="field">
+				<label>Name</label>
+				<input id="p-name" placeholder="Keyboard">
+			</div>
+			<button class="btn" onclick="createProduct()">Create</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Products</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Filter by code</label>
+				<input id="p-filter" placeholder="01">
+			</div>
+			<button class="btn ghost" onclick="loadProducts()">Search</button>
+			<button class="btn ghost" onclick="document.getElementById('p-filter').value='';loadProducts()">Clear</button>
+		</div>
+		<table>
+			<thead><tr><th>Code</th><th>Name</th><th>Id</th></tr></thead>
+			<tbody id="p-body"></tbody>
+		</table>
+	</div>
+</section>
+
+<section id="inventory">
+	<div class="card">
+		<h2>New inventory</h2>
+		<div class="row">
+			<div class="field">
+				<label>Product code</label>
+				<input id="i-code" placeholder="01">
+			</div>
+			<div class="field">
+				<label>Quantity</label>
+				<input id="i-qty" type="number" value="0">
+			</div>
+			<button class="btn" onclick="createInventory()">Create</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Inventory</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Filter by product code</label>
+				<input id="i-filter" placeholder="01">
+			</div>
+			<button class="btn ghost" onclick="loadInventory()">Search</button>
+			<button class="btn ghost" onclick="document.getElementById('i-filter').value='';loadInventory()">Clear</button>
+		</div>
+		<table>
+			<thead><tr><th>Product code</th><th class="num">Quantity</th><th>Movement</th></tr></thead>
+			<tbody id="i-body"></tbody>
+		</table>
+	</div>
+</section>
+
+<section id="inbound">
+	<div class="card">
+		<h2>New inbound invoice</h2>
+		<div class="row">
+			<div class="field">
+				<label>Number</label>
+				<input id="in-number" placeholder="NF-1002">
+			</div>
+		</div>
+		<div class="items-editor" id="in-items"></div>
+		<div class="row">
+			<button class="btn ghost sm" onclick="addItemLine('in-items')">Add item</button>
+			<button class="btn" onclick="createInvoice('inbound')">Create</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Inbound invoices</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Filter by status</label>
+				<select id="in-filter" onchange="loadInbound()">
+					<option value="">All</option>
+					<option>PENDING</option>
+					<option>RECEIVED</option>
+					<option>COMPLETED</option>
+					<option>FAILED</option>
+				</select>
+			</div>
+			<button class="btn ghost" onclick="loadInbound()">Refresh</button>
+		</div>
+		<table>
+			<thead><tr><th>Number</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+			<tbody id="in-body"></tbody>
+		</table>
+	</div>
+</section>
+
+<section id="outbound">
+	<div class="card">
+		<h2>New outbound invoice</h2>
+		<div class="row">
+			<div class="field">
+				<label>Number</label>
+				<input id="out-number" placeholder="NF-2001">
+			</div>
+		</div>
+		<div class="items-editor" id="out-items"></div>
+		<div class="row">
+			<button class="btn ghost sm" onclick="addItemLine('out-items')">Add item</button>
+			<button class="btn" onclick="createInvoice('outbound')">Create</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Outbound invoices</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Filter by status</label>
+				<select id="out-filter" onchange="loadOutbound()">
+					<option value="">All</option>
+					<option>PENDING</option>
+					<option>RECEIVED</option>
+					<option>COMPLETED</option>
+					<option>FAILED</option>
+				</select>
+			</div>
+			<button class="btn ghost" onclick="loadOutbound()">Refresh</button>
+		</div>
+		<table>
+			<thead><tr><th>Number</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+			<tbody id="out-body"></tbody>
+		</table>
+	</div>
+</section>
+
+<section id="movements">
+	<div class="card">
+		<h2>Stock movements</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Product code</label>
+				<input id="m-product" placeholder="03">
+			</div>
+			<div class="field">
+				<label>Invoice number</label>
+				<input id="m-invoice" placeholder="NF-1002">
+			</div>
+			<button class="btn ghost" onclick="loadMovements()">Search</button>
+			<button class="btn ghost" onclick="document.getElementById('m-product').value='';document.getElementById('m-invoice').value='';loadMovements()">Clear</button>
+		</div>
+		<table>
+			<thead><tr><th>Date</th><th>Type</th><th>Product code</th><th class="num">Quantity</th><th>Invoice</th></tr></thead>
+			<tbody id="m-body"></tbody>
+		</table>
+	</div>
+</section>
+
+<section id="replenishment">
+	<div class="card">
+		<h2>New replenishment</h2>
+		<div class="row">
+			<div class="field" style="flex:1">
+				<label>Message</label>
+				<input id="r-message" placeholder="Low stock detected" style="width:100%">
+			</div>
+			<div class="field">
+				<label>Status</label>
+				<select id="r-status">
+					<option>PENDING</option>
+					<option>APPROVED</option>
+					<option>REJECTED</option>
+					<option>COMPLETED</option>
+				</select>
+			</div>
+		</div>
+		<div class="items-editor" id="r-items"></div>
+		<div class="row">
+			<button class="btn ghost sm" onclick="addItemLine('r-items')">Add item</button>
+			<button class="btn" onclick="createReplenishment()">Create</button>
+		</div>
+	</div>
+
+	<div class="card">
+		<h2>Replenishments</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Filter by status</label>
+				<select id="r-filter" onchange="loadReplenishment()">
+					<option value="">All</option>
+					<option>PENDING</option>
+					<option>APPROVED</option>
+					<option>REJECTED</option>
+					<option>COMPLETED</option>
+				</select>
+			</div>
+			<button class="btn ghost" onclick="loadReplenishment()">Refresh</button>
+		</div>
+		<table>
+			<thead><tr><th>Id</th><th>Message</th><th>Items</th><th>Status</th></tr></thead>
+			<tbody id="r-body"></tbody>
+		</table>
+	</div>
+</section>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+const esc = value => String(value ?? '')
+	.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function notify(message, kind, title) {
+	const box = document.createElement('div');
+	box.className = 'toast ' + kind;
+	box.innerHTML = '<strong>' + esc(title) + '</strong>' + esc(message);
+	document.getElementById('toast').appendChild(box);
+	setTimeout(() => box.remove(), 5000);
+}
+
+async function api(path, options) {
+	const response = await fetch(path, options);
+
+	if (!response.ok) {
+		let detail = response.statusText;
+		try {
+			const problem = await response.json();
+			detail = problem.detail || problem.message || detail;
+		} catch (ignored) {}
+
+		notify(detail, 'err', response.status + ' Error');
+		throw new Error(detail);
+	}
+
+	if (response.status === 204) return null;
+
+	const text = await response.text();
+	return text ? JSON.parse(text) : null;
+}
+
+const post = (path, body) => api(path, {
+	method: 'POST',
+	headers: { 'Content-Type': 'application/json' },
+	body: body === undefined ? undefined : JSON.stringify(body)
+});
+
+function rows(tbody, list, columns, render) {
+	const target = document.getElementById(tbody);
+
+	if (!list || list.length === 0) {
+		target.innerHTML = '<tr><td class="empty" colspan="' + columns + '">No records found</td></tr>';
+		return;
+	}
+
+	target.innerHTML = list.map(render).join('');
+}
+
+const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + '</span>';
+const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
+
+function addItemLine(containerId) {
+	const line = document.createElement('div');
+	line.className = 'item-line';
+	line.innerHTML =
+		'<input placeholder="Product code" class="item-code">' +
+		'<input type="number" placeholder="Quantity" class="item-qty" value="1">' +
+		'<button class="btn ghost sm" onclick="this.parentElement.remove()">Remove</button>';
+	document.getElementById(containerId).appendChild(line);
+}
+
+function readItems(containerId) {
+	return [...document.querySelectorAll('#' + containerId + ' .item-line')]
+		.map(line => ({
+			productCode: line.querySelector('.item-code').value.trim(),
+			quantity: Number(line.querySelector('.item-qty').value)
+		}))
+		.filter(item => item.productCode);
+}
+
+async function loadProducts() {
+	const code = document.getElementById('p-filter').value.trim();
+	const list = code ? [await api('/products/code/' + encodeURIComponent(code))].filter(Boolean)
+			: await api('/products');
+
+	rows('p-body', list, 3, product =>
+		'<tr><td>' + esc(product.code) + '</td><td>' + esc(product.name) +
+		'</td><td class="mono">' + esc(product.id) + '</td></tr>');
+}
+
+async function createProduct() {
+	const code = document.getElementById('p-code').value.trim();
+	const name = document.getElementById('p-name').value.trim();
+
+	if (!code || !name) return notify('Code and name are required', 'err', 'Invalid input');
+
+	await post('/products', { code, name });
+	notify('Product ' + code + ' created', 'ok', 'Success');
+	document.getElementById('p-code').value = '';
+	document.getElementById('p-name').value = '';
+	loadProducts();
+}
+
+async function loadInventory() {
+	const code = document.getElementById('i-filter').value.trim();
+	let list;
+
+	if (code) {
+		const response = await fetch('/inventory/' + encodeURIComponent(code));
+		list = response.ok ? [await response.json()] : [];
+	} else {
+		list = await api('/inventory');
+	}
+
+	rows('i-body', list, 3, inventory =>
+		'<tr><td>' + esc(inventory.productCode) + '</td>' +
+		'<td class="num">' + esc(inventory.quantity) + '</td>' +
+		'<td><input type="number" value="1" style="min-width:80px" id="mv-' + esc(inventory.productCode) + '"> ' +
+		'<button class="btn sm" onclick="move(\'' + esc(inventory.productCode) + '\', 1)">Add</button> ' +
+		'<button class="btn ghost sm" onclick="move(\'' + esc(inventory.productCode) + '\', -1)">Remove</button></td></tr>');
+}
+
+async function createInventory() {
+	const productCode = document.getElementById('i-code').value.trim();
+	const quantity = Number(document.getElementById('i-qty').value);
+
+	if (!productCode) return notify('Product code is required', 'err', 'Invalid input');
+
+	await post('/inventory', { productCode, quantity });
+	notify('Inventory for ' + productCode + ' created', 'ok', 'Success');
+	document.getElementById('i-code').value = '';
+	loadInventory();
+}
+
+async function move(productCode, sign) {
+	const quantity = Number(document.getElementById('mv-' + productCode).value) * sign;
+
+	await post('/inventory/' + encodeURIComponent(productCode) + '/movements?quantity=' + quantity);
+	notify('Stock of ' + productCode + ' changed by ' + quantity, 'ok', 'Success');
+	loadInventory();
+}
+
+function invoiceRow(invoice, kind, executeLabel, executePath) {
+	return '<tr><td>' + esc(invoice.number) + '</td>' +
+		'<td>' + itemsLabel(invoice.items) + '</td>' +
+		'<td>' + badge(invoice.status) + '</td>' +
+		'<td><button class="btn ghost sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'check\')">Check</button> ' +
+		'<button class="btn sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'' + executePath + '\')">' + executeLabel + '</button></td></tr>';
+}
+
+async function runAction(kind, number, action) {
+	await post('/' + kind + '-invoice/' + encodeURIComponent(number) + '/' + action);
+	notify('Invoice ' + number + ': ' + action + ' done', 'ok', 'Success');
+	kind === 'inbound' ? loadInbound() : loadOutbound();
+}
+
+async function loadInbound() {
+	const status = document.getElementById('in-filter').value;
+	const list = (await api('/inbound-invoice')).filter(i => !status || i.status === status);
+
+	rows('in-body', list, 4, invoice => invoiceRow(invoice, 'inbound', 'Complete', 'complete'));
+}
+
+async function loadOutbound() {
+	const status = document.getElementById('out-filter').value;
+	const list = (await api('/outbound-invoice')).filter(i => !status || i.status === status);
+
+	rows('out-body', list, 4, invoice => invoiceRow(invoice, 'outbound', 'Execute', 'execute'));
+}
+
+async function createInvoice(kind) {
+	const prefix = kind === 'inbound' ? 'in' : 'out';
+	const number = document.getElementById(prefix + '-number').value.trim();
+	const items = readItems(prefix + '-items');
+
+	if (!number || items.length === 0) return notify('Number and at least one item are required', 'err', 'Invalid input');
+
+	await post('/' + kind + '-invoice', { number, items });
+	notify('Invoice ' + number + ' created', 'ok', 'Success');
+	document.getElementById(prefix + '-number').value = '';
+	document.getElementById(prefix + '-items').innerHTML = '';
+	addItemLine(prefix + '-items');
+	kind === 'inbound' ? loadInbound() : loadOutbound();
+}
+
+async function loadMovements() {
+	const product = document.getElementById('m-product').value.trim();
+	const invoice = document.getElementById('m-invoice').value.trim();
+
+	let path = '/stock-movements';
+	if (product) path += '/product/' + encodeURIComponent(product);
+	else if (invoice) path += '/invoice/' + encodeURIComponent(invoice);
+
+	const list = await api(path);
+
+	rows('m-body', list, 5, movement =>
+		'<tr><td class="mono">' + esc((movement.date || '').replace('T', ' ').slice(0, 19)) + '</td>' +
+		'<td>' + badge(movement.type) + '</td>' +
+		'<td>' + esc(movement.productCode) + '</td>' +
+		'<td class="num">' + esc(movement.quantity) + '</td>' +
+		'<td>' + esc(movement.invoiceNumber) + '</td></tr>');
+}
+
+async function loadReplenishment() {
+	const status = document.getElementById('r-filter').value;
+	const list = (await api('/replenishment')).filter(r => !status || r.status === status);
+
+	rows('r-body', list, 4, replenishment =>
+		'<tr><td class="mono">' + esc(replenishment.id) + '</td>' +
+		'<td>' + esc(replenishment.message) + '</td>' +
+		'<td>' + itemsLabel(replenishment.items) + '</td>' +
+		'<td>' + badge(replenishment.status) + '</td></tr>');
+}
+
+async function createReplenishment() {
+	const message = document.getElementById('r-message').value.trim();
+	const status = document.getElementById('r-status').value;
+	const items = readItems('r-items');
+
+	if (items.length === 0) return notify('At least one item is required', 'err', 'Invalid input');
+
+	await post('/replenishment', { message, items, status });
+	notify('Replenishment created', 'ok', 'Success');
+	document.getElementById('r-message').value = '';
+	document.getElementById('r-items').innerHTML = '';
+	addItemLine('r-items');
+	loadReplenishment();
+}
+
+const loaders = {
+	products: loadProducts,
+	inventory: loadInventory,
+	inbound: loadInbound,
+	outbound: loadOutbound,
+	movements: loadMovements,
+	replenishment: loadReplenishment
+};
+
+document.getElementById('tabs').addEventListener('click', event => {
+	const tab = event.target.dataset.tab;
+	if (!tab) return;
+
+	document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+	document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === tab));
+
+	loaders[tab]().catch(() => {});
+});
+
+['in-items', 'out-items', 'r-items'].forEach(addItemLine);
+document.getElementById('status').textContent = window.location.origin;
+loadProducts().catch(() => {});
+</script>
+
+</body>
+</html>

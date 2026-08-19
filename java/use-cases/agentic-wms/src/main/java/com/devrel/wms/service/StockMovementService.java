@@ -40,6 +40,10 @@ public class StockMovementService {
 		return save;
 	}
 
+	public List<StockMovement> findAll() {
+		return stockMovementRepository.findAll();
+	}
+
 	public List<StockMovement> findByProductCode(String productCode) {
 		return stockMovementRepository.findByProductCode(productCode);
 	}

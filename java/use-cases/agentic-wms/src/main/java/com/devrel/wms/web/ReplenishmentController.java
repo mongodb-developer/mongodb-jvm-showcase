@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/replenishment")
 public class ReplenishmentController {
@@ -23,6 +25,11 @@ public class ReplenishmentController {
 	@PostMapping
 	public ResponseEntity<Replenishment> create(@RequestBody Replenishment replenishment) {
 		return ResponseEntity.ok(replenishmentService.save(replenishment));
+	}
+
+	@GetMapping
+	public ResponseEntity<List<Replenishment>> findAll() {
+		return ResponseEntity.ok(replenishmentService.findAll());
 	}
 
 	@GetMapping("/{id}")

@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class InventoryService {
 
@@ -29,6 +31,10 @@ public class InventoryService {
 		logger.info("Inventory for product code {} saved", save.productCode());
 
 		return save;
+	}
+
+	public List<Inventory> findAll() {
+		return inventoryRepository.findAll();
 	}
 
 	public Inventory findByProductCode(String productCode) {

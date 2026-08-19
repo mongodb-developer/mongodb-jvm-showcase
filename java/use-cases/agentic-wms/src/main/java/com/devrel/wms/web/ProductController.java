@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -23,6 +25,11 @@ public class ProductController {
 	@PostMapping
 	public ResponseEntity<Product> create(@RequestBody Product product) {
 		return ResponseEntity.ok(productService.save(product));
+	}
+
+	@GetMapping
+	public ResponseEntity<List<Product>> findAll() {
+		return ResponseEntity.ok(productService.findAll());
 	}
 
 	@GetMapping("/{id}")

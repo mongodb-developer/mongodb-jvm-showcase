@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/inventory")
@@ -30,6 +31,11 @@ public class InventoryController {
 		return ResponseEntity
 				.created(URI.create("/inventory/" + created.productCode()))
 				.body(created);
+	}
+
+	@GetMapping
+	public ResponseEntity<List<Inventory>> findAll() {
+		return ResponseEntity.ok(inventoryService.findAll());
 	}
 
 	@GetMapping("/{productCode}")

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class InboundInvoiceService {
 
@@ -34,6 +36,10 @@ public class InboundInvoiceService {
 		logger.info("inbound Invoice with Id {} saved", save.id());
 
 		return save;
+	}
+
+	public List<InboundInvoice> findAll() {
+		return inboundInvoiceRepository.findAll();
 	}
 
 	private InboundInvoice changeInboundStatus(

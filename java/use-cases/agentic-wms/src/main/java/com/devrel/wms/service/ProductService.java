@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductService {
 
@@ -22,6 +24,10 @@ public class ProductService {
 		logger.info("Product with Id {} saved", save.id());
 
 		return save;
+	}
+
+	public List<Product> findAll() {
+		return productRepository.findAll();
 	}
 
 	public Product findById(String id) {

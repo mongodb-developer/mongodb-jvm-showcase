@@ -20,6 +20,11 @@ public class StockMovementController {
 		this.stockMovementService = stockMovementService;
 	}
 
+	@GetMapping
+	public ResponseEntity<List<StockMovement>> findAll() {
+		return ResponseEntity.ok(stockMovementService.findAll());
+	}
+
 	@GetMapping("/product/{productCode}")
 	public ResponseEntity<List<StockMovement>> findByProductCode(@PathVariable String productCode) {
 		return ResponseEntity.ok(stockMovementService.findByProductCode(productCode));

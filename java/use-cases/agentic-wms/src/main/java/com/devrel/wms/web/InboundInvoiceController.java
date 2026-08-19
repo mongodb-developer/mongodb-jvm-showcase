@@ -3,6 +3,7 @@ package com.devrel.wms.web;
 import com.devrel.wms.entity.InboundInvoice;
 import com.devrel.wms.service.InboundInvoiceService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/inbound-invoice")
@@ -28,6 +30,11 @@ public class InboundInvoiceController {
 		return ResponseEntity
 				.created(URI.create("/inbound-invoice/" + created.number()))
 				.body(created);
+	}
+
+	@GetMapping
+	public ResponseEntity<List<InboundInvoice>> findAll() {
+		return ResponseEntity.ok(inboundInvoiceService.findAll());
 	}
 
 	@PostMapping("/{number}/check")
