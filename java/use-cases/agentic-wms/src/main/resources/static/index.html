@@ -19,6 +19,24 @@
 		--info: #4dabf7;
 	}
 
+	html[data-theme="light"] {
+		--bg: #f7f9fa;
+		--panel: #ffffff;
+		--panel-2: #eef1f4;
+		--border: #d9e0e6;
+		--text: #001e2b;
+		--muted: #5c6c7a;
+		--accent: #00684a;
+		--accent-dark: #00ed64;
+		--danger: #c0392b;
+		--warn: #a06800;
+		--info: #1864ab;
+	}
+
+	html[data-theme="light"] button.btn { background: var(--accent); color: #ffffff; }
+	html[data-theme="light"] button.btn:hover { background: #00513a; }
+	html[data-theme="light"] .toast { box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+
 	* { box-sizing: border-box; }
 
 	body {
@@ -185,6 +203,7 @@
 	<h1>Agentic WMS</h1>
 	<span class="spacer"></span>
 	<span class="status" id="status"></span>
+	<button class="btn ghost sm" id="theme-toggle" onclick="toggleTheme()"></button>
 </header>
 
 <nav id="tabs">
@@ -225,28 +244,13 @@
 			<button class="btn ghost" onclick="document.getElementById('p-filter').value='';loadProducts()">Clear</button>
 		</div>
 		<table>
-			<thead><tr><th>Code</th><th>Name</th><th>Id</th></tr></thead>
+			<thead><tr><th>Id</th><th>Code</th><th>Name</th></tr></thead>
 			<tbody id="p-body"></tbody>
 		</table>
 	</div>
 </section>
 
 <section id="inventory">
-	<div class="card">
-		<h2>New inventory</h2>
-		<div class="row">
-			<div class="field">
-				<label>Product code</label>
-				<input id="i-code" placeholder="01">
-			</div>
-			<div class="field">
-				<label>Quantity</label>
-				<input id="i-qty" type="number" value="0">
-			</div>
-			<button class="btn" onclick="createInventory()">Create</button>
-		</div>
-	</div>
-
 	<div class="card">
 		<h2>Inventory</h2>
 		<div class="row" style="margin-bottom:14px">
@@ -258,7 +262,7 @@
 			<button class="btn ghost" onclick="document.getElementById('i-filter').value='';loadInventory()">Clear</button>
 		</div>
 		<table>
-			<thead><tr><th>Product code</th><th class="num">Quantity</th><th>Movement</th></tr></thead>
+			<thead><tr><th>Product code</th><th>Product name</th><th class="num">Quantity</th></tr></thead>
 			<tbody id="i-body"></tbody>
 		</table>
 	</div>
@@ -364,30 +368,6 @@
 
 <section id="replenishment">
 	<div class="card">
-		<h2>New replenishment</h2>
-		<div class="row">
-			<div class="field" style="flex:1">
-				<label>Message</label>
-				<input id="r-message" placeholder="Low stock detected" style="width:100%">
-			</div>
-			<div class="field">
-				<label>Status</label>
-				<select id="r-status">
-					<option>PENDING</option>
-					<option>APPROVED</option>
-					<option>REJECTED</option>
-					<option>COMPLETED</option>
-				</select>
-			</div>
-		</div>
-		<div class="items-editor" id="r-items"></div>
-		<div class="row">
-			<button class="btn ghost sm" onclick="addItemLine('r-items')">Add item</button>
-			<button class="btn" onclick="createReplenishment()">Create</button>
-		</div>
-	</div>
-
-	<div class="card">
 		<h2>Replenishments</h2>
 		<div class="row" style="margin-bottom:14px">
 			<div class="field">
@@ -490,8 +470,9 @@ async function loadProducts() {
 			: await api('/products');
 
 	rows('p-body', list, 3, product =>
-		'<tr><td>' + esc(product.code) + '</td><td>' + esc(product.name) +
-		'</td><td class="mono">' + esc(product.id) + '</td></tr>');
+		'<tr><td class="mono">' + esc(product.id) + '</td>' +
+			'<td>' + esc(product.code) + '</td><td>' + esc(product.name) +
+		'</td></tr>');
 }
 
 async function createProduct() {
@@ -518,32 +499,18 @@ async function loadInventory() {
 		list = await api('/inventory');
 	}
 
+	const names = await productNames();
+
 	rows('i-body', list, 3, inventory =>
 		'<tr><td>' + esc(inventory.productCode) + '</td>' +
-		'<td class="num">' + esc(inventory.quantity) + '</td>' +
-		'<td><input type="number" value="1" style="min-width:80px" id="mv-' + esc(inventory.productCode) + '"> ' +
-		'<button class="btn sm" onclick="move(\'' + esc(inventory.productCode) + '\', 1)">Add</button> ' +
-		'<button class="btn ghost sm" onclick="move(\'' + esc(inventory.productCode) + '\', -1)">Remove</button></td></tr>');
+		'<td>' + esc(names.get(inventory.productCode) || '-') + '</td>' +
+		'<td class="num">' + esc(inventory.quantity) + '</td></tr>');
 }
 
-async function createInventory() {
-	const productCode = document.getElementById('i-code').value.trim();
-	const quantity = Number(document.getElementById('i-qty').value);
+async function productNames() {
+	const products = await api('/products');
 
-	if (!productCode) return notify('Product code is required', 'err', 'Invalid input');
-
-	await post('/inventory', { productCode, quantity });
-	notify('Inventory for ' + productCode + ' created', 'ok', 'Success');
-	document.getElementById('i-code').value = '';
-	loadInventory();
-}
-
-async function move(productCode, sign) {
-	const quantity = Number(document.getElementById('mv-' + productCode).value) * sign;
-
-	await post('/inventory/' + encodeURIComponent(productCode) + '/movements?quantity=' + quantity);
-	notify('Stock of ' + productCode + ' changed by ' + quantity, 'ok', 'Success');
-	loadInventory();
+	return new Map((products || []).map(product => [product.code, product.name]));
 }
 
 function invoiceRow(invoice, kind, executeLabel, executePath) {
@@ -618,21 +585,6 @@ async function loadReplenishment() {
 		'<td>' + badge(replenishment.status) + '</td></tr>');
 }
 
-async function createReplenishment() {
-	const message = document.getElementById('r-message').value.trim();
-	const status = document.getElementById('r-status').value;
-	const items = readItems('r-items');
-
-	if (items.length === 0) return notify('At least one item is required', 'err', 'Invalid input');
-
-	await post('/replenishment', { message, items, status });
-	notify('Replenishment created', 'ok', 'Success');
-	document.getElementById('r-message').value = '';
-	document.getElementById('r-items').innerHTML = '';
-	addItemLine('r-items');
-	loadReplenishment();
-}
-
 const loaders = {
 	products: loadProducts,
 	inventory: loadInventory,
@@ -652,7 +604,19 @@ document.getElementById('tabs').addEventListener('click', event => {
 	loaders[tab]().catch(() => {});
 });
 
-['in-items', 'out-items', 'r-items'].forEach(addItemLine);
+function applyTheme(theme) {
+	document.documentElement.dataset.theme = theme;
+	document.getElementById('theme-toggle').textContent = theme === 'light' ? 'Dark' : 'Light';
+	localStorage.setItem('wms-theme', theme);
+}
+
+function toggleTheme() {
+	applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+}
+
+applyTheme(localStorage.getItem('wms-theme') || 'dark');
+
+['in-items', 'out-items'].forEach(addItemLine);
 document.getElementById('status').textContent = window.location.origin;
 loadProducts().catch(() => {});
 </script>
