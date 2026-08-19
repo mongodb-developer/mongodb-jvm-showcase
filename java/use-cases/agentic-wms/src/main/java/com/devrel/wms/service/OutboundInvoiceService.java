@@ -1,6 +1,7 @@
 package com.devrel.wms.service;
 
 import com.devrel.wms.entity.OutboundInvoice;
+import com.devrel.wms.entity.StockMovement;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.OutboundInvoiceRepository;
@@ -14,12 +15,15 @@ public class OutboundInvoiceService {
 	private final Logger logger = LoggerFactory.getLogger(OutboundInvoiceService.class);
 	private final OutboundInvoiceRepository outboundInvoiceRepository;
 	private final InventoryService inventoryService;
+	private final StockMovementService stockMovementService;
 
 	OutboundInvoiceService(
 			OutboundInvoiceRepository outboundInvoiceRepository,
-			InventoryService inventoryService) {
+			InventoryService inventoryService,
+			StockMovementService stockMovementService) {
 		this.outboundInvoiceRepository = outboundInvoiceRepository;
 		this.inventoryService = inventoryService;
+		this.stockMovementService = stockMovementService;
 	}
 
 	public OutboundInvoice save(OutboundInvoice outboundInvoice) {
@@ -64,7 +68,16 @@ public class OutboundInvoiceService {
 			throw new ConflictException("Invoice is not received: " + number);
 		}
 
-		outbound.items().forEach(item -> inventoryService.add(item.productCode(), -item.quantity()));
+		outbound.items().forEach(item -> {
+			inventoryService.add(item.productCode(), -item.quantity());
+
+			stockMovementService.register(
+					item.productCode(),
+					item.quantity(),
+					outbound.number(),
+					StockMovement.MovementType.OUTBOUND
+			);
+		});
 
 		outboundInvoiceRepository
 				.save(changeOutboundStatus(outbound, OutboundInvoice.InvoiceStatus.COMPLETED));
