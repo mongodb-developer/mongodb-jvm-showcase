@@ -8,6 +8,7 @@ import com.devrel.wms.repository.InboundInvoiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InboundInvoiceService {
@@ -61,6 +62,7 @@ public class InboundInvoiceService {
 		inboundInvoiceRepository.save(changeInboundStatus(invoice, InboundInvoice.InvoiceStatus.RECEIVED));
 	}
 
+	@Transactional
 	public void complete(String number) {
 
 		InboundInvoice inbound = getInbound(number);
