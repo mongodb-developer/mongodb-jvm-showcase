@@ -107,7 +107,7 @@ public class ReplenishmentTool {
 			return "Replenishment not found: " + replenishmentId;
 		}
 
-		Depositor depositor = replenishment.depositor();
+		Depositor depositor = resolveDepositor(replenishment.depositor());
 
 		if (depositor == null || depositor.email() == null || depositor.email().isBlank()) {
 			return "Depositor has no email registered. Notification was not sent.";
@@ -123,6 +123,26 @@ public class ReplenishmentTool {
         Subject: %s
 
         %s""".formatted(depositor.name(), depositor.email(), EMAIL_SUBJECT, email);
+	}
+
+	private Depositor resolveDepositor(Depositor depositor) {
+		if (depositor == null || depositor.id() == null) {
+			return depositor;
+		}
+
+		if (depositor.email() != null && !depositor.email().isBlank()) {
+			return depositor;
+		}
+
+		Depositor registered = inventoryService.findDepositorById(depositor.id());
+
+		if (registered == null) {
+			return depositor;
+		}
+
+		logger.info("Depositor {} email resolved from inventory", depositor.id());
+
+		return registered;
 	}
 
 	private String composeEmail(Replenishment replenishment, Depositor depositor) {

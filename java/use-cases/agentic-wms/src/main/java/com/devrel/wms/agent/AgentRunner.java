@@ -62,7 +62,28 @@ public class AgentRunner {
 		}
 
 		return agentRunService.save(finish(
-				agentRun, tasks, AgentRun.Status.COMPLETED, tasks.getLast().result()));
+				agentRun, tasks, AgentRun.Status.COMPLETED, summarize(definition, goal, tasks)));
+	}
+
+	private String summarize(AgentDefinition definition, String goal, List<AgentRun.AgentTask> tasks) {
+		try {
+			return definition.reporter()
+					.prompt()
+					.user("""
+                %s
+
+                These are the results of the executed tasks:
+                %s
+
+                Summarize the outcome of this execution.
+                """.formatted(goal, previousResults(tasks)))
+					.call()
+					.content();
+		} catch (Exception exception) {
+			logger.error("Could not summarize agent run for goal: {}", goal, exception);
+
+			return null;
+		}
 	}
 
 	private List<AgentRun.AgentTask> plan(AgentDefinition definition, String goal) {

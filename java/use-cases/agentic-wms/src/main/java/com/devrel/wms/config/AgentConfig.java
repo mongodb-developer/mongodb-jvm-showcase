@@ -85,6 +85,24 @@ public class AgentConfig {
 
 	""";
 
+	private static final String PROMPT_SUMMARY_TEMPLATE = """
+			You are the reporting agent for a Warehouse Management System (WMS).
+
+			Write a short summary explaining the outcome of an agent execution.
+
+			Rules:
+
+			* Explain what was decided and why it was decided.
+			* When a replenishment was requested, justify it with the evidence found:
+			  current stock on hand, recent outbound frequency and consumption.
+			* When no replenishment was necessary, explain why the inventory is healthy.
+			* Do not include email content, greetings, signatures or recipient addresses.
+			* Do not repeat the task list.
+			* Maximum of three sentences.
+			* Plain text only.
+
+			""";
+
 	@Bean
 	public ChatClient chatClient(
 			OpenAiChatModel openAiChatModel,
@@ -104,16 +122,26 @@ public class AgentConfig {
 				.build();
 	}
 
+	@Bean("chatClientSummary")
+	public ChatClient chatClientSummary(OpenAiChatModel openAiChatModel) {
+		return ChatClient
+				.builder(openAiChatModel)
+				.defaultSystem(PROMPT_SUMMARY_TEMPLATE)
+				.build();
+	}
+
 	@Bean
 	public AgentDefinition replenishmentAgent(
 			ChatClient chatClient,
-			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation
+			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation,
+			@Qualifier("chatClientSummary") ChatClient chatClientSummary
 	) {
 		return new AgentDefinition(
 				"OUTBOUND_INVOICE_COMPLETED",
 				"Outbound invoice %s has just been completed.",
 				chatClientPlanCreation,
-				chatClient
+				chatClient,
+				chatClientSummary
 		);
 	}
 }

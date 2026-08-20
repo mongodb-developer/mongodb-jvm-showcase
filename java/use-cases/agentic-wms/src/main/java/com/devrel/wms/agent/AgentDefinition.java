@@ -6,5 +6,6 @@ public record AgentDefinition(
         String trigger,
         String goal,
         ChatClient planner,
-        ChatClient executor
+        ChatClient executor,
+        ChatClient reporter
 ) {}

@@ -46,6 +46,13 @@ public class InventoryService {
 		return inventoryRepository.findByProductCodeAndDepositorId(productCode, depositorId).orElse(null);
 	}
 
+	public Depositor findDepositorById(String depositorId) {
+		logger.info("# calling findDepositoryId: {}", depositorId);
+		return inventoryRepository.findFirstByDepositorId(depositorId)
+				.map(Inventory::depositor)
+				.orElse(null);
+	}
+
 	public void add(String productCode, Depositor depositor, int quantity) {
 		if (depositor == null || depositor.id() == null) {
 			throw new IllegalArgumentException("Depositor is required for product code: " + productCode);

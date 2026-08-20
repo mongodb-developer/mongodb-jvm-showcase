@@ -15,6 +15,8 @@ public interface InventoryRepository extends MongoRepository<Inventory, String> 
 
 	Optional<Inventory> findByProductCodeAndDepositorId(String productCode, String depositorId);
 
+	Optional<Inventory> findFirstByDepositorId(String depositorId);
+
 	@Query("{ 'productCode': ?0, 'depositor.id': ?1, '$expr': { '$gte': [ { '$add': [ '$quantity', ?2 ] }, 0 ] } }")
 	@Update("{ '$inc': { 'quantity': ?2 } }")
 	long add(String productCode, String depositorId, int quantity);
