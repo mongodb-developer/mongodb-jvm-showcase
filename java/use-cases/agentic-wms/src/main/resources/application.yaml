@@ -7,10 +7,14 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+    vectorstore:
+      mongodb:
+        initialize-schema: true
+        collection-name: depositor_knowledge
+        index-name: vector-index
   data:
     mongodb:
       auto-index-creation: true
-
 logging:
   level:
     org.springframework.data.mongodb.core: DEBUG
