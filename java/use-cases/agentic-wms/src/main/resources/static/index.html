@@ -191,6 +191,64 @@
 		box-shadow: 0 8px 24px rgba(0,0,0,.4);
 		font-size: 13px;
 	}
+	.auto-refresh {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 12px;
+		color: var(--muted);
+	}
+	.auto-refresh input { min-width: 0; }
+
+	.run {
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		margin-bottom: 12px;
+		overflow: hidden;
+	}
+
+	.run-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 14px;
+		background: var(--panel-2);
+		cursor: pointer;
+	}
+
+	.run-head .goal { flex: 1; font-weight: 600; }
+	.run-head .meta { color: var(--muted); font-size: 12px; }
+	.run-head .caret { color: var(--muted); font-size: 11px; }
+
+	.run-tasks { display: none; padding: 6px 14px 12px; }
+	.run.open .run-tasks { display: block; }
+
+	.task {
+		display: flex;
+		gap: 12px;
+		padding: 10px 0;
+		border-bottom: 1px solid var(--border);
+	}
+	.task:last-child { border-bottom: none; }
+
+	.task .step {
+		flex: 0 0 24px;
+		height: 24px;
+		border-radius: 50%;
+		border: 1px solid var(--border);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 11px;
+		color: var(--muted);
+	}
+	.task .body { flex: 1; min-width: 0; }
+	.task .description { font-weight: 600; margin-bottom: 3px; }
+	.task .result { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
+	.task .timing { color: var(--muted); font-size: 11px; margin-top: 3px; }
+
+	.badge.RUNNING { color: var(--info); border-color: var(--info); }
+
 	.toast.ok { border-color: var(--accent); }
 	.toast.err { border-color: var(--danger); }
 	.toast strong { display: block; margin-bottom: 2px; }
@@ -213,6 +271,7 @@
 	<button data-tab="outbound">Outbound Invoices</button>
 	<button data-tab="movements">Stock Movements</button>
 	<button data-tab="replenishment">Replenishment</button>
+	<button data-tab="agentruns">Agent Runs</button>
 </nav>
 
 <main>
@@ -406,6 +465,28 @@
 			<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th></tr></thead>
 			<tbody id="r-body"></tbody>
 		</table>
+	</div>
+</section>
+
+<section id="agentruns">
+	<div class="card">
+		<h2>Agent runs</h2>
+		<div class="row" style="margin-bottom:14px">
+			<div class="field">
+				<label>Filter by status</label>
+				<select id="a-filter" onchange="loadAgentRuns()">
+					<option value="">All</option>
+					<option>RUNNING</option>
+					<option>COMPLETED</option>
+					<option>FAILED</option>
+				</select>
+			</div>
+			<button class="btn ghost" onclick="loadAgentRuns()">Refresh</button>
+			<label class="auto-refresh">
+				<input type="checkbox" id="a-auto" checked> Auto refresh while running
+			</label>
+		</div>
+		<div id="a-body"></div>
 	</div>
 </section>
 
@@ -618,13 +699,84 @@ async function loadReplenishment() {
 		'<td>' + badge(replenishment.status) + '</td></tr>');
 }
 
+const openRuns = new Set();
+let autoRefreshTimer = null;
+
+const stamp = value => value ? esc(String(value).replace('T', ' ').slice(0, 19)) : '';
+
+function duration(startedAt, completedAt) {
+	if (!startedAt || !completedAt) return '';
+
+	const seconds = (new Date(completedAt) - new Date(startedAt)) / 1000;
+
+	return seconds.toFixed(1) + 's';
+}
+
+function taskCard(task, index) {
+	return '<div class="task">' +
+		'<div class="step">' + (index + 1) + '</div>' +
+		'<div class="body">' +
+		'<div class="description">' + esc(task.description) + '</div>' +
+		(task.result ? '<div class="result">' + esc(task.result) + '</div>' : '') +
+		'<div class="timing">' + badge(task.status) +
+		(task.completedAt ? ' &middot; ' + duration(task.startedAt, task.completedAt) : '') +
+		'</div>' +
+		'</div></div>';
+}
+
+function runCard(run) {
+	const tasks = run.tasks || [];
+	const done = tasks.filter(task => task.status === 'COMPLETED').length;
+
+	return '<div class="run ' + (openRuns.has(run.id) ? 'open' : '') + '" data-run="' + esc(run.id) + '">' +
+		'<div class="run-head" onclick="toggleRun(\'' + esc(run.id) + '\')">' +
+		'<span class="caret">&#9662;</span>' +
+		'<span class="goal">' + esc(run.trigger) + ' &middot; ' + esc(run.reference) + '</span>' +
+		'<span class="meta">' + done + '/' + tasks.length + ' tasks &middot; ' + stamp(run.startedAt) +
+		(run.completedAt ? ' &middot; ' + duration(run.startedAt, run.completedAt) : '') + '</span>' +
+		badge(run.status) +
+		'</div>' +
+		'<div class="run-tasks">' +
+		(tasks.length ? tasks.map(taskCard).join('') : '<div class="empty">No task planned</div>') +
+		(run.summary ? '<div class="result" style="margin-top:10px"><strong>Summary:</strong> ' + esc(run.summary) + '</div>' : '') +
+		'</div></div>';
+}
+
+function toggleRun(id) {
+	openRuns.has(id) ? openRuns.delete(id) : openRuns.add(id);
+	document.querySelector('.run[data-run="' + id + '"]').classList.toggle('open');
+}
+
+async function loadAgentRuns() {
+	const status = document.getElementById('a-filter').value;
+	const runs = (await api('/agent-runs')).filter(run => !status || run.status === status);
+	const target = document.getElementById('a-body');
+
+	target.innerHTML = runs.length
+			? runs.map(runCard).join('')
+			: '<div class="empty">No agent run found</div>';
+
+	scheduleAgentRefresh(runs.some(run => run.status === 'RUNNING'));
+}
+
+function scheduleAgentRefresh(hasRunning) {
+	clearTimeout(autoRefreshTimer);
+
+	const active = document.getElementById('agentruns').classList.contains('active');
+
+	if (hasRunning && active && document.getElementById('a-auto').checked) {
+		autoRefreshTimer = setTimeout(() => loadAgentRuns().catch(() => {}), 3000);
+	}
+}
+
 const loaders = {
 	products: loadProducts,
 	inventory: loadInventory,
 	inbound: loadInbound,
 	outbound: loadOutbound,
 	movements: loadMovements,
-	replenishment: loadReplenishment
+	replenishment: loadReplenishment,
+	agentruns: loadAgentRuns
 };
 
 document.getElementById('tabs').addEventListener('click', event => {
@@ -634,6 +786,7 @@ document.getElementById('tabs').addEventListener('click', event => {
 	document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
 	document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === tab));
 
+	clearTimeout(autoRefreshTimer);
 	loaders[tab]().catch(() => {});
 });
 

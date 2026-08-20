@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AgentRunService {
 
@@ -22,6 +24,14 @@ public class AgentRunService {
 		logger.info("AgentRun with Id {} saved", save.id());
 
 		return save;
+	}
+
+	public List<AgentRun> findAll() {
+		return agentRunRepository.findAllByOrderByStartedAtDesc();
+	}
+
+	public AgentRun findById(String id) {
+		return agentRunRepository.findById(id).orElse(null);
 	}
 
 }
