@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,18 +42,19 @@ public class AgentRunner {
 
 		for (int index = 0; index < tasks.size(); index++) {
 			String description = tasks.get(index).description();
+			String capability = tasks.get(index).tool();
 			LocalDateTime startedAt = LocalDateTime.now();
 
 			try {
-				String result = executeTask(definition, goal, description, tasks);
+				String result = executeTask(definition, goal, description, capability, tasks);
 
 				tasks.set(index, new AgentRun.AgentTask(
-						description, AgentRun.TaskStatus.COMPLETED, null, result, startedAt, LocalDateTime.now()));
+						description, AgentRun.TaskStatus.COMPLETED, capability, result, startedAt, LocalDateTime.now()));
 			} catch (Exception exception) {
 				logger.error("Agent run {} failed on task: {}", agentRun.id(), description, exception);
 
 				tasks.set(index, new AgentRun.AgentTask(
-						description, AgentRun.TaskStatus.FAILED, null, exception.getMessage(), startedAt, LocalDateTime.now()));
+						description, AgentRun.TaskStatus.FAILED, capability, exception.getMessage(), startedAt, LocalDateTime.now()));
 
 				return agentRunService.save(finish(
 						agentRun, tasks, AgentRun.Status.FAILED, "Failed on task: " + description));
@@ -87,36 +89,62 @@ public class AgentRunner {
 	}
 
 	private List<AgentRun.AgentTask> plan(AgentDefinition definition, String goal) {
-		List<String> descriptions = definition.planner()
+		List<PlannedTask> planned = definition.planner()
 				.prompt()
 				.user("""
                 %s
 
-                Create the execution plan required to accomplish this goal.
-                """.formatted(goal))
-				.call()
-				.entity(new ParameterizedTypeReference<List<String>>() {});
+                These are the capabilities available to execute the plan:
+                %s
 
-		if (descriptions == null || descriptions.isEmpty()) {
+                Create the execution plan required to accomplish this goal.
+                Assign to each task exactly one capability, using its name.
+                """.formatted(goal, capabilityCatalog(definition)))
+				.call()
+				.entity(new ParameterizedTypeReference<List<PlannedTask>>() {});
+
+		if (planned == null || planned.isEmpty()) {
 			throw new IllegalStateException("Planner returned no task for goal: " + goal);
 		}
 
-		return descriptions.stream()
-				.map(description -> new AgentRun.AgentTask(
-						description, AgentRun.TaskStatus.PENDING, null, null, null, null))
+		return planned.stream()
+				.map(task -> new AgentRun.AgentTask(
+						task.description(), AgentRun.TaskStatus.PENDING, task.capability(), null, null, null))
 				.toList();
+	}
+
+	private String capabilityCatalog(AgentDefinition definition) {
+		return definition.capabilities().stream()
+				.map(capability -> "- " + capability.name() + ": " + capability.description())
+				.collect(Collectors.joining("\n"));
+	}
+
+	private Object[] toolsOf(AgentDefinition definition, String capability) {
+		return definition.capabilities().stream()
+				.filter(candidate -> candidate.name().equalsIgnoreCase(capability))
+				.map(AgentCapability::tools)
+				.filter(Objects::nonNull)
+				.toArray();
 	}
 
 	private String executeTask(
 			AgentDefinition definition,
 			String goal,
 			String description,
+			String capability,
 			List<AgentRun.AgentTask> tasks
 	) {
+		Object[] tools = toolsOf(definition, capability);
+
+		if (tools.length == 0) {
+			logger.warn("Task has no known capability: {}. Running without tools", capability);
+		}
+
 		return definition.executor()
 				.prompt()
 				.system(system -> system
 						.param("current_date", LocalDateTime.now()))
+				.tools(tools)
 				.user("""
                 %s
 

@@ -768,6 +768,7 @@ function taskCard(task, index) {
 		'<div class="description">' + esc(task.description) + '</div>' +
 		(task.result ? '<div class="result">' + esc(task.result) + '</div>' : '') +
 		'<div class="timing">' + badge(task.status) +
+		(task.tool ? ' &middot; ' + esc(task.tool) : '') +
 		(task.completedAt ? ' &middot; ' + duration(task.startedAt, task.completedAt) : '') +
 		'</div>' +
 		'</div></div>';

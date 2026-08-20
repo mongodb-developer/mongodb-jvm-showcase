@@ -1,12 +1,17 @@
 package com.devrel.wms.config;
 
+import com.devrel.wms.agent.AgentCapability;
 import com.devrel.wms.agent.AgentDefinition;
+import com.devrel.wms.tool.DepositorEmailTool;
+import com.devrel.wms.tool.InventoryAnalysisTool;
 import com.devrel.wms.tool.ReplenishmentTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class AgentConfig {
@@ -75,16 +80,19 @@ public class AgentConfig {
 			* Do not expose internal reasoning or chain of thought.
 			* Create a maximum of 6 tasks.
 			* Always filter by depositor.
-			
+			* Assign exactly one capability to each task, using the capability name.
+			* A task must never mix two capabilities. Creating a replenishment request and
+			  writing the notification email are always two separate tasks, in this order.
+
 			For replenishment analysis after an outbound invoice, a typical plan may include:
-			
-			1. Identify the products affected by the outbound invoice.
-			2. Check the current inventory for the affected products for the specific depositor.
-			3. Analyze recent stock movements and consumption for the specific depositor.
-			4. Determine whether replenishment is required.
-			5. Create a replenishment request if necessary.
-			6. Write the notification email for the depositor if a replenishment request was created.
-			
+
+			1. Identify the products affected by the outbound invoice. [ANALYSIS]
+			2. Check the current inventory for the affected products for the specific depositor. [ANALYSIS]
+			3. Analyze recent stock movements and consumption for the specific depositor. [ANALYSIS]
+			4. Determine whether replenishment is required. [DECISION]
+			5. Create a replenishment request if necessary. [REPLENISHMENT]
+			6. Write the notification email for the depositor if a replenishment request was created. [NOTIFICATION]
+
 			Return only the execution plan.
 
 	""";
@@ -108,13 +116,9 @@ public class AgentConfig {
 			""";
 
 	@Bean
-	public ChatClient chatClient(
-			OpenAiChatModel openAiChatModel,
-			ReplenishmentTool replenishmentTool
-	) {
+	public ChatClient chatClient(OpenAiChatModel openAiChatModel) {
 		return ChatClient.builder(openAiChatModel)
 				.defaultSystem(PROMPT_TEMPLATE)
-				.defaultTools(replenishmentTool)
 				.build();
 	}
 
@@ -138,14 +142,35 @@ public class AgentConfig {
 	public AgentDefinition replenishmentAgent(
 			ChatClient chatClient,
 			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation,
-			@Qualifier("chatClientSummary") ChatClient chatClientSummary
+			@Qualifier("chatClientSummary") ChatClient chatClientSummary,
+			InventoryAnalysisTool inventoryAnalysisTool,
+			ReplenishmentTool replenishmentTool,
+			DepositorEmailTool depositorEmailTool
 	) {
 		return new AgentDefinition(
 				"OUTBOUND_INVOICE_COMPLETED",
 				"Outbound invoice %s has just been completed.",
 				chatClientPlanCreation,
 				chatClient,
-				chatClientSummary
+				chatClientSummary,
+				List.of(
+						new AgentCapability(
+								"ANALYSIS",
+								"Read inventory, stock movements and invoice movements. Cannot change anything.",
+								inventoryAnalysisTool),
+						new AgentCapability(
+								"REPLENISHMENT",
+								"Create a replenishment request. Cannot write the notification email.",
+								replenishmentTool),
+						new AgentCapability(
+								"NOTIFICATION",
+								"Write the notification email of an existing replenishment request.",
+								depositorEmailTool),
+						new AgentCapability(
+								"DECISION",
+								"Decide, based on the results of previous tasks, whether replenishment is required. Uses no tool.",
+								null)
+				)
 		);
 	}
 }
