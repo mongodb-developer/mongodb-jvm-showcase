@@ -1,8 +1,10 @@
 package com.devrel.wms.config;
 
+import com.devrel.wms.agent.AgentDefinition;
 import com.devrel.wms.tool.ReplenishmentTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -96,5 +98,18 @@ public class AgentConfig {
 				.builder(openAiChatModel)
 				.defaultSystem(PROMPT_PLAN_CREATION_TEMPLATE)
 				.build();
+	}
+
+	@Bean
+	public AgentDefinition replenishmentAgent(
+			ChatClient chatClient,
+			@Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation
+	) {
+		return new AgentDefinition(
+				"OUTBOUND_INVOICE_COMPLETED",
+				"Outbound invoice %s has just been completed.",
+				chatClientPlanCreation,
+				chatClient
+		);
 	}
 }
