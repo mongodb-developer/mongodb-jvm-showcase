@@ -70,12 +70,13 @@ public class AgentConfig {
 			* Use conditional tasks when the action depends on information that will only be discovered during execution.
 			* Do not expose internal reasoning or chain of thought.
 			* Create a maximum of 6 tasks.
+			* Always filter by depositor.
 			
 			For replenishment analysis after an outbound invoice, a typical plan may include:
 			
 			1. Identify the products affected by the outbound invoice.
-			2. Check the current inventory for the affected products.
-			3. Analyze recent stock movements and consumption.
+			2. Check the current inventory for the affected products for the specific depositor.
+			3. Analyze recent stock movements and consumption for the specific depositor.
 			4. Determine whether replenishment is required.
 			5. Create a replenishment request if necessary.
 			6. Notify the depositor if a replenishment request was created.

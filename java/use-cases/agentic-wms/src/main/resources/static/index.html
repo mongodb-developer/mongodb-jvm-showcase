@@ -439,7 +439,7 @@
 			<button class="btn ghost" onclick="document.getElementById('m-product').value='';document.getElementById('m-invoice').value='';loadMovements()">Clear</button>
 		</div>
 		<table>
-			<thead><tr><th>Date</th><th>Type</th><th>Product code</th><th class="num">Quantity</th><th>Invoice</th></tr></thead>
+			<thead><tr><th>Date</th><th>Type</th><th>Product code</th><th>Depositor</th><th class="num">Quantity</th><th>Invoice</th></tr></thead>
 			<tbody id="m-body"></tbody>
 		</table>
 	</div>
@@ -679,10 +679,11 @@ async function loadMovements() {
 
 	const list = await api(path);
 
-	rows('m-body', list, 5, movement =>
+	rows('m-body', list, 6, movement =>
 		'<tr><td class="mono">' + esc((movement.date || '').replace('T', ' ').slice(0, 19)) + '</td>' +
 		'<td>' + badge(movement.type) + '</td>' +
 		'<td>' + esc(movement.productCode) + '</td>' +
+		'<td>' + depositorLabel(movement.depositor) + '</td>' +
 		'<td class="num">' + esc(movement.quantity) + '</td>' +
 		'<td>' + esc(movement.invoiceNumber) + '</td></tr>');
 }
