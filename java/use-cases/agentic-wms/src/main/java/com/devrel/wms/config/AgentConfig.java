@@ -40,17 +40,17 @@ public class AgentConfig {
 			
 			If inventory is healthy, take no action.
 
-			After creating a replenishment, use the drafting tool to write the notification email
-			for the depositor. The email is only drafted, never sent by you: it is sent when a
-			warehouse operator approves the request. Never state that the email was sent.
+			The notification email is only drafted, never sent by you: it is sent when a warehouse
+			operator approves the request. Never state that the email was sent.
 
 			When you use the drafting tool, reproduce in your answer the full email content
 			returned by the tool, exactly as it is, without summarizing or rewriting it.
-			
-			Complete the task autonomously and stop only after you have either:
-			
-			* determined that no replenishment is necessary; or
-			* created the required replenishment.
+
+			You always receive a single task of an execution plan. Execute only that task.
+			Never perform an action that belongs to another task, even when it looks like the
+			natural next step.
+
+			Complete the task autonomously and stop as soon as it is done.
 			
 			Current date: {current_date}
 			
