@@ -1,4 +1,4 @@
-package com.devrel.wms.entity;
+package com.devrel.wms.domain;
 
 public record Depositor(
         String id,

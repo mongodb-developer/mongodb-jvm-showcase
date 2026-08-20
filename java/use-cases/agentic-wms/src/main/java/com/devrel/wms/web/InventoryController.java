@@ -1,7 +1,7 @@
 package com.devrel.wms.web;
 
-import com.devrel.wms.entity.Depositor;
-import com.devrel.wms.entity.Inventory;
+import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.Inventory;
 import com.devrel.wms.service.InventoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

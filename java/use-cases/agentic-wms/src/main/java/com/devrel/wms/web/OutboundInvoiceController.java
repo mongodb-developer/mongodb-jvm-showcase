@@ -1,6 +1,6 @@
 package com.devrel.wms.web;
 
-import com.devrel.wms.entity.OutboundInvoice;
+import com.devrel.wms.domain.OutboundInvoice;
 import com.devrel.wms.service.OutboundInvoiceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,7 +1,7 @@
 package com.devrel.wms.service;
 
-import com.devrel.wms.entity.Depositor;
-import com.devrel.wms.entity.Inventory;
+import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.Inventory;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.repository.InventoryRepository;
 import org.slf4j.Logger;

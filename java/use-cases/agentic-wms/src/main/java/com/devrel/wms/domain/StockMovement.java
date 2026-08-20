@@ -1,4 +1,4 @@
-package com.devrel.wms.entity;
+package com.devrel.wms.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

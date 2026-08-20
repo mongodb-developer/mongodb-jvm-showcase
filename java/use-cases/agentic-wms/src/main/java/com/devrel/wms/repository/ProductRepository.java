@@ -1,6 +1,6 @@
 package com.devrel.wms.repository;
 
-import com.devrel.wms.entity.Product;
+import com.devrel.wms.domain.Product;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

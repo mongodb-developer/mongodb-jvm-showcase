@@ -1,6 +1,6 @@
 package com.devrel.wms.repository;
 
-import com.devrel.wms.entity.OutboundInvoice;
+import com.devrel.wms.domain.OutboundInvoice;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

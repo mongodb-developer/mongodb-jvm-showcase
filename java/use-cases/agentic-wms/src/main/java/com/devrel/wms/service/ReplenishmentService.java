@@ -1,6 +1,6 @@
 package com.devrel.wms.service;
 
-import com.devrel.wms.entity.Replenishment;
+import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.repository.ReplenishmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

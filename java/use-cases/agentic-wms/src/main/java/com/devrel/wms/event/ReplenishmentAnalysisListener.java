@@ -1,8 +1,11 @@
 package com.devrel.wms.event;
 
+import com.devrel.wms.domain.AgentRun;
+import com.devrel.wms.service.AgentRunService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -15,9 +18,13 @@ public class ReplenishmentAnalysisListener {
 
 	private final Logger logger = LoggerFactory.getLogger(ReplenishmentAnalysisListener.class);
 	private final ChatClient chatClient;
+	private final ChatClient chatClientPlanCreation;
+	private final AgentRunService agentRunService;
 
-	ReplenishmentAnalysisListener(ChatClient chatClient) {
+	ReplenishmentAnalysisListener(ChatClient chatClient, AgentRunService agentRunService, @Qualifier("chatClientPlanCreation") ChatClient chatClientPlanCreation) {
 		this.chatClient = chatClient;
+		this.agentRunService = agentRunService;
+		this.chatClientPlanCreation = chatClientPlanCreation;
 	}
 
 	@Async
@@ -45,9 +52,20 @@ public class ReplenishmentAnalysisListener {
 					.call()
 					.content();
 
+			saveAgentPlan(response);
+
 			logger.info("Replenishment analysis for invoice {} finished. Content: {}", number, response);
 		} catch (Exception exception) {
 			logger.error("Replenishment analysis failed for invoice {}", number, exception);
 		}
+	}
+
+	private void saveAgentPlan(String context) {
+
+		AgentRun entity = chatClientPlanCreation.prompt(
+				context
+		).call().entity(AgentRun.class);
+
+		agentRunService.save(entity);
 	}
 }

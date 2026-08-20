@@ -1,6 +1,6 @@
 package com.devrel.wms.web;
 
-import com.devrel.wms.entity.Replenishment;
+import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.service.ReplenishmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

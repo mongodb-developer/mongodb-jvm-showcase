@@ -1,6 +1,6 @@
 package com.devrel.wms.web;
 
-import com.devrel.wms.entity.StockMovement;
+import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.service.StockMovementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

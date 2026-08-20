@@ -1,6 +1,6 @@
 package com.devrel.wms.web;
 
-import com.devrel.wms.entity.Product;
+import com.devrel.wms.domain.Product;
 import com.devrel.wms.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

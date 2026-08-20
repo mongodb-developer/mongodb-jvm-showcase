@@ -1,9 +1,9 @@
 package com.devrel.wms.tool;
 
-import com.devrel.wms.entity.Depositor;
-import com.devrel.wms.entity.Inventory;
-import com.devrel.wms.entity.Replenishment;
-import com.devrel.wms.entity.StockMovement;
+import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.Inventory;
+import com.devrel.wms.domain.Replenishment;
+import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.service.InventoryService;
 import com.devrel.wms.service.ReplenishmentService;
 import com.devrel.wms.service.StockMovementService;

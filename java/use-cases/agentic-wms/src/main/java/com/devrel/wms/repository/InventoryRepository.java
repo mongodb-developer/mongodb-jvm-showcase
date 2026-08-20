@@ -1,6 +1,6 @@
 package com.devrel.wms.repository;
 
-import com.devrel.wms.entity.Inventory;
+import com.devrel.wms.domain.Inventory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;

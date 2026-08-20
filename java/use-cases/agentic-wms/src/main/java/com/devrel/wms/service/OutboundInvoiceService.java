@@ -1,7 +1,7 @@
 package com.devrel.wms.service;
 
-import com.devrel.wms.entity.OutboundInvoice;
-import com.devrel.wms.entity.StockMovement;
+import com.devrel.wms.domain.OutboundInvoice;
+import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.event.OutboundInvoiceCompleted;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.exception.NotFoundException;

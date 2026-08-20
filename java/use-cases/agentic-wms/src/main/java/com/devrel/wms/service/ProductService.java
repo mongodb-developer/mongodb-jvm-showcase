@@ -1,6 +1,6 @@
 package com.devrel.wms.service;
 
-import com.devrel.wms.entity.Product;
+import com.devrel.wms.domain.Product;
 import com.devrel.wms.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

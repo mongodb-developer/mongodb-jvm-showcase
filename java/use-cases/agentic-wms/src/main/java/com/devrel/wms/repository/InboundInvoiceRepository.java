@@ -1,7 +1,6 @@
 package com.devrel.wms.repository;
 
-import com.devrel.wms.entity.InboundInvoice;
-import com.devrel.wms.entity.Product;
+import com.devrel.wms.domain.InboundInvoice;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
