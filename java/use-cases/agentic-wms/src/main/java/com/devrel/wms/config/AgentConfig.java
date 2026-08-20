@@ -40,7 +40,11 @@ public class AgentConfig {
 			
 			If inventory is healthy, take no action.
 
-			When you use the notification tool, reproduce in your answer the full email content
+			After creating a replenishment, use the drafting tool to write the notification email
+			for the depositor. The email is only drafted, never sent by you: it is sent when a
+			warehouse operator approves the request. Never state that the email was sent.
+
+			When you use the drafting tool, reproduce in your answer the full email content
 			returned by the tool, exactly as it is, without summarizing or rewriting it.
 			
 			Complete the task autonomously and stop only after you have either:
@@ -79,7 +83,7 @@ public class AgentConfig {
 			3. Analyze recent stock movements and consumption for the specific depositor.
 			4. Determine whether replenishment is required.
 			5. Create a replenishment request if necessary.
-			6. Notify the depositor if a replenishment request was created.
+			6. Write the notification email for the depositor if a replenishment request was created.
 			
 			Return only the execution plan.
 

@@ -76,7 +76,7 @@ public class ReplenishmentTool {
 		}
 
 		Replenishment created = replenishmentService.save(
-				new Replenishment(null, depositor, newItems, message, Replenishment.Status.PENDING));
+				new Replenishment(null, depositor, newItems, message, Replenishment.Status.PENDING, null));
 
 		String skipped = items.stream()
 				.map(Replenishment.ReplenishmentItem::productCode)
@@ -145,15 +145,17 @@ public class ReplenishmentTool {
 	}
 
 	@Tool(description = """
-    	Notify by email the depositor that owns a replenishment request.
+    	Write the notification email that will be sent to the depositor of a replenishment request.
+    	The email is only drafted and stored, never sent by this tool.
+    	It is sent later, when a warehouse operator approves the replenishment request.
     	Use this tool only after a replenishment request has been created,
     	passing the id returned by the creation tool.
     """)
-	public String notifyDepositor(
-			@ToolParam(description = "Id of the replenishment request to notify about")
+	public String draftDepositorEmail(
+			@ToolParam(description = "Id of the replenishment request to write the email for")
 			String replenishmentId
 	) {
-		logger.info("##TOOL## - Notifying depositor about replenishment {}", replenishmentId);
+		logger.info("##TOOL## - Drafting depositor email for replenishment {}", replenishmentId);
 
 		Replenishment replenishment = replenishmentService.findById(replenishmentId);
 
@@ -162,21 +164,18 @@ public class ReplenishmentTool {
 		}
 
 		Depositor depositor = resolveDepositor(replenishment.depositor());
+		String recipient = depositor == null ? null : depositor.email();
+		String body = composeEmail(replenishment, depositor);
 
-		if (depositor == null || depositor.email() == null || depositor.email().isBlank()) {
-			return "Depositor has no email registered. Notification was not sent.";
-		}
-
-		String email = composeEmail(replenishment, depositor);
-
-		logger.info("##EMAIL## - To: {} <{}> | Subject: {}\n{}",
-				depositor.name(), depositor.email(), EMAIL_SUBJECT, email);
+		replenishmentService.saveNotification(replenishmentId, new Replenishment.Notification(
+				recipient, EMAIL_SUBJECT, body, null));
 
 		return """
-        Email sent to %s <%s>
+        Email drafted for replenishment %s. It will be sent when the request is approved.
+        To: %s
         Subject: %s
 
-        %s""".formatted(depositor.name(), depositor.email(), EMAIL_SUBJECT, email);
+        %s""".formatted(replenishmentId, recipient == null ? "to be resolved on approval" : recipient, EMAIL_SUBJECT, body);
 	}
 
 	private Depositor resolveDepositor(Depositor depositor) {
@@ -204,10 +203,12 @@ public class ReplenishmentTool {
 				.map(item -> "  - Product " + item.productCode() + ": " + item.quantity() + " unit(s)")
 				.collect(Collectors.joining("\n"));
 
+		String name = depositor == null || depositor.name() == null ? "depositor" : depositor.name();
+
 		return """
         Hello %s,
 
-        We are sending you this email because the following products stored in our
+        We are contacting you because the following products stored in our
         warehouse require replenishment:
 
         %s
@@ -218,6 +219,6 @@ public class ReplenishmentTool {
         convenience so we can keep your stock at a healthy level.
 
         Best regards,
-        Agentic WMS Team""".formatted(depositor.name(), products, replenishment.message());
+        Agentic WMS Team""".formatted(name, products, replenishment.message());
 	}
 }

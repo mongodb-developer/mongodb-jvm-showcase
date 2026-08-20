@@ -244,6 +244,7 @@
 	}
 	.task .body { flex: 1; min-width: 0; }
 	.task .description { font-weight: 600; margin-bottom: 3px; }
+	.result { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
 	.task .result { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
 	.task .timing { color: var(--muted); font-size: 11px; margin-top: 3px; }
 
@@ -702,7 +703,27 @@ async function loadReplenishment() {
 		'<td>' + esc(replenishment.message) + '</td>' +
 		'<td>' + itemsLabel(replenishment.items) + '</td>' +
 		'<td>' + badge(replenishment.status) + '</td>' +
-		'<td>' + replenishmentActions(replenishment) + '</td></tr>');
+		'<td>' + replenishmentActions(replenishment) + '</td></tr>' +
+		notificationRow(replenishment));
+}
+
+function notificationRow(replenishment) {
+	const draft = replenishment.notification;
+
+	if (!draft) return '';
+
+	const state = draft.sentAt
+			? 'Sent at ' + stamp(draft.sentAt)
+			: 'Draft. Will be sent on approval';
+
+	return '<tr><td colspan="6" style="padding-top:0">' +
+		'<details><summary class="mono" style="cursor:pointer;color:var(--muted)">' +
+		'Email &middot; ' + esc(state) + '</summary>' +
+		'<div class="result" style="margin-top:8px">' +
+		'<strong>To:</strong> ' + esc(draft.to || 'to be resolved on approval') + '<br>' +
+		'<strong>Subject:</strong> ' + esc(draft.subject) + '<br><br>' +
+		esc(draft.body) +
+		'</div></details></td></tr>';
 }
 
 function replenishmentActions(replenishment) {
