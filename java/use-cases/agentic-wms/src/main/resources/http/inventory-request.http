@@ -6,7 +6,8 @@ Content-Type: application/json
   "productCode": "01",
   "depositor": {
     "id": "RICAS",
-    "name": "Ricas Ltda"
+    "name": "Ricas Ltda",
+    "email": "contact@ricas.com"
   },
   "quantity": 10
 }

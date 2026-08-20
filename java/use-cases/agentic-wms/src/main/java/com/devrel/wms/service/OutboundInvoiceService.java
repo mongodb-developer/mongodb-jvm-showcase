@@ -109,6 +109,7 @@ public class OutboundInvoiceService {
                 Use the available tools autonomously.
                 Do not ask the user for additional information.
                 If replenishment is necessary, create it.
+                After creating a replenishment, notify the depositor using the notification tool.
                 If not, take no action.
                 """.formatted(number))
 				.call()

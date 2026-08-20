@@ -284,6 +284,10 @@
 				<label>Depositor name</label>
 				<input id="in-dep-name" placeholder="Ricas Ltda">
 			</div>
+			<div class="field">
+				<label>Depositor email</label>
+				<input id="in-dep-email" placeholder="contact@ricas.com">
+			</div>
 		</div>
 		<div class="items-editor" id="in-items"></div>
 		<div class="row">
@@ -399,7 +403,7 @@
 			<button class="btn ghost" onclick="loadReplenishment()">Refresh</button>
 		</div>
 		<table>
-			<thead><tr><th>Id</th><th>Message</th><th>Items</th><th>Status</th></tr></thead>
+			<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th></tr></thead>
 			<tbody id="r-body"></tbody>
 		</table>
 	</div>
@@ -460,7 +464,10 @@ function rows(tbody, list, columns, render) {
 
 const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + '</span>';
 const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
-const depositorLabel = depositor => depositor ? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.id) + ')</span>' : '-';
+const depositorLabel = depositor => depositor
+	? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.id) + ')</span>'
+		+ (depositor.email ? '<br><span class="mono">' + esc(depositor.email) + '</span>' : '')
+	: '-';
 
 function addItemLine(containerId) {
 	const line = document.createElement('div');
@@ -564,11 +571,14 @@ async function createInvoice(kind) {
 	const number = document.getElementById(prefix + '-number').value.trim();
 	const depositorId = document.getElementById(prefix + '-dep-id').value.trim();
 	const depositorName = document.getElementById(prefix + '-dep-name').value.trim();
+	const emailField = document.getElementById(prefix + '-dep-email');
 	const items = readItems(prefix + '-items');
 
 	if (!number || items.length === 0) return notify('Number and at least one item are required', 'err', 'Invalid input');
 
-	const depositor = depositorId ? { id: depositorId, name: depositorName } : null;
+	const depositor = depositorId
+			? { id: depositorId, name: depositorName, email: emailField ? emailField.value.trim() : null }
+			: null;
 
 	await post('/' + kind + '-invoice', { number, depositor, items });
 	notify('Invoice ' + number + ' created', 'ok', 'Success');
@@ -600,8 +610,9 @@ async function loadReplenishment() {
 	const status = document.getElementById('r-filter').value;
 	const list = (await api('/replenishment')).filter(r => !status || r.status === status);
 
-	rows('r-body', list, 4, replenishment =>
+	rows('r-body', list, 5, replenishment =>
 		'<tr><td class="mono">' + esc(replenishment.id) + '</td>' +
+		'<td>' + depositorLabel(replenishment.depositor) + '</td>' +
 		'<td>' + esc(replenishment.message) + '</td>' +
 		'<td>' + itemsLabel(replenishment.items) + '</td>' +
 		'<td>' + badge(replenishment.status) + '</td></tr>');

@@ -1,5 +1,6 @@
 package com.devrel.wms.tool;
 
+import com.devrel.wms.entity.Depositor;
 import com.devrel.wms.entity.Inventory;
 import com.devrel.wms.entity.Replenishment;
 import com.devrel.wms.entity.StockMovement;
@@ -13,6 +14,7 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ReplenishmentTool {
@@ -38,6 +40,9 @@ public class ReplenishmentTool {
     	 are expected to run out of stock soon.
     """)
 	public Replenishment createReplenishment(
+			@ToolParam(description = "Depositor that owns the products, taken from the inventory entry")
+			Depositor depositor,
+
 			@ToolParam(description = "Products and quantities that need replenishment")
 			List<Replenishment.ReplenishmentItem> items,
 
@@ -46,7 +51,7 @@ public class ReplenishmentTool {
 	) {
 
 		Replenishment replenishment =
-				new Replenishment(null, items, message, Replenishment.Status.PENDING);
+				new Replenishment(null, depositor, items, message, Replenishment.Status.PENDING);
 
 		return replenishmentService.save(replenishment);
 	}
@@ -84,4 +89,36 @@ public class ReplenishmentTool {
 		return stockMovementService.findByInvoiceNumber(invoiceNumber);
 	}
 
+	@Tool(description = """
+    	Notify by email the depositor that owns a replenishment request.
+    	Use this tool only after a replenishment request has been created,
+    	passing the id returned by the creation tool.
+    """)
+	public String notifyDepositor(
+			@ToolParam(description = "Id of the replenishment request to notify about")
+			String replenishmentId
+	) {
+		logger.info("##TOOL## - Notifying depositor about replenishment {}", replenishmentId);
+
+		Replenishment replenishment = replenishmentService.findById(replenishmentId);
+
+		if (replenishment == null) {
+			return "Replenishment not found: " + replenishmentId;
+		}
+
+		Depositor depositor = replenishment.depositor();
+
+		if (depositor == null || depositor.email() == null || depositor.email().isBlank()) {
+			return "Depositor has no email registered. Notification was not sent.";
+		}
+
+		String body = replenishment.items().stream()
+				.map(item -> item.productCode() + ": " + item.quantity() + " unit(s)")
+				.collect(Collectors.joining("; "));
+
+		logger.info("##EMAIL## - To: {} <{}> | Subject: Replenishment required | Body: {} | Reason: {}",
+				depositor.name(), depositor.email(), body, replenishment.message());
+
+		return "Email sent to " + depositor.email() + " with " + replenishment.items().size() + " item(s).";
+	}
 }

@@ -55,7 +55,9 @@ public class InventoryService {
 			mongoTemplate.upsert(
 					new Query(Criteria.where("productCode").is(productCode)
 							.and("depositor.id").is(depositor.id())),
-					new Update().inc("quantity", quantity).setOnInsert("depositor.name", depositor.name()),
+					new Update().inc("quantity", quantity)
+						.setOnInsert("depositor.name", depositor.name())
+						.setOnInsert("depositor.email", depositor.email()),
 					Inventory.class
 			);
 
