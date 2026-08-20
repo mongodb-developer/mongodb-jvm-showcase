@@ -10,5 +10,7 @@ import java.util.List;
 public interface StockMovementRepository extends MongoRepository<StockMovement, String> {
 	List<StockMovement> findByProductCode(String productCode);
 
+	List<StockMovement> findByProductCodeAndDepositorId(String productCode, String depositorId);
+
 	List<StockMovement> findByInvoiceNumber(String invoiceNumber);
 }
