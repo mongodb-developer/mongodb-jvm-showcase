@@ -32,6 +32,13 @@ public class ReplenishmentController {
 		return ResponseEntity.ok(replenishmentService.findAll());
 	}
 
+	@PostMapping("/{id}/status/{status}")
+	public ResponseEntity<Replenishment> changeStatus(
+			@PathVariable String id,
+			@PathVariable Replenishment.Status status) {
+		return ResponseEntity.ok(replenishmentService.changeStatus(id, status));
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Replenishment> findById(@PathVariable String id) {
 		return ResponseEntity.ok(replenishmentService.findById(id));

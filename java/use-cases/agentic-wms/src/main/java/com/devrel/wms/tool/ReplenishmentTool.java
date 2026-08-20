@@ -14,6 +14,7 @@ import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,8 +40,10 @@ public class ReplenishmentTool {
 	@Tool(description = """
    		 Create a replenishment request when one or more products
     	 are expected to run out of stock soon.
+    	 Products already covered by a pending request of the same depositor are skipped.
+    	 The answer reports the created replenishment id and any skipped product.
     """)
-	public Replenishment createReplenishment(
+	public String createReplenishment(
 			@ToolParam(description = "Depositor that owns the products, taken from the inventory entry")
 			Depositor depositor,
 
@@ -50,11 +53,49 @@ public class ReplenishmentTool {
 			@ToolParam(description = "Short explanation of why replenishment is necessary")
 			String message
 	) {
+		logger.info("##TOOL## - Creating replenishment for depositor {}", depositor == null ? null : depositor.id());
 
-		Replenishment replenishment =
-				new Replenishment(null, depositor, items, message, Replenishment.Status.PENDING);
+		if (depositor == null || depositor.id() == null) {
+			return "Depositor is required to create a replenishment.";
+		}
 
-		return replenishmentService.save(replenishment);
+		List<Replenishment> pending = replenishmentService.findPendingByDepositor(depositor.id());
+
+		Set<String> covered = pending.stream()
+				.flatMap(replenishment -> replenishment.items().stream())
+				.map(Replenishment.ReplenishmentItem::productCode)
+				.collect(Collectors.toSet());
+
+		List<Replenishment.ReplenishmentItem> newItems = items.stream()
+				.filter(item -> !covered.contains(item.productCode()))
+				.toList();
+
+		if (newItems.isEmpty()) {
+			return "No replenishment created. All requested products are already covered by pending requests: "
+					+ pendingReference(pending) + ".";
+		}
+
+		Replenishment created = replenishmentService.save(
+				new Replenishment(null, depositor, newItems, message, Replenishment.Status.PENDING));
+
+		String skipped = items.stream()
+				.map(Replenishment.ReplenishmentItem::productCode)
+				.filter(covered::contains)
+				.collect(Collectors.joining(", "));
+
+		return "Replenishment %s created for products %s.%s".formatted(
+				created.id(),
+				newItems.stream()
+						.map(Replenishment.ReplenishmentItem::productCode)
+						.collect(Collectors.joining(", ")),
+				skipped.isBlank() ? "" : " Products already covered by pending requests and skipped: " + skipped + "."
+		);
+	}
+
+	private String pendingReference(List<Replenishment> pending) {
+		return pending.stream()
+				.map(Replenishment::id)
+				.collect(Collectors.joining(", "));
 	}
 
 	@Tool(description = """

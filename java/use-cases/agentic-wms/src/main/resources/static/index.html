@@ -462,7 +462,7 @@
 			<button class="btn ghost" onclick="loadReplenishment()">Refresh</button>
 		</div>
 		<table>
-			<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th></tr></thead>
+			<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
 			<tbody id="r-body"></tbody>
 		</table>
 	</div>
@@ -692,12 +692,35 @@ async function loadReplenishment() {
 	const status = document.getElementById('r-filter').value;
 	const list = (await api('/replenishment')).filter(r => !status || r.status === status);
 
-	rows('r-body', list, 5, replenishment =>
+	rows('r-body', list, 6, replenishment =>
 		'<tr><td class="mono">' + esc(replenishment.id) + '</td>' +
 		'<td>' + depositorLabel(replenishment.depositor) + '</td>' +
 		'<td>' + esc(replenishment.message) + '</td>' +
 		'<td>' + itemsLabel(replenishment.items) + '</td>' +
-		'<td>' + badge(replenishment.status) + '</td></tr>');
+		'<td>' + badge(replenishment.status) + '</td>' +
+		'<td>' + replenishmentActions(replenishment) + '</td></tr>');
+}
+
+function replenishmentActions(replenishment) {
+	const action = (label, status, ghost) =>
+			'<button class="btn ' + (ghost ? 'ghost ' : '') + 'sm" onclick="changeReplenishmentStatus(\''
+			+ esc(replenishment.id) + '\', \'' + status + '\')">' + label + '</button>';
+
+	if (replenishment.status === 'PENDING') {
+		return action('Approve', 'APPROVED') + ' ' + action('Reject', 'REJECTED', true);
+	}
+
+	if (replenishment.status === 'APPROVED') {
+		return action('Complete', 'COMPLETED');
+	}
+
+	return '<span class="mono">-</span>';
+}
+
+async function changeReplenishmentStatus(id, status) {
+	await post('/replenishment/' + encodeURIComponent(id) + '/status/' + status);
+	notify('Replenishment moved to ' + status, 'ok', 'Success');
+	loadReplenishment();
 }
 
 const openRuns = new Set();
