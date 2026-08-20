@@ -191,6 +191,10 @@
 		box-shadow: 0 8px 24px rgba(0,0,0,.4);
 		font-size: 13px;
 	}
+	.lang { display: flex; gap: 4px; }
+	.lang button { font-size: 15px; padding: 3px 8px; opacity: .4; }
+	.lang button.active { opacity: 1; border-color: var(--accent); }
+
 	.auto-refresh {
 		display: flex;
 		align-items: center;
@@ -262,6 +266,10 @@
 	<h1>Agentic WMS</h1>
 	<span class="spacer"></span>
 	<span class="status" id="status"></span>
+	<div class="lang">
+		<button class="btn ghost sm" data-lang="EN" onclick="changeLanguage('EN')" title="Agent answers in English">&#127482;&#127480;</button>
+		<button class="btn ghost sm" data-lang="PT_BR" onclick="changeLanguage('PT_BR')" title="Agente responde em português">&#127463;&#127479;</button>
+	</div>
 	<button class="btn ghost sm" id="theme-toggle" onclick="toggleTheme()"></button>
 </header>
 
@@ -840,6 +848,20 @@ document.getElementById('tabs').addEventListener('click', event => {
 	loaders[tab]().catch(() => {});
 });
 
+function markLanguage(language) {
+	document.querySelectorAll('.lang button')
+			.forEach(button => button.classList.toggle('active', button.dataset.lang === language));
+}
+
+async function changeLanguage(language) {
+	markLanguage(await post('/settings/language/' + language));
+	notify('Agent language changed to ' + language, 'ok', 'Success');
+}
+
+async function loadLanguage() {
+	markLanguage(await api('/settings/language'));
+}
+
 function applyTheme(theme) {
 	document.documentElement.dataset.theme = theme;
 	document.getElementById('theme-toggle').textContent = theme === 'light' ? 'Dark' : 'Light';
@@ -854,6 +876,7 @@ applyTheme(localStorage.getItem('wms-theme') || 'dark');
 
 ['in-items', 'out-items'].forEach(addItemLine);
 document.getElementById('status').textContent = window.location.origin;
+loadLanguage().catch(() => {});
 loadProducts().catch(() => {});
 </script>
 

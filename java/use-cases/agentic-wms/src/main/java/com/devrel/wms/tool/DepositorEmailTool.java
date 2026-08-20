@@ -1,5 +1,7 @@
 package com.devrel.wms.tool;
 
+import com.devrel.wms.config.AgentLanguage;
+import com.devrel.wms.config.AgentLanguageSettings;
 import com.devrel.wms.domain.Depositor;
 import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.service.InventoryService;
@@ -17,15 +19,23 @@ public class DepositorEmailTool {
 
 	private static final Logger logger = LoggerFactory.getLogger(DepositorEmailTool.class);
 	private static final String EMAIL_SUBJECT = "Replenishment required for your products";
+	private static final String EMAIL_SUBJECT_PT_BR = "Reabastecimento necessário para seus produtos";
 
 	private final ReplenishmentService replenishmentService;
 	private final InventoryService inventoryService;
+	private final AgentLanguageSettings agentLanguageSettings;
 
 	DepositorEmailTool(
 			ReplenishmentService replenishmentService,
-			InventoryService inventoryService) {
+			InventoryService inventoryService,
+			AgentLanguageSettings agentLanguageSettings) {
 		this.replenishmentService = replenishmentService;
 		this.inventoryService = inventoryService;
+		this.agentLanguageSettings = agentLanguageSettings;
+	}
+
+	private String subject() {
+		return agentLanguageSettings.language() == AgentLanguage.PT_BR ? EMAIL_SUBJECT_PT_BR : EMAIL_SUBJECT;
 	}
 
 	@Tool(description = """
@@ -59,14 +69,14 @@ public class DepositorEmailTool {
 		String body = composeEmail(replenishment, depositor);
 
 		replenishmentService.saveNotification(replenishmentId, new Replenishment.Notification(
-				recipient, EMAIL_SUBJECT, body, null));
+				recipient, subject(), body, null));
 
 		return """
         Email drafted for replenishment %s. It will be sent when the request is approved.
         To: %s
         Subject: %s
 
-        %s""".formatted(replenishmentId, recipient == null ? "to be resolved on approval" : recipient, EMAIL_SUBJECT, body);
+        %s""".formatted(replenishmentId, recipient == null ? "to be resolved on approval" : recipient, subject(), body);
 	}
 
 	private Depositor resolveDepositor(Depositor depositor) {
@@ -90,11 +100,13 @@ public class DepositorEmailTool {
 	}
 
 	private String composeEmail(Replenishment replenishment, Depositor depositor) {
+		if (agentLanguageSettings.language() == AgentLanguage.PT_BR) {
+			return composePortugueseEmail(replenishment, depositor);
+		}
+
 		String products = replenishment.items().stream()
 				.map(item -> "  - Product " + item.productCode() + ": " + item.quantity() + " unit(s)")
 				.collect(Collectors.joining("\n"));
-
-		String name = depositor == null || depositor.name() == null ? "depositor" : depositor.name();
 
 		return """
         Hello %s,
@@ -110,6 +122,32 @@ public class DepositorEmailTool {
         convenience so we can keep your stock at a healthy level.
 
         Best regards,
-        Agentic WMS Team""".formatted(name, products, replenishment.message());
+        Agentic WMS Team""".formatted(depositorName(depositor), products, replenishment.message());
+	}
+
+	private String composePortugueseEmail(Replenishment replenishment, Depositor depositor) {
+		String products = replenishment.items().stream()
+				.map(item -> "  - Produto " + item.productCode() + ": " + item.quantity() + " unidade(s)")
+				.collect(Collectors.joining("\n"));
+
+		return """
+        Olá %s,
+
+        Estamos entrando em contato porque os seguintes produtos armazenados em
+        nosso centro de distribuição precisam de reabastecimento:
+
+        %s
+
+        Motivo: %s
+
+        Por favor, providencie uma nova remessa de entrada com essas quantidades o
+        quanto antes, para mantermos seu estoque em um nível saudável.
+
+        Atenciosamente,
+        Equipe Agentic WMS""".formatted(depositorName(depositor), products, replenishment.message());
+	}
+
+	private String depositorName(Depositor depositor) {
+		return depositor == null || depositor.name() == null ? "depositor" : depositor.name();
 	}
 }

@@ -1,5 +1,6 @@
 package com.devrel.wms.agent;
 
+import com.devrel.wms.config.AgentLanguageSettings;
 import com.devrel.wms.domain.AgentRun;
 import com.devrel.wms.service.AgentRunService;
 import org.slf4j.Logger;
@@ -18,9 +19,11 @@ public class AgentRunner {
 
 	private final Logger logger = LoggerFactory.getLogger(AgentRunner.class);
 	private final AgentRunService agentRunService;
+	private final AgentLanguageSettings agentLanguageSettings;
 
-	AgentRunner(AgentRunService agentRunService) {
+	AgentRunner(AgentRunService agentRunService, AgentLanguageSettings agentLanguageSettings) {
 		this.agentRunService = agentRunService;
+		this.agentLanguageSettings = agentLanguageSettings;
 	}
 
 	public AgentRun run(AgentDefinition definition, String reference) {
@@ -78,7 +81,8 @@ public class AgentRunner {
                 %s
 
                 Summarize the outcome of this execution.
-                """.formatted(goal, previousResults(tasks)))
+                %s
+                """.formatted(goal, previousResults(tasks), agentLanguageSettings.instruction()))
 					.call()
 					.content();
 		} catch (Exception exception) {
@@ -99,7 +103,8 @@ public class AgentRunner {
 
                 Create the execution plan required to accomplish this goal.
                 Assign to each task exactly one capability, using its name.
-                """.formatted(goal, capabilityCatalog(definition)))
+                %s
+                """.formatted(goal, capabilityCatalog(definition), agentLanguageSettings.instruction()))
 				.call()
 				.entity(new ParameterizedTypeReference<List<PlannedTask>>() {});
 
@@ -158,7 +163,8 @@ public class AgentRunner {
                 Use the available tools autonomously.
                 Do not execute any other task of the plan.
                 Answer with a short result of this task only.
-                """.formatted(goal, previousResults(tasks), description))
+                %s
+                """.formatted(goal, previousResults(tasks), description, agentLanguageSettings.instruction()))
 				.call()
 				.content();
 	}

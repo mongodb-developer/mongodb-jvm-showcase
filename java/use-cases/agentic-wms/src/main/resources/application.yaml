@@ -17,7 +17,7 @@ spring:
           - type
   data:
     mongodb:
-      auto-index-creation: true
+      auto-index-creation: false
 wms:
   knowledge:
     ingest-on-startup: true
