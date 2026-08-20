@@ -2,16 +2,16 @@ package com.devrel.wms.service;
 
 import com.devrel.wms.entity.OutboundInvoice;
 import com.devrel.wms.entity.StockMovement;
+import com.devrel.wms.event.OutboundInvoiceCompleted;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.OutboundInvoiceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,19 +21,18 @@ public class OutboundInvoiceService {
 	private final OutboundInvoiceRepository outboundInvoiceRepository;
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
-
-	private ChatClient chatClient;
+	private final ApplicationEventPublisher eventPublisher;
 
 	OutboundInvoiceService(
 			OutboundInvoiceRepository outboundInvoiceRepository,
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
-			ChatClient chatClient
+			ApplicationEventPublisher eventPublisher
 	) {
 		this.outboundInvoiceRepository = outboundInvoiceRepository;
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
-		this.chatClient = chatClient;
+		this.eventPublisher = eventPublisher;
 	}
 
 	public OutboundInvoice save(OutboundInvoice outboundInvoice) {
@@ -98,24 +97,9 @@ public class OutboundInvoiceService {
 		outboundInvoiceRepository
 				.save(changeOutboundStatus(outbound, OutboundInvoice.InvoiceStatus.COMPLETED));
 
-		String response = chatClient
-				.prompt()
-				.system(system -> system
-						.param("current_date", LocalDateTime.now()))
-				.user("""
-                Outbound invoice %s has just been completed.
+		eventPublisher.publishEvent(new OutboundInvoiceCompleted(number));
 
-                Analyze this invoice and determine whether any product requires replenishment.
-                Use the available tools autonomously.
-                Do not ask the user for additional information.
-                If replenishment is necessary, create it.
-                After creating a replenishment, notify the depositor using the notification tool.
-                If not, take no action.
-                """.formatted(number))
-				.call()
-				.content();
-
-		logger.info("Invoice {} completed. Content: {} ", number, response);
+		logger.info("Invoice {} completed", number);
 	}
 
 	private OutboundInvoice getOutbound(String number) {
