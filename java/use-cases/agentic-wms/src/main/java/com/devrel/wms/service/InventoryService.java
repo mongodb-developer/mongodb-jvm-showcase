@@ -68,6 +68,8 @@ public class InventoryService {
 					Inventory.class
 			);
 
+			refreshDepositorEmail(productCode, depositor);
+
 			logger.info("Inventory for product code {} and depositor {} increased by {}",
 					productCode, depositor.id(), quantity);
 
@@ -79,8 +81,25 @@ public class InventoryService {
 					+ " and depositor " + depositor.id());
 		}
 
+		refreshDepositorEmail(productCode, depositor);
+
 		logger.info("Inventory for product code {} and depositor {} decreased by {}",
 				productCode, depositor.id(), -quantity);
+	}
+
+	private void refreshDepositorEmail(String productCode, Depositor depositor) {
+		if (depositor.email() == null || depositor.email().isBlank()) {
+			return;
+		}
+
+		mongoTemplate.updateFirst(
+				new Query(Criteria.where("productCode").is(productCode)
+						.and("depositor.id").is(depositor.id())),
+				new Update().set("depositor.email", depositor.email()),
+				Inventory.class
+		);
+
+		logger.info("Depositor {} email updated for product code {}", depositor.id(), productCode);
 	}
 
 }

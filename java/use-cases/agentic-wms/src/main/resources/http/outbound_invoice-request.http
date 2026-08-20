@@ -5,7 +5,8 @@ Content-Type: application/json
   "number": "NF-2003",
   "depositor": {
     "id": "RICAS",
-    "name": "Ricas Ltda"
+    "name": "Ricas Ltda",
+    "email": "contact@ricas.com"
   },
   "items": [
     {
