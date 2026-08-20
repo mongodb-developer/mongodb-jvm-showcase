@@ -5,6 +5,7 @@ import com.devrel.wms.domain.Inventory;
 import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.service.InventoryService;
+import com.devrel.wms.service.ProductService;
 import com.devrel.wms.service.ReplenishmentService;
 import com.devrel.wms.service.StockMovementService;
 import org.slf4j.Logger;
@@ -23,18 +24,39 @@ public class ReplenishmentTool {
 	private static final Logger logger = LoggerFactory.getLogger(ReplenishmentTool.class);
 	private static final String EMAIL_SUBJECT = "Replenishment required for your products";
 
+	private static final String PRODUCT_CODE_PARAM = """
+			Exact product code as stored in the system, for example '02'.
+			Never include words or labels such as 'Product', 'SKU' or the product name.""";
+
+	private static final String DEPOSITOR_ID_PARAM = """
+			Exact depositor identifier as stored in the system, for example 'bsp'.
+			Never use the depositor name.""";
+
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
 	private final ReplenishmentService replenishmentService;
+	private final ProductService productService;
 
 
 	public ReplenishmentTool(
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
-			ReplenishmentService replenishmentService) {
+			ReplenishmentService replenishmentService,
+			ProductService productService) {
 		this.inventoryService = inventoryService;
 		this.replenishmentService = replenishmentService;
 		this.stockMovementService = stockMovementService;
+		this.productService = productService;
+	}
+
+	private String requireProductCode(String productCode) {
+		if (productCode != null && productService.findByCode(productCode) != null) {
+			return productCode;
+		}
+
+		throw new IllegalArgumentException(
+				"Unknown product code: '" + productCode + "'. Use the exact code as stored, "
+						+ "for example '02'. Do not add any word or label to the code.");
 	}
 
 	@Tool(description = """
@@ -47,7 +69,8 @@ public class ReplenishmentTool {
 			@ToolParam(description = "Depositor that owns the products, taken from the inventory entry")
 			Depositor depositor,
 
-			@ToolParam(description = "Products and quantities that need replenishment")
+			@ToolParam(description = "Products and quantities that need replenishment. "
+					+ "Each product code must be the exact code as stored, for example '02'")
 			List<Replenishment.ReplenishmentItem> items,
 
 			@ToolParam(description = "Short explanation of why replenishment is necessary")
@@ -58,6 +81,8 @@ public class ReplenishmentTool {
 		if (depositor == null || depositor.id() == null) {
 			return "Depositor is required to create a replenishment.";
 		}
+
+		items.forEach(item -> requireProductCode(item.productCode()));
 
 		List<Replenishment> pending = replenishmentService.findPendingByDepositor(depositor.id());
 
@@ -103,9 +128,10 @@ public class ReplenishmentTool {
     	Use this tool when you need to know the current available stock.
     """)
 	public List<Inventory> getInventoryByProductCode(
-			@ToolParam(description = "Unique product code") String productCode) {
+			@ToolParam(description = PRODUCT_CODE_PARAM) String productCode) {
 		logger.info("##TOOL## - Calling Inventory Product Code for product {}", productCode);
-		return inventoryService.findByProductCode(productCode);
+
+		return inventoryService.findByProductCode(requireProductCode(productCode));
 	}
 
 	@Tool(description = """
@@ -113,10 +139,10 @@ public class ReplenishmentTool {
     	Use this tool to analyze recent inbound and outbound quantities and dates.
     """)
 	public List<StockMovement> getStockMovement(
-			@ToolParam(description = "Unique product code") String productCode) {
+			@ToolParam(description = PRODUCT_CODE_PARAM) String productCode) {
 		logger.info("##TOOL## - Getting stock movement by product number {}", productCode);
 
-		return stockMovementService.findByProductCode(productCode);
+		return stockMovementService.findByProductCode(requireProductCode(productCode));
 	}
 
 	@Tool(description = """
@@ -125,11 +151,11 @@ public class ReplenishmentTool {
     	of a single depositor.
     """)
 	public List<StockMovement> getStockMovementByDepositor(
-			@ToolParam(description = "Unique product code") String productCode,
-			@ToolParam(description = "Unique depositor identifier") String depositorId) {
+			@ToolParam(description = PRODUCT_CODE_PARAM) String productCode,
+			@ToolParam(description = DEPOSITOR_ID_PARAM) String depositorId) {
 		logger.info("##TOOL## - Getting stock movement by product {} and depositor {}", productCode, depositorId);
 
-		return stockMovementService.findByProductCodeAndDepositor(productCode, depositorId);
+		return stockMovementService.findByProductCodeAndDepositor(requireProductCode(productCode), depositorId);
 	}
 
 	@Tool(description = """
@@ -161,6 +187,11 @@ public class ReplenishmentTool {
 
 		if (replenishment == null) {
 			return "Replenishment not found: " + replenishmentId;
+		}
+
+		if (replenishment.notification() != null) {
+			return "Email already drafted for replenishment %s. Nothing was changed. It will be sent when the request is approved."
+					.formatted(replenishmentId);
 		}
 
 		Depositor depositor = resolveDepositor(replenishment.depositor());
