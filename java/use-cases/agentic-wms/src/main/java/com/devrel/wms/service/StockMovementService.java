@@ -1,5 +1,6 @@
 package com.devrel.wms.service;
 
+import com.devrel.wms.domain.Depositor;
 import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.repository.StockMovementRepository;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class StockMovementService {
 
 	public StockMovement register(
 			String productCode,
+			Depositor depositor,
 			int quantity,
 			String invoiceNumber,
 			StockMovement.MovementType type
@@ -29,13 +31,14 @@ public class StockMovementService {
 				null,
 				LocalDateTime.now(),
 				productCode,
+				depositor,
 				quantity,
 				invoiceNumber,
 				type
 		));
 
-		logger.info("Stock movement {} of {} unit(s) for product code {} registered",
-				type, quantity, productCode);
+		logger.info("Stock movement {} of {} unit(s) for product code {} and depositor {} registered",
+				type, quantity, productCode, depositor == null ? null : depositor.id());
 
 		return save;
 	}

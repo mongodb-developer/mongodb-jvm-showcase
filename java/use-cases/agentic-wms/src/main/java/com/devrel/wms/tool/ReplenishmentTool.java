@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class ReplenishmentTool {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReplenishmentTool.class);
+	private static final String EMAIL_SUBJECT = "Replenishment required for your products";
 
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
@@ -112,13 +113,37 @@ public class ReplenishmentTool {
 			return "Depositor has no email registered. Notification was not sent.";
 		}
 
-		String body = replenishment.items().stream()
-				.map(item -> item.productCode() + ": " + item.quantity() + " unit(s)")
-				.collect(Collectors.joining("; "));
+		String email = composeEmail(replenishment, depositor);
 
-		logger.info("##EMAIL## - To: {} <{}> | Subject: Replenishment required | Body: {} | Reason: {}",
-				depositor.name(), depositor.email(), body, replenishment.message());
+		logger.info("##EMAIL## - To: {} <{}> | Subject: {}\n{}",
+				depositor.name(), depositor.email(), EMAIL_SUBJECT, email);
 
-		return "Email sent to " + depositor.email() + " with " + replenishment.items().size() + " item(s).";
+		return """
+        Email sent to %s <%s>
+        Subject: %s
+
+        %s""".formatted(depositor.name(), depositor.email(), EMAIL_SUBJECT, email);
+	}
+
+	private String composeEmail(Replenishment replenishment, Depositor depositor) {
+		String products = replenishment.items().stream()
+				.map(item -> "  - Product " + item.productCode() + ": " + item.quantity() + " unit(s)")
+				.collect(Collectors.joining("\n"));
+
+		return """
+        Hello %s,
+
+        We are sending you this email because the following products stored in our
+        warehouse require replenishment:
+
+        %s
+
+        Reason: %s
+
+        Please arrange a new inbound shipment for these quantities at your earliest
+        convenience so we can keep your stock at a healthy level.
+
+        Best regards,
+        Agentic WMS Team""".formatted(depositor.name(), products, replenishment.message());
 	}
 }

@@ -88,6 +88,7 @@ public class OutboundInvoiceService {
 
 			stockMovementService.register(
 					item.productCode(),
+					outbound.depositor(),
 					item.quantity(),
 					outbound.number(),
 					StockMovement.MovementType.OUTBOUND

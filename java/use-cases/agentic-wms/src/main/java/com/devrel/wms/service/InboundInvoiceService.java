@@ -83,6 +83,7 @@ public class InboundInvoiceService {
 
 			stockMovementService.register(
 					item.productCode(),
+					inbound.depositor(),
 					item.quantity(),
 					inbound.number(),
 					StockMovement.MovementType.INBOUND

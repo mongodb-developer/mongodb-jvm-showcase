@@ -39,6 +39,9 @@ public class AgentConfig {
 			* include a short message explaining the reason.
 			
 			If inventory is healthy, take no action.
+
+			When you use the notification tool, reproduce in your answer the full email content
+			returned by the tool, exactly as it is, without summarizing or rewriting it.
 			
 			Complete the task autonomously and stop only after you have either:
 			
