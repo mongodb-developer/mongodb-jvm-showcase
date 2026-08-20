@@ -18,6 +18,9 @@ spring:
   data:
     mongodb:
       auto-index-creation: false
+devrel:
+  application:
+    track-name: devrel-tutorial-java-agentic-wms
 wms:
   knowledge:
     ingest-on-startup: true
