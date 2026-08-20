@@ -1,176 +1,428 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agentic WMS</title>
 <style>
 	:root {
-		--bg: #10151a;
-		--panel: #18212b;
-		--panel-2: #1f2a36;
-		--border: #2b3947;
-		--text: #e6edf3;
-		--muted: #8b9aa9;
+		--bg: #0d1216;
+		--surface: #151d24;
+		--surface-2: #1b262f;
+		--surface-3: #223040;
+		--border: #26333f;
+		--border-strong: #33455a;
+		--text: #e8eef4;
+		--text-soft: #b3c1cd;
+		--muted: #7f8f9d;
 		--accent: #00ed64;
-		--accent-dark: #00684a;
-		--danger: #ff6b6b;
-		--warn: #ffc107;
-		--info: #4dabf7;
+		--accent-ink: #001e2b;
+		--accent-soft: rgba(0, 237, 100, .12);
+		--danger: #ff7a7a;
+		--warn: #ffc861;
+		--info: #6cb8ff;
+		--shadow: 0 10px 30px rgba(0, 0, 0, .35);
+		--radius: 10px;
+		--radius-sm: 7px;
+		--sidebar: 236px;
+		--topbar: 60px;
 	}
 
 	html[data-theme="light"] {
-		--bg: #f7f9fa;
-		--panel: #ffffff;
-		--panel-2: #eef1f4;
-		--border: #d9e0e6;
+		--bg: #f4f7f9;
+		--surface: #ffffff;
+		--surface-2: #f0f4f7;
+		--surface-3: #e6ecf1;
+		--border: #dde5eb;
+		--border-strong: #c4d1db;
 		--text: #001e2b;
-		--muted: #5c6c7a;
+		--text-soft: #33475b;
+		--muted: #61748a;
 		--accent: #00684a;
-		--accent-dark: #00ed64;
-		--danger: #c0392b;
-		--warn: #a06800;
-		--info: #1864ab;
+		--accent-ink: #ffffff;
+		--accent-soft: rgba(0, 104, 74, .09);
+		--danger: #b5322a;
+		--warn: #8a5a00;
+		--info: #10559a;
+		--shadow: 0 10px 30px rgba(16, 40, 60, .1);
 	}
 
-	html[data-theme="light"] button.btn { background: var(--accent); color: #ffffff; }
-	html[data-theme="light"] button.btn:hover { background: #00513a; }
-	html[data-theme="light"] .toast { box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-
 	* { box-sizing: border-box; }
+
+	html, body { height: 100%; }
 
 	body {
 		margin: 0;
 		background: var(--bg);
 		color: var(--text);
-		font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+		-webkit-font-smoothing: antialiased;
 	}
 
-	header {
+	/* ---------- app shell ---------- */
+
+	.app { display: flex; min-height: 100vh; }
+
+	aside {
+		width: var(--sidebar);
+		flex: 0 0 var(--sidebar);
+		background: var(--surface);
+		border-right: 1px solid var(--border);
+		display: flex;
+		flex-direction: column;
+		position: sticky;
+		top: 0;
+		height: 100vh;
+	}
+
+	.brand {
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		padding: 16px 24px;
-		background: var(--panel);
+		gap: 10px;
+		height: var(--topbar);
+		padding: 0 18px;
 		border-bottom: 1px solid var(--border);
 	}
 
-	header h1 { font-size: 18px; margin: 0; font-weight: 600; }
-	header .leaf { color: var(--accent); font-size: 20px; }
-	header .spacer { flex: 1; }
-	header .status { color: var(--muted); font-size: 12px; }
+	.brand .mark {
+		width: 26px;
+		height: 26px;
+		border-radius: 8px;
+		background: var(--accent);
+		color: var(--accent-ink);
+		display: grid;
+		place-items: center;
+		font-weight: 700;
+		font-size: 13px;
+		flex: 0 0 26px;
+	}
 
-	nav {
-		display: flex;
-		gap: 4px;
-		padding: 0 24px;
-		background: var(--panel);
-		border-bottom: 1px solid var(--border);
-		overflow-x: auto;
+	.brand .title { font-size: 14px; font-weight: 600; letter-spacing: .2px; }
+	.brand .sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+
+	nav { padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+
+	nav .group {
+		font-size: 10px;
+		text-transform: uppercase;
+		letter-spacing: .9px;
+		color: var(--muted);
+		padding: 14px 10px 6px;
 	}
 
 	nav button {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
 		background: none;
 		border: none;
-		border-bottom: 2px solid transparent;
-		color: var(--muted);
-		padding: 12px 16px;
-		font-size: 14px;
+		border-radius: var(--radius-sm);
+		color: var(--text-soft);
+		padding: 9px 11px;
+		font-size: 13.5px;
+		font-family: inherit;
+		text-align: left;
 		cursor: pointer;
-		white-space: nowrap;
+		transition: background .12s, color .12s;
 	}
 
-	nav button:hover { color: var(--text); }
-	nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+	nav button .ico { width: 16px; text-align: center; opacity: .8; font-size: 13px; }
+	nav button:hover { background: var(--surface-2); color: var(--text); }
 
-	main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+	nav button.active {
+		background: var(--accent-soft);
+		color: var(--accent);
+		font-weight: 600;
+	}
+
+	nav button.active .ico { opacity: 1; }
+
+	.side-foot {
+		margin-top: auto;
+		padding: 14px 18px;
+		border-top: 1px solid var(--border);
+		font-size: 11px;
+		color: var(--muted);
+		word-break: break-all;
+	}
+
+	.content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+	.topbar {
+		height: var(--topbar);
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 0 28px;
+		background: color-mix(in srgb, var(--bg) 88%, transparent);
+		border-bottom: 1px solid var(--border);
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		backdrop-filter: blur(8px);
+	}
+
+	.topbar h1 { font-size: 17px; font-weight: 600; margin: 0; }
+	.topbar .spacer { flex: 1; }
+
+	main { padding: 26px 28px 60px; max-width: 1320px; width: 100%; }
 	section { display: none; }
 	section.active { display: block; }
 
+	/* ---------- cards ---------- */
+
 	.card {
-		background: var(--panel);
+		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 8px;
-		padding: 16px;
+		border-radius: var(--radius);
 		margin-bottom: 20px;
+		overflow: hidden;
 	}
 
-	.card h2 {
-		font-size: 14px;
-		margin: 0 0 14px;
+	.card-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 14px 18px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.card-head h2 {
+		font-size: 13px;
+		margin: 0;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: .5px;
+		letter-spacing: .7px;
 		color: var(--muted);
 	}
 
-	.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+	.card-head .spacer { flex: 1; }
+	.card-body { padding: 18px; }
+	.card-body.flush { padding: 0; }
 
-	.field { display: flex; flex-direction: column; gap: 4px; }
-	.field label { font-size: 11px; color: var(--muted); text-transform: uppercase; }
-
-	input, select {
-		background: var(--panel-2);
-		border: 1px solid var(--border);
-		border-radius: 6px;
-		color: var(--text);
-		padding: 8px 10px;
-		font-size: 14px;
-		min-width: 140px;
+	.toolbar {
+		display: flex;
+		gap: 10px;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		padding: 14px 18px;
+		background: var(--surface-2);
+		border-bottom: 1px solid var(--border);
 	}
 
-	input:focus, select:focus { outline: none; border-color: var(--accent); }
+	/* ---------- forms ---------- */
+
+	.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+	.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+
+	.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+
+	.field label {
+		font-size: 10.5px;
+		color: var(--muted);
+		text-transform: uppercase;
+		letter-spacing: .7px;
+		font-weight: 600;
+	}
+
+	input, select {
+		background: var(--bg);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-sm);
+		color: var(--text);
+		padding: 9px 11px;
+		font-size: 13.5px;
+		font-family: inherit;
+		width: 100%;
+		transition: border-color .12s, box-shadow .12s;
+	}
+
+	html[data-theme="light"] input,
+	html[data-theme="light"] select { background: var(--surface); }
+
+	input::placeholder { color: var(--muted); opacity: .7; }
+
+	input:focus, select:focus {
+		outline: none;
+		border-color: var(--accent);
+		box-shadow: 0 0 0 3px var(--accent-soft);
+	}
 
 	button.btn {
 		background: var(--accent);
-		color: #001e2b;
-		border: none;
-		border-radius: 6px;
-		padding: 8px 14px;
+		color: var(--accent-ink);
+		border: 1px solid transparent;
+		border-radius: var(--radius-sm);
+		padding: 9px 15px;
 		font-size: 13px;
 		font-weight: 600;
+		font-family: inherit;
 		cursor: pointer;
+		white-space: nowrap;
+		transition: filter .12s, background .12s;
 	}
 
-	button.btn:hover { background: #00c957; }
-	button.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-	button.btn.ghost:hover { background: var(--panel-2); }
-	button.btn.sm { padding: 5px 10px; font-size: 12px; }
+	button.btn:hover { filter: brightness(1.08); }
+	button.btn:active { filter: brightness(.95); }
 
+	button.btn.ghost {
+		background: transparent;
+		color: var(--text);
+		border-color: var(--border-strong);
+	}
+
+	button.btn.ghost:hover { background: var(--surface-3); filter: none; }
+	button.btn.sm { padding: 6px 11px; font-size: 12px; }
+
+	.items-editor { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+
+	.items-editor .item-line {
+		display: grid;
+		grid-template-columns: 1fr 130px auto;
+		gap: 8px;
+		align-items: center;
+	}
+
+	/* ---------- tables ---------- */
+
+	.table-wrap { overflow-x: auto; }
 	table { width: 100%; border-collapse: collapse; }
+
 	th {
 		text-align: left;
-		font-size: 11px;
+		font-size: 10.5px;
 		text-transform: uppercase;
+		letter-spacing: .7px;
 		color: var(--muted);
-		padding: 8px;
+		font-weight: 600;
+		padding: 11px 18px;
+		background: var(--surface-2);
 		border-bottom: 1px solid var(--border);
+		white-space: nowrap;
+		position: sticky;
+		top: 0;
 	}
-	td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-	tr:last-child td { border-bottom: none; }
-	td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); }
-	td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+	td {
+		padding: 12px 18px;
+		border-bottom: 1px solid var(--border);
+		vertical-align: middle;
+	}
+
+	tbody tr:hover td { background: var(--surface-2); }
+	tbody tr:last-child td { border-bottom: none; }
+
+	td.mono, .mono {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 12px;
+		color: var(--muted);
+	}
+
+	.num { text-align: right; font-variant-numeric: tabular-nums; }
+	td.num { font-weight: 600; }
 
 	.badge {
 		display: inline-block;
-		padding: 3px 9px;
+		padding: 3px 10px;
 		border-radius: 20px;
-		font-size: 11px;
-		font-weight: 600;
+		font-size: 10.5px;
+		font-weight: 700;
+		letter-spacing: .5px;
 		border: 1px solid;
+		white-space: nowrap;
 	}
-	.badge.PENDING { color: var(--warn); border-color: var(--warn); }
-	.badge.RECEIVED, .badge.APPROVED { color: var(--info); border-color: var(--info); }
-	.badge.COMPLETED { color: var(--accent); border-color: var(--accent); }
-	.badge.FAILED, .badge.REJECTED { color: var(--danger); border-color: var(--danger); }
-	.badge.INBOUND { color: var(--accent); border-color: var(--accent); }
-	.badge.OUTBOUND { color: var(--warn); border-color: var(--warn); }
 
-	.empty { color: var(--muted); text-align: center; padding: 28px; font-size: 13px; }
+	.badge.PENDING { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
+	.badge.RECEIVED, .badge.APPROVED, .badge.RUNNING { color: var(--info); border-color: var(--info); background: color-mix(in srgb, var(--info) 12%, transparent); }
+	.badge.COMPLETED, .badge.INBOUND { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+	.badge.FAILED, .badge.REJECTED { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+	.badge.OUTBOUND { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
 
-	.items-editor { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
-	.items-editor .item-line { display: flex; gap: 8px; align-items: center; }
-	.items-editor input { min-width: 0; }
+	.empty { color: var(--muted); text-align: center; padding: 34px 18px; font-size: 13px; }
+
+	.actions { display: flex; gap: 6px; }
+
+	/* ---------- agent runs ---------- */
+
+	.lang { display: flex; gap: 4px; }
+	.lang button { font-size: 15px; padding: 4px 9px; opacity: .35; }
+	.lang button.active { opacity: 1; border-color: var(--accent); background: var(--accent-soft); }
+
+	.auto-refresh {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+		font-size: 12px;
+		color: var(--muted);
+		padding-bottom: 8px;
+	}
+
+	.auto-refresh input { width: auto; }
+
+	.run {
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		margin-bottom: 12px;
+		overflow: hidden;
+		background: var(--surface);
+	}
+
+	.run.open { border-color: var(--border-strong); }
+
+	.run-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 13px 16px;
+		background: var(--surface-2);
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.run-head:hover { background: var(--surface-3); }
+	.run-head .goal { flex: 1; font-weight: 600; min-width: 0; }
+	.run-head .meta { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+	.run-head .caret { color: var(--muted); font-size: 10px; transition: transform .15s; }
+	.run.open .run-head .caret { transform: rotate(180deg); }
+
+	.run-tasks { display: none; padding: 8px 16px 16px; }
+	.run.open .run-tasks { display: block; }
+
+	.task { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+	.task:last-child { border-bottom: none; }
+
+	.task .step {
+		flex: 0 0 26px;
+		height: 26px;
+		border-radius: 50%;
+		background: var(--surface-3);
+		border: 1px solid var(--border-strong);
+		display: grid;
+		place-items: center;
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--muted);
+	}
+
+	.task .body { flex: 1; min-width: 0; }
+	.task .description { font-weight: 600; margin-bottom: 5px; }
+	.task .timing { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; margin-top: 8px; }
+
+	.result {
+		color: var(--text-soft);
+		font-size: 13px;
+		white-space: pre-wrap;
+		background: var(--surface-2);
+		border-left: 2px solid var(--border-strong);
+		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+		padding: 10px 12px;
+	}
+
+	details summary { padding: 6px 0; }
+	details summary:hover { color: var(--text); }
+
+	/* ---------- toast ---------- */
 
 	#toast {
 		position: fixed;
@@ -179,331 +431,325 @@
 		max-width: 420px;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 10px;
 		z-index: 50;
 	}
 
 	.toast {
-		padding: 12px 16px;
-		border-radius: 8px;
+		padding: 13px 16px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--border);
 		border-left: 3px solid;
-		background: var(--panel-2);
-		box-shadow: 0 8px 24px rgba(0,0,0,.4);
+		background: var(--surface);
+		box-shadow: var(--shadow);
 		font-size: 13px;
-	}
-	.lang { display: flex; gap: 4px; }
-	.lang button { font-size: 15px; padding: 3px 8px; opacity: .4; }
-	.lang button.active { opacity: 1; border-color: var(--accent); }
-
-	.auto-refresh {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 12px;
-		color: var(--muted);
-	}
-	.auto-refresh input { min-width: 0; }
-
-	.run {
-		border: 1px solid var(--border);
-		border-radius: 8px;
-		margin-bottom: 12px;
-		overflow: hidden;
+		animation: rise .18s ease-out;
 	}
 
-	.run-head {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		padding: 12px 14px;
-		background: var(--panel-2);
-		cursor: pointer;
+	@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+
+	.toast.ok { border-left-color: var(--accent); }
+	.toast.err { border-left-color: var(--danger); }
+	.toast strong { display: block; margin-bottom: 3px; }
+
+	@media (max-width: 900px) {
+		.app { flex-direction: column; }
+		aside { width: 100%; flex: none; height: auto; position: static; }
+		nav { flex-direction: row; overflow-x: auto; padding: 8px; }
+		nav .group, .side-foot { display: none; }
+		nav button { width: auto; }
+		main, .topbar { padding-left: 16px; padding-right: 16px; }
 	}
-
-	.run-head .goal { flex: 1; font-weight: 600; }
-	.run-head .meta { color: var(--muted); font-size: 12px; }
-	.run-head .caret { color: var(--muted); font-size: 11px; }
-
-	.run-tasks { display: none; padding: 6px 14px 12px; }
-	.run.open .run-tasks { display: block; }
-
-	.task {
-		display: flex;
-		gap: 12px;
-		padding: 10px 0;
-		border-bottom: 1px solid var(--border);
-	}
-	.task:last-child { border-bottom: none; }
-
-	.task .step {
-		flex: 0 0 24px;
-		height: 24px;
-		border-radius: 50%;
-		border: 1px solid var(--border);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 11px;
-		color: var(--muted);
-	}
-	.task .body { flex: 1; min-width: 0; }
-	.task .description { font-weight: 600; margin-bottom: 3px; }
-	.result { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
-	.task .result { color: var(--muted); font-size: 13px; white-space: pre-wrap; }
-	.task .timing { color: var(--muted); font-size: 11px; margin-top: 3px; }
-
-	.badge.RUNNING { color: var(--info); border-color: var(--info); }
-
-	.toast.ok { border-color: var(--accent); }
-	.toast.err { border-color: var(--danger); }
-	.toast strong { display: block; margin-bottom: 2px; }
 </style>
 </head>
 <body>
 
-<header>
-	<span class="leaf">&#9679;</span>
-	<h1>Agentic WMS</h1>
-	<span class="spacer"></span>
-	<span class="status" id="status"></span>
-	<div class="lang">
-		<button class="btn ghost sm" data-lang="EN" onclick="changeLanguage('EN')" title="Agent answers in English">&#127482;&#127480;</button>
-		<button class="btn ghost sm" data-lang="PT_BR" onclick="changeLanguage('PT_BR')" title="Agente responde em português">&#127463;&#127479;</button>
+<div class="app">
+
+	<aside>
+		<div class="brand">
+			<span class="mark">W</span>
+			<div>
+				<div class="title">Agentic WMS</div>
+				<div class="sub">MongoDB showcase</div>
+			</div>
+		</div>
+
+		<nav id="tabs">
+			<div class="group">Warehouse</div>
+			<button data-tab="products" class="active"><span class="ico">&#9635;</span>Products</button>
+			<button data-tab="inventory"><span class="ico">&#9707;</span>Inventory</button>
+			<button data-tab="movements"><span class="ico">&#8646;</span>Stock Movements</button>
+
+			<div class="group">Operations</div>
+			<button data-tab="inbound"><span class="ico">&#8600;</span>Inbound Invoices</button>
+			<button data-tab="outbound"><span class="ico">&#8599;</span>Outbound Invoices</button>
+
+			<div class="group">Agent</div>
+			<button data-tab="replenishment"><span class="ico">&#9873;</span>Replenishment</button>
+			<button data-tab="agentruns"><span class="ico">&#9881;</span>Agent Runs</button>
+		</nav>
+
+		<div class="side-foot" id="status"></div>
+	</aside>
+
+	<div class="content">
+
+		<div class="topbar">
+			<h1 id="page-title">Products</h1>
+			<span class="spacer"></span>
+			<div class="lang">
+				<button class="btn ghost sm" data-lang="EN" onclick="changeLanguage('EN')" title="Agent answers in English">&#127482;&#127480;</button>
+				<button class="btn ghost sm" data-lang="PT_BR" onclick="changeLanguage('PT_BR')" title="Agente responde em português">&#127463;&#127479;</button>
+			</div>
+			<button class="btn ghost sm" id="theme-toggle" onclick="toggleTheme()"></button>
+		</div>
+
+		<main>
+
+		<section id="products" class="active">
+			<div class="card">
+				<div class="card-head"><h2>New product</h2></div>
+				<div class="card-body">
+					<div class="grid">
+						<div class="field">
+							<label>Code</label>
+							<input id="p-code" placeholder="01">
+						</div>
+						<div class="field">
+							<label>Name</label>
+							<input id="p-name" placeholder="Keyboard">
+						</div>
+					</div>
+					<div class="row" style="margin-top:16px">
+						<button class="btn" onclick="createProduct()">Create product</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>Products</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by code</label>
+						<input id="p-filter" placeholder="01">
+					</div>
+					<button class="btn ghost" onclick="loadProducts()">Search</button>
+					<button class="btn ghost" onclick="document.getElementById('p-filter').value='';loadProducts()">Clear</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Code</th><th>Name</th><th>Id</th></tr></thead>
+						<tbody id="p-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="inventory">
+			<div class="card">
+				<div class="card-head"><h2>Inventory</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by product code</label>
+						<input id="i-filter" placeholder="01">
+					</div>
+					<button class="btn ghost" onclick="loadInventory()">Search</button>
+					<button class="btn ghost" onclick="document.getElementById('i-filter').value='';loadInventory()">Clear</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Product code</th><th>Product name</th><th>Depositor</th><th class="num">Quantity</th></tr></thead>
+						<tbody id="i-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="inbound">
+			<div class="card">
+				<div class="card-head"><h2>New inbound invoice</h2></div>
+				<div class="card-body">
+					<div class="grid">
+						<div class="field">
+							<label>Number</label>
+							<input id="in-number" placeholder="NF-1002">
+						</div>
+						<div class="field">
+							<label>Depositor id</label>
+							<input id="in-dep-id" placeholder="bsp">
+						</div>
+						<div class="field">
+							<label>Depositor name</label>
+							<input id="in-dep-name" placeholder="Braspress">
+						</div>
+						<div class="field">
+							<label>Depositor email</label>
+							<input id="in-dep-email" placeholder="logistics@braspress.com">
+						</div>
+					</div>
+					<div class="items-editor" id="in-items"></div>
+					<div class="row">
+						<button class="btn ghost sm" onclick="addItemLine('in-items')">Add item</button>
+						<span class="spacer" style="flex:1"></span>
+						<button class="btn" onclick="createInvoice('inbound')">Create invoice</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>Inbound invoices</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by status</label>
+						<select id="in-filter" onchange="loadInbound()">
+							<option value="">All</option>
+							<option>PENDING</option>
+							<option>RECEIVED</option>
+							<option>COMPLETED</option>
+							<option>FAILED</option>
+						</select>
+					</div>
+					<button class="btn ghost" onclick="loadInbound()">Refresh</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+						<tbody id="in-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="outbound">
+			<div class="card">
+				<div class="card-head"><h2>New outbound invoice</h2></div>
+				<div class="card-body">
+					<div class="grid">
+						<div class="field">
+							<label>Number</label>
+							<input id="out-number" placeholder="NF-2001">
+						</div>
+						<div class="field">
+							<label>Depositor id</label>
+							<input id="out-dep-id" placeholder="bsp">
+						</div>
+						<div class="field">
+							<label>Depositor name</label>
+							<input id="out-dep-name" placeholder="Braspress">
+						</div>
+						<div class="field">
+							<label>Depositor email</label>
+							<input id="out-dep-email" placeholder="logistics@braspress.com">
+						</div>
+					</div>
+					<div class="items-editor" id="out-items"></div>
+					<div class="row">
+						<button class="btn ghost sm" onclick="addItemLine('out-items')">Add item</button>
+						<span class="spacer" style="flex:1"></span>
+						<button class="btn" onclick="createInvoice('outbound')">Create invoice</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>Outbound invoices</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by status</label>
+						<select id="out-filter" onchange="loadOutbound()">
+							<option value="">All</option>
+							<option>PENDING</option>
+							<option>RECEIVED</option>
+							<option>COMPLETED</option>
+							<option>FAILED</option>
+						</select>
+					</div>
+					<button class="btn ghost" onclick="loadOutbound()">Refresh</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+						<tbody id="out-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="movements">
+			<div class="card">
+				<div class="card-head"><h2>Stock movements</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Product code</label>
+						<input id="m-product" placeholder="01">
+					</div>
+					<div class="field">
+						<label>Invoice number</label>
+						<input id="m-invoice" placeholder="NF-1002">
+					</div>
+					<button class="btn ghost" onclick="loadMovements()">Search</button>
+					<button class="btn ghost" onclick="document.getElementById('m-product').value='';document.getElementById('m-invoice').value='';loadMovements()">Clear</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Date</th><th>Type</th><th>Product code</th><th>Depositor</th><th class="num">Quantity</th><th>Invoice</th></tr></thead>
+						<tbody id="m-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="replenishment">
+			<div class="card">
+				<div class="card-head"><h2>Replenishments</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by status</label>
+						<select id="r-filter" onchange="loadReplenishment()">
+							<option value="">All</option>
+							<option>PENDING</option>
+							<option>APPROVED</option>
+							<option>REJECTED</option>
+							<option>COMPLETED</option>
+						</select>
+					</div>
+					<button class="btn ghost" onclick="loadReplenishment()">Refresh</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+						<tbody id="r-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="agentruns">
+			<div class="card">
+				<div class="card-head"><h2>Agent runs</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by status</label>
+						<select id="a-filter" onchange="loadAgentRuns()">
+							<option value="">All</option>
+							<option>RUNNING</option>
+							<option>COMPLETED</option>
+							<option>FAILED</option>
+						</select>
+					</div>
+					<button class="btn ghost" onclick="loadAgentRuns()">Refresh</button>
+					<label class="auto-refresh">
+						<input type="checkbox" id="a-auto" checked> Auto refresh while running
+					</label>
+				</div>
+				<div class="card-body" id="a-body"></div>
+			</div>
+		</section>
+
+		</main>
 	</div>
-	<button class="btn ghost sm" id="theme-toggle" onclick="toggleTheme()"></button>
-</header>
-
-<nav id="tabs">
-	<button data-tab="products" class="active">Products</button>
-	<button data-tab="inventory">Inventory</button>
-	<button data-tab="inbound">Inbound Invoices</button>
-	<button data-tab="outbound">Outbound Invoices</button>
-	<button data-tab="movements">Stock Movements</button>
-	<button data-tab="replenishment">Replenishment</button>
-	<button data-tab="agentruns">Agent Runs</button>
-</nav>
-
-<main>
-
-<section id="products" class="active">
-	<div class="card">
-		<h2>New product</h2>
-		<div class="row">
-			<div class="field">
-				<label>Code</label>
-				<input id="p-code" placeholder="01">
-			</div>
-			<div class="field">
-				<label>Name</label>
-				<input id="p-name" placeholder="Keyboard">
-			</div>
-			<button class="btn" onclick="createProduct()">Create</button>
-		</div>
-	</div>
-
-	<div class="card">
-		<h2>Products</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Filter by code</label>
-				<input id="p-filter" placeholder="01">
-			</div>
-			<button class="btn ghost" onclick="loadProducts()">Search</button>
-			<button class="btn ghost" onclick="document.getElementById('p-filter').value='';loadProducts()">Clear</button>
-		</div>
-		<table>
-			<thead><tr><th>Id</th><th>Code</th><th>Name</th></tr></thead>
-			<tbody id="p-body"></tbody>
-		</table>
-	</div>
-</section>
-
-<section id="inventory">
-	<div class="card">
-		<h2>Inventory</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Filter by product code</label>
-				<input id="i-filter" placeholder="01">
-			</div>
-			<button class="btn ghost" onclick="loadInventory()">Search</button>
-			<button class="btn ghost" onclick="document.getElementById('i-filter').value='';loadInventory()">Clear</button>
-		</div>
-		<table>
-			<thead><tr><th>Product code</th><th>Product name</th><th>Depositor</th><th class="num">Quantity</th></tr></thead>
-			<tbody id="i-body"></tbody>
-		</table>
-	</div>
-</section>
-
-<section id="inbound">
-	<div class="card">
-		<h2>New inbound invoice</h2>
-		<div class="row">
-			<div class="field">
-				<label>Number</label>
-				<input id="in-number" placeholder="NF-1002">
-			</div>
-			<div class="field">
-				<label>Depositor id</label>
-				<input id="in-dep-id" placeholder="RICAS">
-			</div>
-			<div class="field">
-				<label>Depositor name</label>
-				<input id="in-dep-name" placeholder="Ricas Ltda">
-			</div>
-			<div class="field">
-				<label>Depositor email</label>
-				<input id="in-dep-email" placeholder="contact@ricas.com">
-			</div>
-		</div>
-		<div class="items-editor" id="in-items"></div>
-		<div class="row">
-			<button class="btn ghost sm" onclick="addItemLine('in-items')">Add item</button>
-			<button class="btn" onclick="createInvoice('inbound')">Create</button>
-		</div>
-	</div>
-
-	<div class="card">
-		<h2>Inbound invoices</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Filter by status</label>
-				<select id="in-filter" onchange="loadInbound()">
-					<option value="">All</option>
-					<option>PENDING</option>
-					<option>RECEIVED</option>
-					<option>COMPLETED</option>
-					<option>FAILED</option>
-				</select>
-			</div>
-			<button class="btn ghost" onclick="loadInbound()">Refresh</button>
-		</div>
-		<table>
-			<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
-			<tbody id="in-body"></tbody>
-		</table>
-	</div>
-</section>
-
-<section id="outbound">
-	<div class="card">
-		<h2>New outbound invoice</h2>
-		<div class="row">
-			<div class="field">
-				<label>Number</label>
-				<input id="out-number" placeholder="NF-2001">
-			</div>
-			<div class="field">
-				<label>Depositor id</label>
-				<input id="out-dep-id" placeholder="RICAS">
-			</div>
-			<div class="field">
-				<label>Depositor name</label>
-				<input id="out-dep-name" placeholder="Ricas Ltda">
-			</div>
-			<div class="field">
-				<label>Depositor email</label>
-				<input id="out-dep-email" placeholder="contact@ricas.com">
-			</div>
-		</div>
-		<div class="items-editor" id="out-items"></div>
-		<div class="row">
-			<button class="btn ghost sm" onclick="addItemLine('out-items')">Add item</button>
-			<button class="btn" onclick="createInvoice('outbound')">Create</button>
-		</div>
-	</div>
-
-	<div class="card">
-		<h2>Outbound invoices</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Filter by status</label>
-				<select id="out-filter" onchange="loadOutbound()">
-					<option value="">All</option>
-					<option>PENDING</option>
-					<option>RECEIVED</option>
-					<option>COMPLETED</option>
-					<option>FAILED</option>
-				</select>
-			</div>
-			<button class="btn ghost" onclick="loadOutbound()">Refresh</button>
-		</div>
-		<table>
-			<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
-			<tbody id="out-body"></tbody>
-		</table>
-	</div>
-</section>
-
-<section id="movements">
-	<div class="card">
-		<h2>Stock movements</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Product code</label>
-				<input id="m-product" placeholder="03">
-			</div>
-			<div class="field">
-				<label>Invoice number</label>
-				<input id="m-invoice" placeholder="NF-1002">
-			</div>
-			<button class="btn ghost" onclick="loadMovements()">Search</button>
-			<button class="btn ghost" onclick="document.getElementById('m-product').value='';document.getElementById('m-invoice').value='';loadMovements()">Clear</button>
-		</div>
-		<table>
-			<thead><tr><th>Date</th><th>Type</th><th>Product code</th><th>Depositor</th><th class="num">Quantity</th><th>Invoice</th></tr></thead>
-			<tbody id="m-body"></tbody>
-		</table>
-	</div>
-</section>
-
-<section id="replenishment">
-	<div class="card">
-		<h2>Replenishments</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Filter by status</label>
-				<select id="r-filter" onchange="loadReplenishment()">
-					<option value="">All</option>
-					<option>PENDING</option>
-					<option>APPROVED</option>
-					<option>REJECTED</option>
-					<option>COMPLETED</option>
-				</select>
-			</div>
-			<button class="btn ghost" onclick="loadReplenishment()">Refresh</button>
-		</div>
-		<table>
-			<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
-			<tbody id="r-body"></tbody>
-		</table>
-	</div>
-</section>
-
-<section id="agentruns">
-	<div class="card">
-		<h2>Agent runs</h2>
-		<div class="row" style="margin-bottom:14px">
-			<div class="field">
-				<label>Filter by status</label>
-				<select id="a-filter" onchange="loadAgentRuns()">
-					<option value="">All</option>
-					<option>RUNNING</option>
-					<option>COMPLETED</option>
-					<option>FAILED</option>
-				</select>
-			</div>
-			<button class="btn ghost" onclick="loadAgentRuns()">Refresh</button>
-			<label class="auto-refresh">
-				<input type="checkbox" id="a-auto" checked> Auto refresh while running
-			</label>
-		</div>
-		<div id="a-body"></div>
-	</div>
-</section>
-
-</main>
+</div>
 
 <div id="toast"></div>
 
@@ -588,9 +834,8 @@ async function loadProducts() {
 			: await api('/products');
 
 	rows('p-body', list, 3, product =>
-		'<tr><td class="mono">' + esc(product.id) + '</td>' +
-			'<td>' + esc(product.code) + '</td><td>' + esc(product.name) +
-		'</td></tr>');
+		'<tr><td>' + esc(product.code) + '</td><td>' + esc(product.name) + '</td>' +
+			'<td class="mono">' + esc(product.id) + '</td></tr>');
 }
 
 async function createProduct() {
@@ -636,8 +881,10 @@ function invoiceRow(invoice, kind, executeLabel, executePath) {
 		'<td>' + depositorLabel(invoice.depositor) + '</td>' +
 		'<td>' + itemsLabel(invoice.items) + '</td>' +
 		'<td>' + badge(invoice.status) + '</td>' +
-		'<td><button class="btn ghost sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'check\')">Check</button> ' +
-		'<button class="btn sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'' + executePath + '\')">' + executeLabel + '</button></td></tr>';
+		'<td><div class="actions">' +
+		'<button class="btn ghost sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'check\')">Check</button>' +
+		'<button class="btn sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'' + executePath + '\')">' + executeLabel + '</button>' +
+		'</div></td></tr>';
 }
 
 async function runAction(kind, number, action) {
@@ -724,9 +971,9 @@ function notificationRow(replenishment) {
 			? 'Sent at ' + stamp(draft.sentAt)
 			: 'Draft. Will be sent on approval';
 
-	return '<tr><td colspan="6" style="padding-top:0">' +
-		'<details><summary class="mono" style="cursor:pointer;color:var(--muted)">' +
-		'Email &middot; ' + esc(state) + '</summary>' +
+	return '<tr><td colspan="6" style="padding-top:0;border-top:none">' +
+		'<details><summary class="mono" style="cursor:pointer">' +
+		'&#9993; Email &middot; ' + esc(state) + '</summary>' +
 		'<div class="result" style="margin-top:8px">' +
 		'<strong>To:</strong> ' + esc(draft.to || 'to be resolved on approval') + '<br>' +
 		'<strong>Subject:</strong> ' + esc(draft.subject) + '<br><br>' +
@@ -740,11 +987,11 @@ function replenishmentActions(replenishment) {
 			+ esc(replenishment.id) + '\', \'' + status + '\')">' + label + '</button>';
 
 	if (replenishment.status === 'PENDING') {
-		return action('Approve', 'APPROVED') + ' ' + action('Reject', 'REJECTED', true);
+		return '<div class="actions">' + action('Approve', 'APPROVED') + action('Reject', 'REJECTED', true) + '</div>';
 	}
 
 	if (replenishment.status === 'APPROVED') {
-		return action('Complete', 'COMPLETED');
+		return '<div class="actions">' + action('Complete', 'COMPLETED') + '</div>';
 	}
 
 	return '<span class="mono">-</span>';
@@ -776,8 +1023,8 @@ function taskCard(task, index) {
 		'<div class="description">' + esc(task.description) + '</div>' +
 		(task.result ? '<div class="result">' + esc(task.result) + '</div>' : '') +
 		'<div class="timing">' + badge(task.status) +
-		(task.tool ? ' &middot; ' + esc(task.tool) : '') +
-		(task.completedAt ? ' &middot; ' + duration(task.startedAt, task.completedAt) : '') +
+		(task.tool ? '<span>' + esc(task.tool) + '</span>' : '') +
+		(task.completedAt ? '<span>' + duration(task.startedAt, task.completedAt) + '</span>' : '') +
 		'</div>' +
 		'</div></div>';
 }
@@ -788,15 +1035,15 @@ function runCard(run) {
 
 	return '<div class="run ' + (openRuns.has(run.id) ? 'open' : '') + '" data-run="' + esc(run.id) + '">' +
 		'<div class="run-head" onclick="toggleRun(\'' + esc(run.id) + '\')">' +
-		'<span class="caret">&#9662;</span>' +
-		'<span class="goal">' + esc(run.trigger) + ' &middot; ' + esc(run.reference) + '</span>' +
+		'<span class="caret">&#9660;</span>' +
+		'<span class="goal">' + esc(run.reference) + ' <span class="mono">' + esc(run.trigger) + '</span></span>' +
 		'<span class="meta">' + done + '/' + tasks.length + ' tasks &middot; ' + stamp(run.startedAt) +
 		(run.completedAt ? ' &middot; ' + duration(run.startedAt, run.completedAt) : '') + '</span>' +
 		badge(run.status) +
 		'</div>' +
 		'<div class="run-tasks">' +
 		(tasks.length ? tasks.map(taskCard).join('') : '<div class="empty">No task planned</div>') +
-		(run.summary ? '<div class="result" style="margin-top:10px"><strong>Summary:</strong> ' + esc(run.summary) + '</div>' : '') +
+		(run.summary ? '<div class="result" style="margin-top:12px"><strong>Summary</strong><br>' + esc(run.summary) + '</div>' : '') +
 		'</div></div>';
 }
 
@@ -838,11 +1085,14 @@ const loaders = {
 };
 
 document.getElementById('tabs').addEventListener('click', event => {
-	const tab = event.target.dataset.tab;
-	if (!tab) return;
+	const button = event.target.closest('button[data-tab]');
+	if (!button) return;
 
-	document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+	const tab = button.dataset.tab;
+
+	document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b === button));
 	document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === tab));
+	document.getElementById('page-title').textContent = button.textContent.trim();
 
 	clearTimeout(autoRefreshTimer);
 	loaders[tab]().catch(() => {});
