@@ -12,12 +12,15 @@ spring:
         initialize-schema: true
         collection-name: depositor_knowledge
         index-name: vector-index
+        metadata-fields-to-filter:
+          - depositorId
+          - type
   data:
     mongodb:
       auto-index-creation: true
 wms:
   knowledge:
-    ingest-on-startup: false
+    ingest-on-startup: true
 logging:
   level:
     org.springframework.data.mongodb.core: DEBUG

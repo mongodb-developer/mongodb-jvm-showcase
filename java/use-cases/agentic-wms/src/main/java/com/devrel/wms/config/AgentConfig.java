@@ -3,6 +3,7 @@ package com.devrel.wms.config;
 import com.devrel.wms.agent.AgentCapability;
 import com.devrel.wms.agent.AgentDefinition;
 import com.devrel.wms.tool.DepositorEmailTool;
+import com.devrel.wms.tool.DepositorPolicyTool;
 import com.devrel.wms.tool.InventoryAnalysisTool;
 import com.devrel.wms.tool.ReplenishmentTool;
 import org.springframework.ai.chat.client.ChatClient;
@@ -40,8 +41,10 @@ public class AgentConfig {
 			When creating a replenishment:
 			
 			* include only the products that need replenishment;
+			* read the depositor policies first and comply with them, especially minimum
+			  quantity, packaging rounding and blackout periods;
 			* choose a reasonable quantity based on current stock and recent consumption;
-			* include a short message explaining the reason.
+			* include a short message explaining the reason and the policies applied.
 			
 			If inventory is healthy, take no action.
 
@@ -90,7 +93,7 @@ public class AgentConfig {
 			2. Check the current inventory for the affected products for the specific depositor. [ANALYSIS]
 			3. Analyze recent stock movements and consumption for the specific depositor. [ANALYSIS]
 			4. Determine whether replenishment is required. [DECISION]
-			5. Create a replenishment request if necessary. [REPLENISHMENT]
+			5. Create a replenishment request complying with the depositor policies. [REPLENISHMENT]
 			6. Write the notification email for the depositor if a replenishment request was created. [NOTIFICATION]
 
 			Return only the execution plan.
@@ -145,7 +148,8 @@ public class AgentConfig {
 			@Qualifier("chatClientSummary") ChatClient chatClientSummary,
 			InventoryAnalysisTool inventoryAnalysisTool,
 			ReplenishmentTool replenishmentTool,
-			DepositorEmailTool depositorEmailTool
+			DepositorEmailTool depositorEmailTool,
+			DepositorPolicyTool depositorPolicyTool
 	) {
 		return new AgentDefinition(
 				"OUTBOUND_INVOICE_COMPLETED",
@@ -157,19 +161,25 @@ public class AgentConfig {
 						new AgentCapability(
 								"ANALYSIS",
 								"Read inventory, stock movements and invoice movements. Cannot change anything.",
-								inventoryAnalysisTool),
+								List.of(inventoryAnalysisTool)),
+						new AgentCapability(
+								"POLICY",
+								"Read the replenishment policies agreed with the depositor: minimum quantity, "
+										+ "lead time, packaging, blackout periods and approval thresholds.",
+								List.of(depositorPolicyTool)),
 						new AgentCapability(
 								"REPLENISHMENT",
-								"Create a replenishment request. Cannot write the notification email.",
-								replenishmentTool),
+								"Read the depositor policies and create a replenishment request that complies "
+										+ "with them. Cannot write the notification email.",
+								List.of(depositorPolicyTool, replenishmentTool)),
 						new AgentCapability(
 								"NOTIFICATION",
 								"Write the notification email of an existing replenishment request.",
-								depositorEmailTool),
+								List.of(depositorEmailTool)),
 						new AgentCapability(
 								"DECISION",
 								"Decide, based on the results of previous tasks, whether replenishment is required. Uses no tool.",
-								null)
+								List.of())
 				)
 		);
 	}

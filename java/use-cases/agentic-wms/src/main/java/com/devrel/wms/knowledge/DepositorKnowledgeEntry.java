@@ -7,6 +7,7 @@ import java.util.Map;
 
 public record DepositorKnowledgeEntry(
         String depositorId,
+        String key,
         KnowledgeType type,
         String text,
         Map<String, Object> attributes
@@ -16,11 +17,12 @@ public record DepositorKnowledgeEntry(
 		Map<String, Object> metadata = new HashMap<>(attributes == null ? Map.of() : attributes);
 		metadata.put("depositorId", depositorId);
 		metadata.put("type", type.name());
+		metadata.put("key", key);
 
-		return new Document(text, metadata);
+		return new Document(documentId(), text, metadata);
 	}
 
 	private String documentId() {
-		return depositorId + ":" + type.name();
+		return depositorId + ":" + key;
 	}
 }

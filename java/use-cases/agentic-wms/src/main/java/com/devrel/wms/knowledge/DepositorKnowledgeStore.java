@@ -8,6 +8,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DepositorKnowledgeStore {
@@ -25,11 +26,23 @@ public class DepositorKnowledgeStore {
 		logger.info("Added {} knowledge document(s)", documents.size());
 	}
 
-	public List<Document> search(String query, String depositorId, int topK) {
-		return vectorStore.similaritySearch(SearchRequest.builder()
+	public List<Document> search(String query, String depositorId, List<KnowledgeType> types, int topK) {
+		String filter = "depositorId == '" + depositorId + "'";
+
+		if (types != null && !types.isEmpty()) {
+			filter += " && type in [" + types.stream()
+					.map(type -> "'" + type.name() + "'")
+					.collect(Collectors.joining(", ")) + "]";
+		}
+
+		logger.info("Searching depositor knowledge with filter {} for query: {}", filter, query);
+
+		List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
 				.query(query)
 				.topK(topK)
-				.filterExpression("depositorId == '" + depositorId + "'")
+				.filterExpression(filter)
 				.build());
+
+		return documents == null ? List.of() : documents;
 	}
 }

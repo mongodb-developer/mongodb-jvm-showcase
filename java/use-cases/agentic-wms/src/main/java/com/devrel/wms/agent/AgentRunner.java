@@ -124,6 +124,7 @@ public class AgentRunner {
 				.filter(candidate -> candidate.name().equalsIgnoreCase(capability))
 				.map(AgentCapability::tools)
 				.filter(Objects::nonNull)
+				.flatMap(List::stream)
 				.toArray();
 	}
 
