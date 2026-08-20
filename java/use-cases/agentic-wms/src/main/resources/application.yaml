@@ -15,6 +15,9 @@ spring:
   data:
     mongodb:
       auto-index-creation: true
+wms:
+  knowledge:
+    ingest-on-startup: false
 logging:
   level:
     org.springframework.data.mongodb.core: DEBUG
