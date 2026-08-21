@@ -818,8 +818,12 @@
 						<label>Invoice number</label>
 						<input id="m-invoice" placeholder="NF-1002">
 					</div>
+					<div class="field">
+						<label>Depositor</label>
+						<select id="m-dep"></select>
+					</div>
 					<button class="btn ghost" onclick="loadMovements()">Search</button>
-					<button class="btn ghost" onclick="document.getElementById('m-product').value='';document.getElementById('m-invoice').value='';loadMovements()">Clear</button>
+					<button class="btn ghost" onclick="clearMovementFilters()">Clear</button>
 				</div>
 				<div class="table-wrap">
 					<table>
@@ -1388,14 +1392,19 @@ async function createInvoice(kind) {
 }
 
 async function loadMovements() {
+	await loadDepositorOptions('m', 'All depositors');
+
+	const params = new URLSearchParams();
 	const product = document.getElementById('m-product').value.trim();
 	const invoice = document.getElementById('m-invoice').value.trim();
+	const depositorId = document.getElementById('m-dep').value;
 
-	let path = '/stock-movements';
-	if (product) path += '/product/' + encodeURIComponent(product);
-	else if (invoice) path += '/invoice/' + encodeURIComponent(invoice);
+	if (product) params.set('productCode', product);
+	if (invoice) params.set('invoiceNumber', invoice);
+	if (depositorId) params.set('depositorId', depositorId);
 
-	const list = await api(path);
+	const query = params.toString();
+	const list = await api('/stock-movements' + (query ? '?' + query : ''));
 
 	rows('m-body', list, 6, movement =>
 		'<tr><td class="mono">' + esc((movement.date || '').replace('T', ' ').slice(0, 19)) + '</td>' +
@@ -1404,6 +1413,13 @@ async function loadMovements() {
 		'<td>' + depositorLabel(movement.depositor) + '</td>' +
 		'<td class="num">' + esc(movement.quantity) + '</td>' +
 		'<td>' + esc(movement.invoiceNumber) + '</td></tr>');
+}
+
+function clearMovementFilters() {
+	document.getElementById('m-product').value = '';
+	document.getElementById('m-invoice').value = '';
+	document.getElementById('m-dep').value = '';
+	loadMovements();
 }
 
 async function loadReplenishment() {

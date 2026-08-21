@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,8 +22,11 @@ public class StockMovementController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<StockMovement>> findAll() {
-		return ResponseEntity.ok(stockMovementService.findAll());
+	public ResponseEntity<List<StockMovement>> search(
+			@RequestParam(required = false) String productCode,
+			@RequestParam(required = false) String invoiceNumber,
+			@RequestParam(required = false) String depositorId) {
+		return ResponseEntity.ok(stockMovementService.search(productCode, invoiceNumber, depositorId));
 	}
 
 	@GetMapping("/product/{productCode}")

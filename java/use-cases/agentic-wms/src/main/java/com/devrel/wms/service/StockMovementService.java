@@ -3,6 +3,7 @@ package com.devrel.wms.service;
 import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.repository.StockMovementRepository;
+import com.devrel.wms.repository.StockMovementSearchRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,13 @@ public class StockMovementService {
 
 	private final Logger logger = LoggerFactory.getLogger(StockMovementService.class);
 	private final StockMovementRepository stockMovementRepository;
+	private final StockMovementSearchRepository stockMovementSearchRepository;
 
-	StockMovementService(StockMovementRepository stockMovementRepository) {
+	StockMovementService(
+			StockMovementRepository stockMovementRepository,
+			StockMovementSearchRepository stockMovementSearchRepository) {
 		this.stockMovementRepository = stockMovementRepository;
+		this.stockMovementSearchRepository = stockMovementSearchRepository;
 	}
 
 	public StockMovement register(
@@ -45,6 +50,10 @@ public class StockMovementService {
 
 	public List<StockMovement> findAll() {
 		return stockMovementRepository.findAll();
+	}
+
+	public List<StockMovement> search(String productCode, String invoiceNumber, String depositorId) {
+		return stockMovementSearchRepository.search(productCode, invoiceNumber, depositorId);
 	}
 
 	public List<StockMovement> findByProductCode(String productCode) {
