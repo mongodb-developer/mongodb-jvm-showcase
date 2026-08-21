@@ -226,7 +226,7 @@
 		font-weight: 600;
 	}
 
-	input, select {
+	input, select, textarea {
 		background: var(--bg);
 		border: 1px solid var(--border-strong);
 		border-radius: var(--radius-sm);
@@ -239,11 +239,12 @@
 	}
 
 	html[data-theme="light"] input,
-	html[data-theme="light"] select { background: var(--surface); }
+	html[data-theme="light"] select,
+	html[data-theme="light"] textarea { background: var(--surface); }
 
-	input::placeholder { color: var(--muted); opacity: .7; }
+	input::placeholder, textarea::placeholder { color: var(--muted); opacity: .7; }
 
-	input:focus, select:focus {
+	input:focus, select:focus, textarea:focus {
 		outline: none;
 		border-color: var(--accent);
 		box-shadow: 0 0 0 3px var(--accent-soft);
@@ -337,6 +338,8 @@
 	.badge.RECEIVED, .badge.APPROVED, .badge.RUNNING { color: var(--info); border-color: var(--info); background: color-mix(in srgb, var(--info) 12%, transparent); }
 	.badge.COMPLETED, .badge.INBOUND { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 	.badge.FAILED, .badge.REJECTED { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+	.badge.REPLENISHMENT { color: var(--info); border-color: var(--info); background: color-mix(in srgb, var(--info) 12%, transparent); }
+	.badge.GENERAL { color: var(--muted); border-color: var(--border-strong); background: var(--surface-3); }
 	.badge.OUTBOUND { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
 
 	.empty { color: var(--muted); text-align: center; padding: 34px 18px; font-size: 13px; }
@@ -422,6 +425,78 @@
 	details summary { padding: 6px 0; }
 	details summary:hover { color: var(--text); }
 
+	/* ---------- depositor policies ---------- */
+
+	.policy {
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		margin-bottom: 10px;
+		overflow: hidden;
+	}
+
+	.policy.open { border-color: var(--border-strong); }
+
+	.policy-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 13px 16px;
+		background: var(--surface-2);
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.policy-head:hover { background: var(--surface-3); }
+	.policy-head .caret { color: var(--muted); font-size: 10px; transition: transform .15s; }
+	.policy.open .policy-head .caret { transform: rotate(180deg); }
+
+	.policy-head .name { font-weight: 600; flex: 1; min-width: 0; }
+	.policy-head .preview {
+		color: var(--muted);
+		font-size: 12px;
+		flex: 2;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.policy.open .policy-head .preview { display: none; }
+
+	.policy-body { display: none; padding: 14px 16px; border-top: 1px solid var(--border); }
+	.policy.open .policy-body { display: block; }
+	.policy-body textarea { min-height: 96px; resize: vertical; }
+	.policy-body .field + .field { margin-top: 12px; }
+	.policy-body .actions { margin-top: 14px; align-items: center; }
+	.policy-body .actions .spacer { flex: 1; }
+
+	.origin {
+		display: inline-block;
+		padding: 3px 10px;
+		border-radius: 20px;
+		font-size: 10.5px;
+		font-weight: 700;
+		letter-spacing: .5px;
+		border: 1px solid var(--border-strong);
+		color: var(--muted);
+		white-space: nowrap;
+	}
+
+	.origin.db { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+	.attrs { display: flex; flex-wrap: wrap; gap: 6px; }
+
+	.attr {
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 11px;
+		padding: 3px 9px;
+		border-radius: var(--radius-sm);
+		background: var(--surface-3);
+		border: 1px solid var(--border);
+		color: var(--text-soft);
+	}
+
 	/* ---------- toast ---------- */
 
 	#toast {
@@ -486,6 +561,7 @@
 			<button data-tab="outbound"><span class="ico">&#8599;</span>Outbound Invoices</button>
 
 			<div class="group">Agent</div>
+			<button data-tab="policies"><span class="ico">&#9878;</span>Depositor Policies</button>
 			<button data-tab="replenishment"><span class="ico">&#9873;</span>Replenishment</button>
 			<button data-tab="agentruns"><span class="ico">&#9881;</span>Agent Runs</button>
 		</nav>
@@ -697,6 +773,72 @@
 						<tbody id="m-body"></tbody>
 					</table>
 				</div>
+			</div>
+		</section>
+
+		<section id="policies">
+			<div class="card">
+				<div class="card-head"><h2>Agreed policies</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Depositor</label>
+						<select id="pol-dep" onchange="changePolicyDepositor()"></select>
+					</div>
+					<button class="btn ghost" onclick="loadPolicies()">Refresh</button>
+					<span class="spacer" style="flex:1"></span>
+					<button class="btn" onclick="toggleNewPolicy()">New policy</button>
+				</div>
+				<div class="card-body" id="pol-body"></div>
+			</div>
+
+			<div class="card" id="pol-new-card" hidden>
+				<div class="card-head"><h2>New policy</h2></div>
+				<div class="card-body">
+					<div class="grid">
+						<div class="field">
+							<label>Depositor id</label>
+							<input id="pol-new-dep" placeholder="amz">
+						</div>
+						<div class="field">
+							<label>Key</label>
+							<input id="pol-new-key" placeholder="replenishment-minimum">
+						</div>
+						<div class="field">
+							<label>Type</label>
+							<select id="pol-new-type">
+								<option>REPLENISHMENT</option>
+								<option>INBOUND</option>
+								<option>OUTBOUND</option>
+								<option>GENERAL</option>
+							</select>
+						</div>
+					</div>
+					<div class="field" style="margin-top:12px">
+						<label>Policy text used by the agent</label>
+						<textarea id="pol-new-text"
+							placeholder="Replenishment orders for Amazon must contain at least 500 units per product."></textarea>
+					</div>
+					<div class="field" style="margin-top:12px">
+						<label>Attributes (JSON)</label>
+						<textarea id="pol-new-attrs" placeholder='{ "minimumQuantity": 500 }'></textarea>
+					</div>
+					<div class="row" style="margin-top:16px">
+						<button class="btn" onclick="createPolicy()">Create policy</button>
+						<button class="btn ghost" onclick="toggleNewPolicy()">Cancel</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>What the agent retrieves</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Question</label>
+						<input id="pol-question" placeholder="What are the constraints to request 500 units today?">
+					</div>
+					<button class="btn ghost" onclick="previewPolicies()">Search</button>
+				</div>
+				<div class="card-body" id="pol-preview"></div>
 			</div>
 		</section>
 
@@ -1074,8 +1216,199 @@ function scheduleAgentRefresh(hasRunning) {
 	}
 }
 
+const del = path => api(path, { method: 'DELETE' });
+
+let policyDepositors = [];
+const openPolicies = new Set();
+
+const KNOWLEDGE_TYPES = ['REPLENISHMENT', 'INBOUND', 'OUTBOUND', 'GENERAL'];
+
+const typeSelect = (className, selected) => '<select class="' + className + '">' + KNOWLEDGE_TYPES
+	.map(type => '<option' + (type === selected ? ' selected' : '') + '>' + type + '</option>')
+	.join('') + '</select>';
+
+const attrsLabel = attributes => {
+	const entries = Object.entries(attributes || {});
+
+	return entries.length
+			? '<div class="attrs">' + entries
+					.map(([name, value]) => '<span class="attr">' + esc(name) + ': ' + esc(value) + '</span>')
+					.join('') + '</div>'
+			: '';
+};
+
+function policyCard(policy) {
+	const reference = policy.depositorId + ':' + policy.key;
+	const summary = (policy.text || '').replace(/\s+/g, ' ').trim();
+
+	return '<div class="policy ' + (openPolicies.has(reference) ? 'open' : '') +
+		'" data-policy="' + esc(reference) + '">' +
+		'<div class="policy-head" onclick="togglePolicy(\'' + esc(reference) + '\')">' +
+		'<span class="caret">&#9660;</span>' +
+		'<span class="name">' + esc(policy.key) +
+		' <span class="mono">' + esc(policy.depositorId) + '</span></span>' +
+		'<span class="preview">' + esc(summary) + '</span>' +
+		badge(policy.type) +
+		'<span class="origin db">MongoDB</span>' +
+		'</div>' +
+		'<div class="policy-body">' +
+		attrsLabel(policy.attributes) +
+		'<div class="field" style="margin-top:12px"><label>Policy text used by the agent</label>' +
+		'<textarea class="pol-text">' + esc(policy.text) + '</textarea></div>' +
+		'<div class="field"><label>Attributes (JSON)</label>' +
+		'<textarea class="pol-attrs">' + esc(JSON.stringify(policy.attributes || {}, null, 2)) + '</textarea></div>' +
+		'<div class="field"><label>Type</label>' + typeSelect('pol-type', policy.type) + '</div>' +
+		'<div class="actions">' +
+		'<button class="btn sm" onclick="savePolicy(\'' + esc(reference) + '\')">Save</button>' +
+		'<button class="btn ghost sm" onclick="cancelPolicy(\'' + esc(reference) + '\')">Cancel</button>' +
+		'<span class="spacer"></span>' +
+		'<button class="btn ghost sm" onclick="deletePolicy(\'' + esc(reference) + '\')">Delete</button>' +
+		'</div></div></div>';
+}
+
+function togglePolicy(reference) {
+	const card = document.querySelector('.policy[data-policy="' + reference + '"]');
+
+	if (openPolicies.has(reference)) {
+		openPolicies.delete(reference);
+		card.classList.remove('open');
+
+		return;
+	}
+
+	openPolicies.add(reference);
+	card.classList.add('open');
+	card.querySelector('.pol-text').focus();
+}
+
+async function loadPolicies() {
+	const select = document.getElementById('pol-dep');
+
+	if (!policyDepositors.length) {
+		policyDepositors = await api('/depositor-policies/depositors');
+		select.innerHTML = '<option value="">All depositors</option>' + policyDepositors
+				.map(depositor => '<option value="' + esc(depositor.id) + '">'
+						+ esc(depositor.name) + ' (' + esc(depositor.id) + ')</option>')
+				.join('');
+	}
+
+	const depositorId = select.value;
+	const path = '/depositor-policies' + (depositorId ? '/' + encodeURIComponent(depositorId) : '');
+	const list = await api(path);
+	const target = document.getElementById('pol-body');
+
+	target.innerHTML = list.length
+			? list.map(policyCard).join('')
+			: '<div class="empty">No policy registered for this depositor</div>';
+}
+
+function readAttributes(value) {
+	if (!value.trim()) return {};
+
+	try {
+		return JSON.parse(value);
+	} catch (ignored) {
+		notify('Attributes must be a valid JSON object', 'err', 'Invalid input');
+		throw new Error('invalid attributes');
+	}
+}
+
+async function savePolicy(reference) {
+	const card = document.querySelector('.policy[data-policy="' + reference + '"]');
+	const separator = reference.indexOf(':');
+	const text = card.querySelector('.pol-text').value.trim();
+
+	if (!text) return notify('Policy text is required', 'err', 'Invalid input');
+
+	await post('/depositor-policies', {
+		depositorId: reference.slice(0, separator),
+		key: reference.slice(separator + 1),
+		type: card.querySelector('.pol-type').value,
+		text,
+		attributes: readAttributes(card.querySelector('.pol-attrs').value)
+	});
+
+	notify('Policy ' + reference + ' saved and re-embedded', 'ok', 'Success');
+	openPolicies.delete(reference);
+	loadPolicies();
+}
+
+function toggleNewPolicy() {
+	const card = document.getElementById('pol-new-card');
+	card.hidden = !card.hidden;
+
+	if (card.hidden) return;
+
+	document.getElementById('pol-new-dep').value = document.getElementById('pol-dep').value;
+	document.getElementById('pol-new-key').focus();
+}
+
+function changePolicyDepositor() {
+	openPolicies.clear();
+	loadPolicies();
+}
+
+function cancelPolicy(reference) {
+	openPolicies.delete(reference);
+	loadPolicies();
+}
+
+async function createPolicy() {
+	const depositorId = document.getElementById('pol-new-dep').value.trim();
+	const key = document.getElementById('pol-new-key').value.trim();
+	const text = document.getElementById('pol-new-text').value.trim();
+
+	if (!depositorId || !key || !text) {
+		return notify('Depositor, key and text are required', 'err', 'Invalid input');
+	}
+
+	await post('/depositor-policies', {
+		depositorId,
+		key,
+		type: document.getElementById('pol-new-type').value,
+		text,
+		attributes: readAttributes(document.getElementById('pol-new-attrs').value)
+	});
+
+	notify('Policy ' + key + ' created for ' + depositorId, 'ok', 'Success');
+	document.getElementById('pol-new-card').hidden = true;
+	document.getElementById('pol-new-key').value = '';
+	document.getElementById('pol-new-text').value = '';
+	document.getElementById('pol-new-attrs').value = '';
+	policyDepositors = [];
+	loadPolicies();
+}
+
+async function deletePolicy(reference) {
+	const separator = reference.indexOf(':');
+
+	await del('/depositor-policies/' + encodeURIComponent(reference.slice(0, separator))
+			+ '/' + encodeURIComponent(reference.slice(separator + 1)));
+
+	notify('Policy ' + reference + ' deleted', 'ok', 'Success');
+	openPolicies.delete(reference);
+	loadPolicies();
+}
+
+async function previewPolicies() {
+	const depositorId = document.getElementById('pol-dep').value;
+	const question = document.getElementById('pol-question').value.trim();
+	const target = document.getElementById('pol-preview');
+
+	if (!depositorId) return notify('Select a depositor to run the search', 'err', 'Invalid input');
+	if (!question) return notify('Type a question', 'err', 'Invalid input');
+
+	const found = await api('/depositor-policies/' + encodeURIComponent(depositorId)
+			+ '/preview?question=' + encodeURIComponent(question));
+
+	target.innerHTML = found.length
+			? found.map(text => '<div class="result" style="margin-bottom:10px">' + esc(text) + '</div>').join('')
+			: '<div class="empty">No policy retrieved. The agent falls back to standard criteria</div>';
+}
+
 const loaders = {
 	products: loadProducts,
+	policies: loadPolicies,
 	inventory: loadInventory,
 	inbound: loadInbound,
 	outbound: loadOutbound,
