@@ -28,6 +28,23 @@ Content-Type: application/json
   ]
 }
 
+### Update a pending invoice
+PUT http://localhost:8080/outbound-invoice/NF-2003
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productCode": "01",
+      "quantity": 500
+    },
+    {
+      "productCode": "02",
+      "quantity": 200
+    }
+  ]
+}
+
 ### Check
 POST http://localhost:8080/outbound-invoice/NF-2003/check
 Content-Type: application/json

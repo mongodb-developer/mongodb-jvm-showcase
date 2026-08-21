@@ -26,6 +26,12 @@ public class DepositorKnowledgeStore {
 		logger.info("Added {} knowledge document(s)", documents.size());
 	}
 
+	public void delete(List<String> documentIds) {
+		vectorStore.delete(documentIds);
+
+		logger.info("Deleted {} knowledge document(s)", documentIds.size());
+	}
+
 	public List<Document> search(String query, String depositorId, List<KnowledgeType> types, int topK) {
 		String filter = "depositorId == '" + depositorId + "'";
 

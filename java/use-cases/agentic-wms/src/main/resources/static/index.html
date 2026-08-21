@@ -278,6 +278,15 @@
 
 	.items-editor { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
 
+	.edit-box {
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-left: 2px solid var(--accent);
+		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+		padding: 4px 14px 14px;
+	}
+
+
 	.items-editor .item-line {
 		display: grid;
 		grid-template-columns: 1fr 130px auto;
@@ -543,10 +552,10 @@
 
 	<aside>
 		<div class="brand">
-			<span class="mark">W</span>
+			<span class="mark">w</span>
 			<div>
 				<div class="title">Agentic WMS</div>
-				<div class="sub">MongoDB showcase</div>
+				<div class="sub">MongoDB JVM showcase</div>
 			</div>
 		</div>
 
@@ -951,23 +960,27 @@ const depositorLabel = depositor => depositor
 		+ (depositor.email ? '<br><span class="mono">' + esc(depositor.email) + '</span>' : '')
 	: '-';
 
+const itemLine = (productCode, quantity) => '<div class="item-line">' +
+	'<input placeholder="Product code" class="item-code" value="' + esc(productCode) + '">' +
+	'<input type="number" placeholder="Quantity" class="item-qty" value="' + esc(quantity) + '">' +
+	'<button class="btn ghost sm" onclick="this.parentElement.remove()">Remove</button>' +
+	'</div>';
+
 function addItemLine(containerId) {
-	const line = document.createElement('div');
-	line.className = 'item-line';
-	line.innerHTML =
-		'<input placeholder="Product code" class="item-code">' +
-		'<input type="number" placeholder="Quantity" class="item-qty" value="1">' +
-		'<button class="btn ghost sm" onclick="this.parentElement.remove()">Remove</button>';
-	document.getElementById(containerId).appendChild(line);
+	document.getElementById(containerId).insertAdjacentHTML('beforeend', itemLine('', 1));
 }
 
-function readItems(containerId) {
-	return [...document.querySelectorAll('#' + containerId + ' .item-line')]
+function readItemLines(container) {
+	return [...container.querySelectorAll('.item-line')]
 		.map(line => ({
 			productCode: line.querySelector('.item-code').value.trim(),
 			quantity: Number(line.querySelector('.item-qty').value)
 		}))
 		.filter(item => item.productCode);
+}
+
+function readItems(containerId) {
+	return readItemLines(document.getElementById(containerId));
 }
 
 async function loadProducts() {
@@ -1018,21 +1031,97 @@ async function productNames() {
 	return new Map((products || []).map(product => [product.code, product.name]));
 }
 
+const openInvoices = new Set();
+
+const invoiceKey = (kind, number) => kind + ':' + number;
+
 function invoiceRow(invoice, kind, executeLabel, executePath) {
 	return '<tr><td>' + esc(invoice.number) + '</td>' +
 		'<td>' + depositorLabel(invoice.depositor) + '</td>' +
 		'<td>' + itemsLabel(invoice.items) + '</td>' +
 		'<td>' + badge(invoice.status) + '</td>' +
-		'<td><div class="actions">' +
-		'<button class="btn ghost sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'check\')">Check</button>' +
-		'<button class="btn sm" onclick="runAction(\'' + kind + '\',\'' + esc(invoice.number) + '\',\'' + executePath + '\')">' + executeLabel + '</button>' +
-		'</div></td></tr>';
+		'<td>' + invoiceActions(invoice, kind, executeLabel, executePath) + '</td></tr>' +
+		invoiceEditorRow(invoice, kind);
+}
+
+function invoiceActions(invoice, kind, executeLabel, executePath) {
+	const key = invoiceKey(kind, invoice.number);
+
+	const action = (label, path, ghost) =>
+			'<button class="btn ' + (ghost ? 'ghost ' : '') + 'sm" onclick="runAction(\'' + kind + '\',\''
+			+ esc(invoice.number) + '\',\'' + path + '\')">' + label + '</button>';
+
+	if (invoice.status === 'PENDING') {
+		return '<div class="actions">' + action('Check', 'check', true) +
+			'<button class="btn ghost sm" onclick="toggleInvoiceEditor(\'' + esc(key) + '\')">' +
+			(openInvoices.has(key) ? 'Close' : 'Edit') + '</button></div>';
+	}
+
+	if (invoice.status === 'RECEIVED') {
+		return '<div class="actions">' + action(executeLabel, executePath) + '</div>';
+	}
+
+	return '<span class="mono">-</span>';
+}
+
+function invoiceEditorRow(invoice, kind) {
+	const key = invoiceKey(kind, invoice.number);
+
+	if (!openInvoices.has(key)) return '';
+
+	return '<tr data-edit="' + esc(key) + '"><td colspan="5" style="padding-top:0;border-top:none">' +
+		'<div class="edit-box">' +
+		'<div class="items-editor">' +
+		(invoice.items || []).map(item => itemLine(item.productCode, item.quantity)).join('') +
+		'</div>' +
+		'<div class="actions" style="margin-top:12px">' +
+		'<button class="btn ghost sm" onclick="addInvoiceItem(\'' + esc(key) + '\')">Add item</button>' +
+		'<span class="spacer" style="flex:1"></span>' +
+		'<button class="btn sm" onclick="saveInvoice(\'' + esc(key) + '\')">Save changes</button>' +
+		'<button class="btn ghost sm" onclick="toggleInvoiceEditor(\'' + esc(key) + '\')">Cancel</button>' +
+		'</div></div></td></tr>';
+}
+
+function reloadInvoices(kind) {
+	return kind === 'inbound' ? loadInbound() : loadOutbound();
+}
+
+function toggleInvoiceEditor(key) {
+	openInvoices.has(key) ? openInvoices.delete(key) : openInvoices.add(key);
+
+	reloadInvoices(key.slice(0, key.indexOf(':'))).catch(() => {});
+}
+
+function addInvoiceItem(key) {
+	document.querySelector('tr[data-edit="' + key + '"] .items-editor')
+			.insertAdjacentHTML('beforeend', itemLine('', 1));
+}
+
+async function saveInvoice(key) {
+	const separator = key.indexOf(':');
+	const kind = key.slice(0, separator);
+	const number = key.slice(separator + 1);
+	const row = document.querySelector('tr[data-edit="' + key + '"]');
+	const items = readItemLines(row.querySelector('.items-editor'));
+
+	if (items.length === 0) return notify('At least one item is required', 'err', 'Invalid input');
+
+	await api('/' + kind + '-invoice/' + encodeURIComponent(number), {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ items })
+	});
+
+	notify('Invoice ' + number + ' updated', 'ok', 'Success');
+	openInvoices.delete(key);
+	reloadInvoices(kind);
 }
 
 async function runAction(kind, number, action) {
 	await post('/' + kind + '-invoice/' + encodeURIComponent(number) + '/' + action);
 	notify('Invoice ' + number + ': ' + action + ' done', 'ok', 'Success');
-	kind === 'inbound' ? loadInbound() : loadOutbound();
+	openInvoices.delete(invoiceKey(kind, number));
+	reloadInvoices(kind);
 }
 
 async function loadInbound() {

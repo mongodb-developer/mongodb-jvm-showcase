@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class DepositorKnowledgeIngestion {
@@ -24,43 +26,13 @@ public class DepositorKnowledgeIngestion {
 			),
 			new DepositorKnowledgeEntry(
 					"bsp",
-					"lead-time",
+					"replenishment-leadtime",
 					KnowledgeType.REPLENISHMENT,
 					"""
 					Braspress delivers to our warehouse in 2 business days on average.
 					During December the lead time extends to 5 business days due to peak season,
 					so replenishment must be anticipated.""",
 					Map.of("leadTimeDays", 2, "peakLeadTimeDays", 5)
-			),
-			new DepositorKnowledgeEntry(
-					"bsp",
-					"blackout-window",
-					KnowledgeType.REPLENISHMENT,
-					"""
-					Braspress does not accept replenishment requests between the 25th and the last
-					day of each month, when they run their inventory closing. Requests identified
-					during this window must be reported as pending until the next month starts.""",
-					Map.of("blackoutFromDayOfMonth", 25)
-			),
-			new DepositorKnowledgeEntry(
-					"bsp",
-					"packaging",
-					KnowledgeType.INBOUND,
-					"""
-					All Braspress products arrive on standard pallets of 40 units.
-					Replenishment quantities should be rounded up to a full pallet whenever possible
-					to avoid handling costs.""",
-					Map.of("unitsPerPallet", 40)
-			),
-			new DepositorKnowledgeEntry(
-					"bsp",
-					"approval-rules",
-					KnowledgeType.GENERAL,
-					"""
-					Replenishment notifications for Braspress must be addressed to the logistics
-					coordinator. Requests above 1000 units also require approval from the commercial
-					manager before the shipment is arranged.""",
-					Map.of("managerApprovalThreshold", 1000)
 			),
 			new DepositorKnowledgeEntry(
 					"amz",
@@ -73,45 +45,41 @@ public class DepositorKnowledgeIngestion {
 			),
 			new DepositorKnowledgeEntry(
 					"amz",
-					"lead-time",
+					"replenishment-leadtime",
 					KnowledgeType.REPLENISHMENT,
 					"""
 					Amazon delivers to our warehouse in 5 business days on average.
 					Requests created on Friday are only processed on the following Monday.""",
 					Map.of("leadTimeDays", 5)
-			),
-			new DepositorKnowledgeEntry(
-					"amz",
-					"packaging",
-					KnowledgeType.INBOUND,
-					"""
-					Amazon products arrive on mixed pallets of 100 units.
-					Partial pallets are accepted but generate an additional handling fee.""",
-					Map.of("unitsPerPallet", 100)
-			),
-			new DepositorKnowledgeEntry(
-					"amz",
-					"approval-rules",
-					KnowledgeType.GENERAL,
-					"""
-					Amazon replenishment notifications must be sent to the account manager and
-					always include the expected delivery date. No manager approval is required
-					regardless of the requested quantity.""",
-					Map.of()
 			)
 	);
 
 	private final Logger logger = LoggerFactory.getLogger(DepositorKnowledgeIngestion.class);
 	private final DepositorKnowledgeStore depositorKnowledgeStore;
+	private final DepositorKnowledgeRepository depositorKnowledgeRepository;
 
-	DepositorKnowledgeIngestion(DepositorKnowledgeStore depositorKnowledgeStore) {
+	DepositorKnowledgeIngestion(
+			DepositorKnowledgeStore depositorKnowledgeStore,
+			DepositorKnowledgeRepository depositorKnowledgeRepository) {
 		this.depositorKnowledgeStore = depositorKnowledgeStore;
+		this.depositorKnowledgeRepository = depositorKnowledgeRepository;
 	}
 
 	public void ingest() {
+		Set<String> existing = depositorKnowledgeRepository.findAll().stream()
+				.map(entry -> entry.depositorId() + ":" + entry.key())
+				.collect(Collectors.toSet());
+
 		List<Document> documents = ENTRIES.stream()
 				.map(DepositorKnowledgeEntry::toDocument)
+				.filter(document -> !existing.contains(document.getId()))
 				.toList();
+
+		if (documents.isEmpty()) {
+			logger.info("Depositor knowledge already ingested, keeping the {} stored entry(ies)", existing.size());
+
+			return;
+		}
 
 		depositorKnowledgeStore.save(documents);
 

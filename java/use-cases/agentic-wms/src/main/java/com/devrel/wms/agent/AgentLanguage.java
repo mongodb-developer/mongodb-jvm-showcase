@@ -1,4 +1,4 @@
-package com.devrel.wms.config;
+package com.devrel.wms.agent;
 
 public enum AgentLanguage {
 

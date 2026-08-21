@@ -1,7 +1,7 @@
 package com.devrel.wms.tool;
 
-import com.devrel.wms.config.AgentLanguage;
-import com.devrel.wms.config.AgentLanguageSettings;
+import com.devrel.wms.agent.AgentLanguage;
+import com.devrel.wms.agent.AgentLanguageSettings;
 import com.devrel.wms.domain.Depositor;
 import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.service.InventoryService;

@@ -55,6 +55,36 @@ public class InboundInvoiceService {
 		);
 	}
 
+	public InboundInvoice update(String number, InboundInvoice inboundInvoice) {
+		InboundInvoice current = getInbound(number);
+
+		if (current.status() != InboundInvoice.InvoiceStatus.PENDING) {
+			throw new ConflictException("Only a pending invoice can be edited: " + number);
+		}
+
+		if (inboundInvoice.items() == null || inboundInvoice.items().isEmpty()) {
+			throw new IllegalArgumentException("Invoice must have at least one item: " + number);
+		}
+
+		inboundInvoice.items().forEach(item -> {
+			if (item.quantity() == null || item.quantity() <= 0) {
+				throw new IllegalArgumentException("Invalid quantity: " + item.quantity());
+			}
+		});
+
+		InboundInvoice updated = inboundInvoiceRepository.save(new InboundInvoice(
+				current.id(),
+				current.number(),
+				inboundInvoice.depositor() == null ? current.depositor() : inboundInvoice.depositor(),
+				inboundInvoice.items(),
+				InboundInvoice.InvoiceStatus.PENDING
+		));
+
+		logger.info("Inbound invoice {} updated", number);
+
+		return updated;
+	}
+
 	public void check(String number) {
 		InboundInvoice invoice = getInbound(number);
 

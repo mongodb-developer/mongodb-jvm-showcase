@@ -1,0 +1,32 @@
+GET http://localhost:8080/depositor-policies
+Content-Type: application/json
+
+### Depositors
+GET http://localhost:8080/depositor-policies/depositors
+Content-Type: application/json
+
+### Policies of one depositor
+GET http://localhost:8080/depositor-policies/amz
+Content-Type: application/json
+
+### Create or update a policy
+POST http://localhost:8080/depositor-policies
+Content-Type: application/json
+
+{
+  "depositorId": "amz",
+  "key": "replenishment-minimum",
+  "type": "REPLENISHMENT",
+  "text": "Replenishment orders for Amazon must contain at least 500 units per product. Amazon consolidates smaller requests and may delay them by an entire week.",
+  "attributes": {
+    "minimumQuantity": 500
+  }
+}
+
+### What the agent retrieves
+GET http://localhost:8080/depositor-policies/amz/preview?question=What are the constraints to request 500 units today?
+Content-Type: application/json
+
+### Delete a policy
+DELETE http://localhost:8080/depositor-policies/amz/replenishment-minimum
+Content-Type: application/json

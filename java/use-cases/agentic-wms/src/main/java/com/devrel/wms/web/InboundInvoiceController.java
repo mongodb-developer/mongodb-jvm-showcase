@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +36,13 @@ public class InboundInvoiceController {
 	@GetMapping
 	public ResponseEntity<List<InboundInvoice>> findAll() {
 		return ResponseEntity.ok(inboundInvoiceService.findAll());
+	}
+
+	@PutMapping("/{number}")
+	public ResponseEntity<InboundInvoice> update(
+			@PathVariable String number,
+			@RequestBody InboundInvoice inboundInvoice) {
+		return ResponseEntity.ok(inboundInvoiceService.update(number, inboundInvoice));
 	}
 
 	@PostMapping("/{number}/check")

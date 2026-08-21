@@ -1,6 +1,5 @@
 package com.devrel.wms.agent;
 
-import com.devrel.wms.config.AgentLanguageSettings;
 import com.devrel.wms.domain.AgentRun;
 import com.devrel.wms.service.AgentRunService;
 import org.slf4j.Logger;
