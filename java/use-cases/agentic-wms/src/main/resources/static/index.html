@@ -571,6 +571,7 @@
 		<nav id="tabs">
 			<div class="group">Warehouse</div>
 			<button data-tab="products" class="active"><span class="ico">&#9635;</span>Products</button>
+			<button data-tab="depositors"><span class="ico">&#9750;</span>Depositors</button>
 			<button data-tab="inventory"><span class="ico">&#9707;</span>Inventory</button>
 			<button data-tab="movements"><span class="ico">&#8646;</span>Stock Movements</button>
 
@@ -638,6 +639,50 @@
 					<table>
 						<thead><tr><th>Code</th><th>Name</th><th>Id</th></tr></thead>
 						<tbody id="p-body"></tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
+		<section id="depositors">
+			<div class="card">
+				<div class="card-head"><h2 id="d-form-title">New depositor</h2></div>
+				<div class="card-body">
+					<div class="grid">
+						<div class="field">
+							<label>Code</label>
+							<input id="d-code" placeholder="amz">
+						</div>
+						<div class="field">
+							<label>Name</label>
+							<input id="d-name" placeholder="Amazon">
+						</div>
+						<div class="field">
+							<label>Email</label>
+							<input id="d-email" placeholder="supply@amazon.com">
+						</div>
+					</div>
+					<div class="row" style="margin-top:16px">
+						<button class="btn" onclick="saveDepositor()">Save depositor</button>
+						<button class="btn ghost" onclick="resetDepositorForm()">Clear</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>Depositors</h2></div>
+				<div class="toolbar">
+					<div class="field">
+						<label>Filter by code or name</label>
+						<input id="d-filter" placeholder="amz">
+					</div>
+					<button class="btn ghost" onclick="loadDepositors()">Search</button>
+					<button class="btn ghost" onclick="document.getElementById('d-filter').value='';loadDepositors()">Clear</button>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Code</th><th>Name</th><th>Email</th><th></th></tr></thead>
+						<tbody id="d-body"></tbody>
 					</table>
 				</div>
 			</div>
@@ -1016,6 +1061,66 @@ async function createProduct() {
 	document.getElementById('p-code').value = '';
 	document.getElementById('p-name').value = '';
 	loadProducts();
+}
+
+let editingDepositor = null;
+
+async function loadDepositors() {
+	const filter = document.getElementById('d-filter').value.trim().toLowerCase();
+	const all = await api('/depositors');
+	const list = filter
+			? all.filter(d => String(d.id).toLowerCase().includes(filter)
+					|| String(d.name).toLowerCase().includes(filter))
+			: all;
+
+	rows('d-body', list, 4, depositor =>
+		'<tr><td class="mono">' + esc(depositor.id) + '</td><td>' + esc(depositor.name) + '</td>' +
+			'<td class="mono">' + esc(depositor.email) + '</td>' +
+			'<td><button class="btn ghost sm" onclick="editDepositor(\'' + esc(depositor.id) + '\')">Edit</button></td></tr>');
+}
+
+async function editDepositor(id) {
+	const depositor = await api('/depositors/' + encodeURIComponent(id));
+
+	editingDepositor = depositor.id;
+	document.getElementById('d-form-title').textContent = 'Edit depositor ' + depositor.id;
+	document.getElementById('d-code').value = depositor.id;
+	document.getElementById('d-code').disabled = true;
+	document.getElementById('d-name').value = depositor.name;
+	document.getElementById('d-email').value = depositor.email;
+}
+
+function resetDepositorForm() {
+	editingDepositor = null;
+	document.getElementById('d-form-title').textContent = 'New depositor';
+	document.getElementById('d-code').value = '';
+	document.getElementById('d-code').disabled = false;
+	document.getElementById('d-name').value = '';
+	document.getElementById('d-email').value = '';
+}
+
+async function saveDepositor() {
+	const id = document.getElementById('d-code').value.trim();
+	const name = document.getElementById('d-name').value.trim();
+	const email = document.getElementById('d-email').value.trim();
+
+	if (!id || !name || !email) return notify('Code, name and email are required', 'err', 'Invalid input');
+
+	if (editingDepositor) {
+		await api('/depositors/' + encodeURIComponent(editingDepositor), {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name, email })
+		});
+		notify('Depositor ' + editingDepositor + ' updated', 'ok', 'Success');
+	}
+	else {
+		await post('/depositors', { id, name, email });
+		notify('Depositor ' + id + ' created', 'ok', 'Success');
+	}
+
+	resetDepositorForm();
+	loadDepositors();
 }
 
 async function loadInventory() {
@@ -1510,6 +1615,7 @@ async function previewPolicies() {
 
 const loaders = {
 	products: loadProducts,
+	depositors: loadDepositors,
 	policies: loadPolicies,
 	inventory: loadInventory,
 	inbound: loadInbound,
