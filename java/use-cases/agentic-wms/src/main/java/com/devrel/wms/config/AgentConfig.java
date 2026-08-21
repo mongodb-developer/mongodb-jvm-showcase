@@ -7,7 +7,6 @@ import com.devrel.wms.tool.DepositorPolicyTool;
 import com.devrel.wms.tool.InventoryAnalysisTool;
 import com.devrel.wms.tool.ReplenishmentTool;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -119,24 +118,22 @@ public class AgentConfig {
 			""";
 
 	@Bean
-	public ChatClient chatClient(OpenAiChatModel openAiChatModel) {
-		return ChatClient.builder(openAiChatModel)
+	public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
+		return chatClientBuilder
 				.defaultSystem(PROMPT_TEMPLATE)
 				.build();
 	}
 
 	@Bean("chatClientPlanCreation")
-	public ChatClient chatClientPlanCreation(OpenAiChatModel openAiChatModel) {
-		return ChatClient
-				.builder(openAiChatModel)
+	public ChatClient chatClientPlanCreation(ChatClient.Builder chatClientBuilder) {
+		return chatClientBuilder
 				.defaultSystem(PROMPT_PLAN_CREATION_TEMPLATE)
 				.build();
 	}
 
 	@Bean("chatClientSummary")
-	public ChatClient chatClientSummary(OpenAiChatModel openAiChatModel) {
-		return ChatClient
-				.builder(openAiChatModel)
+	public ChatClient chatClientSummary(ChatClient.Builder chatClientBuilder) {
+		return chatClientBuilder
 				.defaultSystem(PROMPT_SUMMARY_TEMPLATE)
 				.build();
 	}

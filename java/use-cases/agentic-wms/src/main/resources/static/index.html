@@ -357,7 +357,7 @@
 	.badge.COMPLETED, .badge.INBOUND { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 	.badge.FAILED, .badge.REJECTED { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
 	.badge.REPLENISHMENT { color: var(--info); border-color: var(--info); background: color-mix(in srgb, var(--info) 12%, transparent); }
-	.badge.GENERAL { color: var(--muted); border-color: var(--border-strong); background: var(--surface-3); }
+	.badge.GENERAL, .badge.SKIPPED { color: var(--muted); border-color: var(--border-strong); background: var(--surface-3); }
 	.badge.OUTBOUND { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
 
 	.empty { color: var(--muted); text-align: center; padding: 34px 18px; font-size: 13px; }
@@ -1020,7 +1020,7 @@ function rows(tbody, list, columns, render) {
 const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + '</span>';
 const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
 const depositorLabel = depositor => depositor
-	? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.code) + ')</span>'
+	? esc(depositor.name)
 	: '-';
 
 const itemLine = (productCode, quantity) => '<div class="item-line">' +

@@ -37,6 +37,7 @@ public record AgentRun(
         PENDING,
         RUNNING,
         COMPLETED,
-        FAILED
+        FAILED,
+        SKIPPED
     }
 }

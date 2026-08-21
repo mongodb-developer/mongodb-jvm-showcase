@@ -58,6 +58,8 @@ public class AgentRunner {
 				tasks.set(index, new AgentRun.AgentTask(
 						description, AgentRun.TaskStatus.FAILED, capability, exception.getMessage(), startedAt, LocalDateTime.now()));
 
+				skipRemaining(tasks, index + 1);
+
 				return agentRunService.save(finish(
 						agentRun, tasks, AgentRun.Status.FAILED, "Failed on task: " + description));
 			}
@@ -67,6 +69,15 @@ public class AgentRunner {
 
 		return agentRunService.save(finish(
 				agentRun, tasks, AgentRun.Status.COMPLETED, summarize(definition, goal, tasks)));
+	}
+
+	private void skipRemaining(List<AgentRun.AgentTask> tasks, int from) {
+		for (int index = from; index < tasks.size(); index++) {
+			AgentRun.AgentTask task = tasks.get(index);
+
+			tasks.set(index, new AgentRun.AgentTask(
+					task.description(), AgentRun.TaskStatus.SKIPPED, task.tool(), null, null, null));
+		}
 	}
 
 	private String summarize(AgentDefinition definition, String goal, List<AgentRun.AgentTask> tasks) {
