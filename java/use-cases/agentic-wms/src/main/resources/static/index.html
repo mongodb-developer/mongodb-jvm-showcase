@@ -147,6 +147,15 @@
 		word-break: break-all;
 	}
 
+	.side-foot a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.side-foot a:hover {
+		text-decoration: underline;
+	}
+
 	.content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 	.topbar {
@@ -575,7 +584,10 @@
 			<button data-tab="agentruns"><span class="ico">&#9881;</span>Agent Runs</button>
 		</nav>
 
-		<div class="side-foot" id="status"></div>
+		<div class="side-foot">
+			<a href="https://github.com/mongodb-developer/mongodb-jvm-showcase/tree/main/java/use-cases/agentic-wms"
+					target="_blank" rel="noopener">View this project on GitHub</a>
+		</div>
 	</aside>
 
 	<div class="content">
@@ -1548,7 +1560,6 @@ function toggleTheme() {
 applyTheme(localStorage.getItem('wms-theme') || 'dark');
 
 ['in-items', 'out-items'].forEach(addItemLine);
-document.getElementById('status').textContent = window.location.origin;
 loadLanguage().catch(() => {});
 loadProducts().catch(() => {});
 </script>

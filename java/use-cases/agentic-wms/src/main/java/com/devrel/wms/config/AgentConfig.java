@@ -81,7 +81,7 @@ public class AgentConfig {
 			* Avoid unnecessary tasks.
 			* Use conditional tasks when the action depends on information that will only be discovered during execution.
 			* Do not expose internal reasoning or chain of thought.
-			* Create a maximum of 6 tasks.
+			* Create a maximum of 8 tasks.
 			* Always filter by depositor.
 			* Assign exactly one capability to each task, using the capability name.
 			* A task must never mix two capabilities. Creating a replenishment request and
