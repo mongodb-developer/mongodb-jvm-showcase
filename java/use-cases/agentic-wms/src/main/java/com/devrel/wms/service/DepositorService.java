@@ -43,6 +43,7 @@ public class DepositorService {
 
 		Depositor merged = new Depositor(
 				current.id(),
+				current.code(),
 				depositor.name() == null ? current.name() : depositor.name(),
 				depositor.email() == null ? current.email() : depositor.email());
 
@@ -56,7 +57,7 @@ public class DepositorService {
 	}
 
 	private void validate(Depositor depositor) {
-		if (depositor.id() == null || depositor.id().isBlank()) {
+		if (depositor.code() == null || depositor.code().isBlank()) {
 			throw new IllegalArgumentException("Depositor code is required");
 		}
 

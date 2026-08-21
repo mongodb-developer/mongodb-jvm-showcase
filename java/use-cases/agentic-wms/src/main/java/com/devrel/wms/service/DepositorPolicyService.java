@@ -23,12 +23,15 @@ public class DepositorPolicyService {
 
 	private final DepositorKnowledgeRepository depositorKnowledgeRepository;
 	private final DepositorKnowledgeStore depositorKnowledgeStore;
+	private final DepositorService depositorService;
 
 	DepositorPolicyService(
 			DepositorKnowledgeRepository depositorKnowledgeRepository,
-			DepositorKnowledgeStore depositorKnowledgeStore) {
+			DepositorKnowledgeStore depositorKnowledgeStore,
+			DepositorService depositorService) {
 		this.depositorKnowledgeRepository = depositorKnowledgeRepository;
 		this.depositorKnowledgeStore = depositorKnowledgeStore;
+		this.depositorService = depositorService;
 	}
 
 	public List<DepositorKnowledgeEntry> findAll() {
@@ -42,17 +45,17 @@ public class DepositorPolicyService {
 	public List<Depositor> findDepositors() {
 		Map<String, Depositor> depositors = new LinkedHashMap<>();
 
-		depositorKnowledgeRepository.findDepositors().stream()
-				.filter(depositor -> depositor.id() != null)
-				.forEach(depositor -> depositors.put(depositor.id(), depositor));
+		depositorService.findAll().stream()
+				.filter(depositor -> depositor.code() != null)
+				.forEach(depositor -> depositors.put(depositor.code(), depositor));
 
 		depositorKnowledgeRepository.findAll().stream()
 				.map(DepositorKnowledgeEntry::depositorId)
-				.filter(id -> id != null && !depositors.containsKey(id))
-				.forEach(id -> depositors.put(id, new Depositor(id, id, null)));
+				.filter(code -> code != null && !depositors.containsKey(code))
+				.forEach(code -> depositors.put(code, new Depositor(null, code, null, null)));
 
 		List<Depositor> result = new ArrayList<>(depositors.values());
-		result.sort(Comparator.comparing(Depositor::id));
+		result.sort(Comparator.comparing(Depositor::code));
 
 		return result;
 	}

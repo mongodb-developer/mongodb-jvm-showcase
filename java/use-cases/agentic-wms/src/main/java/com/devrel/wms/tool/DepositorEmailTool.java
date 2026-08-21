@@ -154,7 +154,7 @@ public class DepositorEmailTool {
 		if (registered == null) {
 			logger.warn("Depositor {} is not registered. The email has no recipient", depositor.id());
 
-			return new Depositor(depositor.id(), depositor.name(), null);
+			return new Depositor(depositor.id(), null, depositor.name(), null);
 		}
 
 		logger.info("Depositor {} resolved from the depositors collection", depositor.id());

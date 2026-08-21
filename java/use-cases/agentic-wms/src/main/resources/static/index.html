@@ -646,7 +646,7 @@
 
 		<section id="depositors">
 			<div class="card">
-				<div class="card-head"><h2 id="d-form-title">New depositor</h2></div>
+				<div class="card-head"><h2>New depositor</h2></div>
 				<div class="card-body">
 					<div class="grid">
 						<div class="field">
@@ -681,7 +681,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Code</th><th>Name</th><th>Email</th><th></th></tr></thead>
+						<thead><tr><th>Id</th><th>Code</th><th>Name</th><th>Email</th><th></th></tr></thead>
 						<tbody id="d-body"></tbody>
 					</table>
 				</div>
@@ -1046,38 +1046,73 @@ async function createProduct() {
 	loadProducts();
 }
 
-let editingDepositor = null;
+const openDepositors = new Set();
 
 async function loadDepositors() {
 	const filter = document.getElementById('d-filter').value.trim().toLowerCase();
 	const all = await api('/depositors');
 	const list = filter
-			? all.filter(d => String(d.id).toLowerCase().includes(filter)
+			? all.filter(d => String(d.code).toLowerCase().includes(filter)
 					|| String(d.name).toLowerCase().includes(filter))
 			: all;
 
-	rows('d-body', list, 4, depositor =>
-		'<tr><td class="mono">' + esc(depositor.id) + '</td><td>' + esc(depositor.name) + '</td>' +
+	rows('d-body', list, 5, depositor =>
+		'<tr><td class="mono">' + esc(depositor.id) + '</td><td class="mono">' + esc(depositor.code) + '</td>' +
+			'<td>' + esc(depositor.name) + '</td>' +
 			'<td class="mono">' + esc(depositor.email) + '</td>' +
-			'<td><button class="btn ghost sm" onclick="editDepositor(\'' + esc(depositor.id) + '\')">Edit</button></td></tr>');
+			'<td><button class="btn ghost sm" onclick="toggleDepositorEditor(\'' + esc(depositor.id) + '\')">' +
+			(openDepositors.has(depositor.id) ? 'Close' : 'Edit') + '</button></td></tr>' +
+			depositorEditorRow(depositor));
 }
 
-async function editDepositor(id) {
-	const depositor = await api('/depositors/' + encodeURIComponent(id));
+function depositorEditorRow(depositor) {
+	if (!openDepositors.has(depositor.id)) return '';
 
-	editingDepositor = depositor.id;
-	document.getElementById('d-form-title').textContent = 'Edit depositor ' + depositor.id;
-	document.getElementById('d-code').value = depositor.id;
-	document.getElementById('d-code').disabled = true;
-	document.getElementById('d-name').value = depositor.name;
-	document.getElementById('d-email').value = depositor.email;
+	return '<tr data-edit-depositor="' + esc(depositor.id) + '">' +
+		'<td colspan="5" style="padding-top:0;border-top:none">' +
+		'<div class="edit-box">' +
+		'<div class="grid">' +
+		'<div class="field"><label>Code</label>' +
+		'<input class="d-edit-code" value="' + esc(depositor.code) + '" disabled></div>' +
+		'<div class="field"><label>Name</label>' +
+		'<input class="d-edit-name" value="' + esc(depositor.name) + '"></div>' +
+		'<div class="field"><label>Email</label>' +
+		'<input class="d-edit-email" value="' + esc(depositor.email) + '"></div>' +
+		'</div>' +
+		'<div class="actions" style="margin-top:12px">' +
+		'<span class="spacer" style="flex:1"></span>' +
+		'<button class="btn sm" onclick="updateDepositor(\'' + esc(depositor.id) + '\')">Save changes</button>' +
+		'<button class="btn ghost sm" onclick="toggleDepositorEditor(\'' + esc(depositor.id) + '\')">Cancel</button>' +
+		'</div></div></td></tr>';
+}
+
+function toggleDepositorEditor(id) {
+	openDepositors.has(id) ? openDepositors.delete(id) : openDepositors.add(id);
+
+	loadDepositors().catch(() => {});
+}
+
+async function updateDepositor(id) {
+	const row = document.querySelector('tr[data-edit-depositor="' + id + '"]');
+	const code = row.querySelector('.d-edit-code').value.trim();
+	const name = row.querySelector('.d-edit-name').value.trim();
+	const email = row.querySelector('.d-edit-email').value.trim();
+
+	if (!name || !email) return notify('Name and email are required', 'err', 'Invalid input');
+
+	await api('/depositors/' + encodeURIComponent(id), {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ name, email })
+	});
+
+	notify('Depositor ' + code + ' updated', 'ok', 'Success');
+	openDepositors.delete(id);
+	loadDepositors();
 }
 
 function resetDepositorForm() {
-	editingDepositor = null;
-	document.getElementById('d-form-title').textContent = 'New depositor';
 	document.getElementById('d-code').value = '';
-	document.getElementById('d-code').disabled = false;
 	document.getElementById('d-name').value = '';
 	document.getElementById('d-email').value = '';
 }
@@ -1089,18 +1124,8 @@ async function saveDepositor() {
 
 	if (!code || !name || !email) return notify('Code, name and email are required', 'err', 'Invalid input');
 
-	if (editingDepositor) {
-		await api('/depositors/' + encodeURIComponent(editingDepositor), {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name, email })
-		});
-		notify('Depositor ' + editingDepositor + ' updated', 'ok', 'Success');
-	}
-	else {
-		await post('/depositors', { code, name, email });
-		notify('Depositor ' + code + ' created', 'ok', 'Success');
-	}
+	await post('/depositors', { code, name, email });
+	notify('Depositor ' + code + ' created', 'ok', 'Success');
 
 	resetDepositorForm();
 	loadDepositors();
@@ -1232,7 +1257,7 @@ async function loadDepositorOptions(prefix) {
 	select.innerHTML = '<option value="">Select a depositor</option>' + list
 			.map(depositor => '<option value="' + esc(depositor.id) + '"'
 					+ ' data-name="' + esc(depositor.name) + '">'
-					+ esc(depositor.name) + ' (' + esc(depositor.id) + ')</option>')
+					+ esc(depositor.name) + ' (' + esc(depositor.code) + ')</option>')
 			.join('');
 
 	select.value = selected;
@@ -1496,8 +1521,8 @@ async function loadPolicies() {
 	if (!policyDepositors.length) {
 		policyDepositors = await api('/depositor-policies/depositors');
 		select.innerHTML = '<option value="">All depositors</option>' + policyDepositors
-				.map(depositor => '<option value="' + esc(depositor.id) + '">'
-						+ esc(depositor.name) + ' (' + esc(depositor.id) + ')</option>')
+				.map(depositor => '<option value="' + esc(depositor.code) + '">'
+						+ esc(depositor.name || depositor.code) + ' (' + esc(depositor.code) + ')</option>')
 				.join('');
 	}
 

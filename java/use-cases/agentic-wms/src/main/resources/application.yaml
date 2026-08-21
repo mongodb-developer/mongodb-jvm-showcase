@@ -24,7 +24,7 @@ spring:
           - type
   data:
     mongodb:
-      auto-index-creation: false
+      auto-index-creation: true
 voyage:
   base-url: ${VOYAGE_BASE_URL}
   api-key: ${VOYAGE_API_KEY}
