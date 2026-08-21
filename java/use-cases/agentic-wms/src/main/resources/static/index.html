@@ -1207,6 +1207,7 @@ function notificationRow(replenishment) {
 		'&#9993; Email &middot; ' + esc(state) + '</summary>' +
 		'<div class="result" style="margin-top:8px">' +
 		'<strong>To:</strong> ' + esc(draft.to || 'to be resolved on approval') + '<br>' +
+		((draft.cc || []).length ? '<strong>Cc:</strong> ' + esc(draft.cc.join(', ')) + '<br>' : '') +
 		'<strong>Subject:</strong> ' + esc(draft.subject) + '<br><br>' +
 		esc(draft.body) +
 		'</div></details></td></tr>';

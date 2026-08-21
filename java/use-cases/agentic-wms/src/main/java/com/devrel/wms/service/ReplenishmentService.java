@@ -67,7 +67,7 @@ public class ReplenishmentService {
 		return save;
 	}
 
-	public Replenishment saveNotification(String id, Replenishment.Notification notification) {
+	public void saveNotification(String id, Replenishment.Notification notification) {
 		Replenishment replenishment = replenishmentRepository.findById(id)
 				.orElseThrow(() -> new NotFoundException("Replenishment not found: " + id));
 
@@ -76,7 +76,6 @@ public class ReplenishmentService {
 
 		logger.info("Replenishment {} notification drafted", save.id());
 
-		return save;
 	}
 
 	private Replenishment withStatus(

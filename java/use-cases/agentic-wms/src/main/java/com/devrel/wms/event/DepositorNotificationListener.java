@@ -48,10 +48,15 @@ public class DepositorNotificationListener {
 			return;
 		}
 
-		logger.info("##EMAIL SENT## - To: {} | Subject: {}\n{}", recipient, draft.subject(), draft.body());
+		logger.info("##EMAIL SENT## - To: {} | Cc: {} | Subject: {}\n{}",
+				recipient, copies(draft), draft.subject(), draft.body());
 
 		replenishmentService.saveNotification(id, new Replenishment.Notification(
-				recipient, draft.subject(), draft.body(), LocalDateTime.now()));
+				recipient, draft.cc(), draft.subject(), draft.body(), LocalDateTime.now()));
+	}
+
+	private String copies(Replenishment.Notification draft) {
+		return draft.cc() == null || draft.cc().isEmpty() ? "-" : String.join(", ", draft.cc());
 	}
 
 	private String recipient(Replenishment.Notification draft, Depositor depositor) {

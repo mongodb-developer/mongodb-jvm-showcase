@@ -4,6 +4,7 @@ import com.devrel.wms.agent.AgentLanguage;
 import com.devrel.wms.agent.AgentLanguageSettings;
 import com.devrel.wms.domain.Depositor;
 import com.devrel.wms.domain.Replenishment;
+import com.devrel.wms.knowledge.DepositorKnowledgeRepository;
 import com.devrel.wms.service.InventoryService;
 import com.devrel.wms.service.ReplenishmentService;
 import org.slf4j.Logger;
@@ -12,6 +13,11 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,18 +26,22 @@ public class DepositorEmailTool {
 	private static final Logger logger = LoggerFactory.getLogger(DepositorEmailTool.class);
 	private static final String EMAIL_SUBJECT = "Replenishment required for your products";
 	private static final String EMAIL_SUBJECT_PT_BR = "Reabastecimento necessário para seus produtos";
+	private static final Set<String> COPY_ATTRIBUTES = Set.of("email", "emails", "cc", "copy");
 
 	private final ReplenishmentService replenishmentService;
 	private final InventoryService inventoryService;
 	private final AgentLanguageSettings agentLanguageSettings;
+	private final DepositorKnowledgeRepository depositorKnowledgeRepository;
 
 	DepositorEmailTool(
 			ReplenishmentService replenishmentService,
 			InventoryService inventoryService,
-			AgentLanguageSettings agentLanguageSettings) {
+			AgentLanguageSettings agentLanguageSettings,
+			DepositorKnowledgeRepository depositorKnowledgeRepository) {
 		this.replenishmentService = replenishmentService;
 		this.inventoryService = inventoryService;
 		this.agentLanguageSettings = agentLanguageSettings;
+		this.depositorKnowledgeRepository = depositorKnowledgeRepository;
 	}
 
 	private String subject() {
@@ -48,9 +58,11 @@ public class DepositorEmailTool {
     	request changes nothing.
     """)
 	public String draftDepositorEmail(
-			@ToolParam(description = "Id of the replenishment request to write the email for")
-			String replenishmentId
+			@ToolParam(description = ReplenishmentIds.ID_PARAM)
+			String id
 	) {
+		String replenishmentId = ReplenishmentIds.sanitize(id);
+
 		logger.info("##TOOL## - Drafting depositor email for replenishment {}", replenishmentId);
 
 		Replenishment replenishment = replenishmentService.findById(replenishmentId);
@@ -66,17 +78,69 @@ public class DepositorEmailTool {
 
 		Depositor depositor = resolveDepositor(replenishment.depositor());
 		String recipient = depositor == null ? null : depositor.email();
+		List<String> copies = copyList(depositor, recipient);
 		String body = composeEmail(replenishment, depositor);
 
 		replenishmentService.saveNotification(replenishmentId, new Replenishment.Notification(
-				recipient, subject(), body, null));
+				recipient, copies, subject(), body, null));
 
 		return """
         Email drafted for replenishment %s. It will be sent when the request is approved.
         To: %s
-        Subject: %s
+        %sSubject: %s
 
-        %s""".formatted(replenishmentId, recipient == null ? "to be resolved on approval" : recipient, subject(), body);
+        %s""".formatted(
+				replenishmentId,
+				recipient == null ? "to be resolved on approval" : recipient,
+				copies.isEmpty() ? "" : "Cc: " + String.join(", ", copies) + "\n",
+				subject(),
+				body);
+	}
+
+	private List<String> copyList(Depositor depositor, String recipient) {
+		if (depositor == null || depositor.id() == null) {
+			return List.of();
+		}
+
+		Set<String> copies = new LinkedHashSet<>();
+
+		depositorKnowledgeRepository.findByDepositorId(depositor.id()).forEach(entry -> {
+			if (entry.attributes() == null) {
+				return;
+			}
+
+			entry.attributes().forEach((name, value) -> {
+				if (COPY_ATTRIBUTES.contains(name)) {
+					copies.addAll(addresses(value));
+				}
+			});
+		});
+
+		copies.remove(recipient);
+
+		if (!copies.isEmpty()) {
+			logger.info("Depositor {} policies require copying {}", depositor.id(), copies);
+		}
+
+		return List.copyOf(copies);
+	}
+
+	private List<String> addresses(Object value) {
+		if (value == null) {
+			return List.of();
+		}
+
+		if (value instanceof Iterable<?> values) {
+			List<String> result = new ArrayList<>();
+			values.forEach(item -> result.addAll(addresses(item)));
+
+			return result;
+		}
+
+		return Arrays.stream(String.valueOf(value).split("[,;]"))
+				.map(String::trim)
+				.filter(address -> address.contains("@"))
+				.toList();
 	}
 
 	private Depositor resolveDepositor(Depositor depositor) {

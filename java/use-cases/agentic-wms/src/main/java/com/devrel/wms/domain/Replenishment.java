@@ -17,6 +17,7 @@ public record Replenishment(
 ) {
     public record Notification(
             String to,
+            List<String> cc,
             String subject,
             String body,
             LocalDateTime sentAt
