@@ -1446,13 +1446,15 @@ function notificationRow(replenishment) {
 
 	if (!draft) return '';
 
+	const label = draft.sentAt ? 'See email' : 'See draft email';
+
 	const state = draft.sentAt
 			? 'Sent at ' + stamp(draft.sentAt)
-			: 'Draft. Will be sent on approval';
+			: 'Will be sent on approval';
 
 	return '<tr><td colspan="6" style="padding-top:0;border-top:none">' +
 		'<details><summary class="mono" style="cursor:pointer">' +
-		'&#9993; Email &middot; ' + esc(state) + '</summary>' +
+		'&#9993; ' + label + ' &middot; ' + esc(state) + '</summary>' +
 		'<div class="result" style="margin-top:8px">' +
 		'<strong>To:</strong> ' + esc(draft.to || 'to be resolved on approval') + '<br>' +
 		((draft.cc || []).length ? '<strong>Cc:</strong> ' + esc(draft.cc.join(', ')) + '<br>' : '') +

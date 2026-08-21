@@ -47,11 +47,16 @@ public class AgentConfig {
 			
 			If inventory is healthy, take no action.
 
+			Never write a notification email yourself. The only way to produce one is to call the
+			drafting tool with the id of the replenishment request that was just created.
+			An email that is not returned by that tool does not exist and is never delivered.
+
 			The notification email is only drafted, never sent by you: it is sent when a warehouse
 			operator approves the request. Never state that the email was sent.
 
 			When you use the drafting tool, reproduce in your answer the full email content
 			returned by the tool, exactly as it is, without summarizing or rewriting it.
+			Never change its subject, recipients or body.
 
 			You always receive a single task of an execution plan. Execute only that task.
 			Never perform an action that belongs to another task, even when it looks like the
@@ -171,7 +176,8 @@ public class AgentConfig {
 								List.of(depositorPolicyTool, replenishmentTool)),
 						new AgentCapability(
 								"NOTIFICATION",
-								"Write the notification email of an existing replenishment request.",
+								"Draft the notification email of an existing replenishment request by calling "
+									+ "the drafting tool with the replenishment id. The email is never written by hand.",
 								List.of(depositorEmailTool)),
 						new AgentCapability(
 								"DECISION",
