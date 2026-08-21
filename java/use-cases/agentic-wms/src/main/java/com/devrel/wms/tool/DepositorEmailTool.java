@@ -3,9 +3,10 @@ package com.devrel.wms.tool;
 import com.devrel.wms.agent.AgentLanguage;
 import com.devrel.wms.agent.AgentLanguageSettings;
 import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.knowledge.DepositorKnowledgeRepository;
-import com.devrel.wms.service.InventoryService;
+import com.devrel.wms.service.DepositorService;
 import com.devrel.wms.service.ReplenishmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,17 +30,17 @@ public class DepositorEmailTool {
 	private static final Set<String> COPY_ATTRIBUTES = Set.of("email", "emails", "cc", "copy");
 
 	private final ReplenishmentService replenishmentService;
-	private final InventoryService inventoryService;
+	private final DepositorService depositorService;
 	private final AgentLanguageSettings agentLanguageSettings;
 	private final DepositorKnowledgeRepository depositorKnowledgeRepository;
 
 	DepositorEmailTool(
 			ReplenishmentService replenishmentService,
-			InventoryService inventoryService,
+			DepositorService depositorService,
 			AgentLanguageSettings agentLanguageSettings,
 			DepositorKnowledgeRepository depositorKnowledgeRepository) {
 		this.replenishmentService = replenishmentService;
-		this.inventoryService = inventoryService;
+		this.depositorService = depositorService;
 		this.agentLanguageSettings = agentLanguageSettings;
 		this.depositorKnowledgeRepository = depositorKnowledgeRepository;
 	}
@@ -143,22 +144,20 @@ public class DepositorEmailTool {
 				.toList();
 	}
 
-	private Depositor resolveDepositor(Depositor depositor) {
+	private Depositor resolveDepositor(DepositorRef depositor) {
 		if (depositor == null || depositor.id() == null) {
-			return depositor;
+			return null;
 		}
 
-		if (depositor.email() != null && !depositor.email().isBlank()) {
-			return depositor;
-		}
-
-		Depositor registered = inventoryService.findDepositorById(depositor.id());
+		Depositor registered = depositorService.findById(depositor.id());
 
 		if (registered == null) {
-			return depositor;
+			logger.warn("Depositor {} is not registered. The email has no recipient", depositor.id());
+
+			return new Depositor(depositor.id(), depositor.name(), null);
 		}
 
-		logger.info("Depositor {} email resolved from inventory", depositor.id());
+		logger.info("Depositor {} resolved from the depositors collection", depositor.id());
 
 		return registered;
 	}

@@ -11,7 +11,7 @@ public record StockMovement(
         @Id String id,
         LocalDateTime date,
         @Indexed String productCode,
-        Depositor depositor,
+        DepositorRef depositor,
         Integer quantity,
         String invoiceNumber,
         MovementType type

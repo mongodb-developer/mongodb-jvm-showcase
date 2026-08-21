@@ -9,6 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public record Inventory(
         @Id String id,
         String productCode,
-        Depositor depositor,
+        DepositorRef depositor,
         int quantity
 ) {}

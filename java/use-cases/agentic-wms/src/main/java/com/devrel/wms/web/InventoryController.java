@@ -1,6 +1,6 @@
 package com.devrel.wms.web;
 
-import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Inventory;
 import com.devrel.wms.service.InventoryService;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +60,7 @@ public class InventoryController {
 	@PostMapping("/{productCode}/movements")
 	public ResponseEntity<Void> add(
 			@PathVariable String productCode,
-			@RequestBody Depositor depositor,
+			@RequestBody DepositorRef depositor,
 			@RequestParam int quantity) {
 		inventoryService.add(productCode, depositor, quantity);
 

@@ -1,6 +1,6 @@
 package com.devrel.wms.service;
 
-import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Inventory;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.repository.InventoryRepository;
@@ -46,14 +46,7 @@ public class InventoryService {
 		return inventoryRepository.findByProductCodeAndDepositorId(productCode, depositorId).orElse(null);
 	}
 
-	public Depositor findDepositorById(String depositorId) {
-		logger.info("# calling findDepositoryId: {}", depositorId);
-		return inventoryRepository.findFirstByDepositorId(depositorId)
-				.map(Inventory::depositor)
-				.orElse(null);
-	}
-
-	public void add(String productCode, Depositor depositor, int quantity) {
+	public void add(String productCode, DepositorRef depositor, int quantity) {
 		if (depositor == null || depositor.id() == null) {
 			throw new IllegalArgumentException("Depositor is required for product code: " + productCode);
 		}
@@ -63,12 +56,9 @@ public class InventoryService {
 					new Query(Criteria.where("productCode").is(productCode)
 							.and("depositor.id").is(depositor.id())),
 					new Update().inc("quantity", quantity)
-						.setOnInsert("depositor.name", depositor.name())
-						.setOnInsert("depositor.email", depositor.email()),
+						.setOnInsert("depositor.name", depositor.name()),
 					Inventory.class
 			);
-
-			refreshDepositorEmail(productCode, depositor);
 
 			logger.info("Inventory for product code {} and depositor {} increased by {}",
 					productCode, depositor.id(), quantity);
@@ -81,25 +71,8 @@ public class InventoryService {
 					+ " and depositor " + depositor.id());
 		}
 
-		refreshDepositorEmail(productCode, depositor);
-
 		logger.info("Inventory for product code {} and depositor {} decreased by {}",
 				productCode, depositor.id(), -quantity);
-	}
-
-	private void refreshDepositorEmail(String productCode, Depositor depositor) {
-		if (depositor.email() == null || depositor.email().isBlank()) {
-			return;
-		}
-
-		mongoTemplate.updateFirst(
-				new Query(Criteria.where("productCode").is(productCode)
-						.and("depositor.id").is(depositor.id())),
-				new Update().set("depositor.email", depositor.email()),
-				Inventory.class
-		);
-
-		logger.info("Depositor {} email updated for product code {}", depositor.id(), productCode);
 	}
 
 }

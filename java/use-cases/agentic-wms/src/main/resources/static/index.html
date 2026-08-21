@@ -718,16 +718,8 @@
 							<input id="in-number" placeholder="NF-1002">
 						</div>
 						<div class="field">
-							<label>Depositor id</label>
-							<input id="in-dep-id" placeholder="bsp">
-						</div>
-						<div class="field">
-							<label>Depositor name</label>
-							<input id="in-dep-name" placeholder="Braspress">
-						</div>
-						<div class="field">
-							<label>Depositor email</label>
-							<input id="in-dep-email" placeholder="logistics@braspress.com">
+							<label>Depositor</label>
+							<select id="in-dep"></select>
 						</div>
 					</div>
 					<div class="items-editor" id="in-items"></div>
@@ -773,16 +765,8 @@
 							<input id="out-number" placeholder="NF-2001">
 						</div>
 						<div class="field">
-							<label>Depositor id</label>
-							<input id="out-dep-id" placeholder="bsp">
-						</div>
-						<div class="field">
-							<label>Depositor name</label>
-							<input id="out-dep-name" placeholder="Braspress">
-						</div>
-						<div class="field">
-							<label>Depositor email</label>
-							<input id="out-dep-email" placeholder="logistics@braspress.com">
+							<label>Depositor</label>
+							<select id="out-dep"></select>
 						</div>
 					</div>
 					<div class="items-editor" id="out-items"></div>
@@ -1014,7 +998,6 @@ const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + 
 const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
 const depositorLabel = depositor => depositor
 	? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.id) + ')</span>'
-		+ (depositor.email ? '<br><span class="mono">' + esc(depositor.email) + '</span>' : '')
 	: '-';
 
 const itemLine = (productCode, quantity) => '<div class="item-line">' +
@@ -1100,11 +1083,11 @@ function resetDepositorForm() {
 }
 
 async function saveDepositor() {
-	const id = document.getElementById('d-code').value.trim();
+	const code = document.getElementById('d-code').value.trim();
 	const name = document.getElementById('d-name').value.trim();
 	const email = document.getElementById('d-email').value.trim();
 
-	if (!id || !name || !email) return notify('Code, name and email are required', 'err', 'Invalid input');
+	if (!code || !name || !email) return notify('Code, name and email are required', 'err', 'Invalid input');
 
 	if (editingDepositor) {
 		await api('/depositors/' + encodeURIComponent(editingDepositor), {
@@ -1115,8 +1098,8 @@ async function saveDepositor() {
 		notify('Depositor ' + editingDepositor + ' updated', 'ok', 'Success');
 	}
 	else {
-		await post('/depositors', { id, name, email });
-		notify('Depositor ' + id + ' created', 'ok', 'Success');
+		await post('/depositors', { code, name, email });
+		notify('Depositor ' + code + ' created', 'ok', 'Success');
 	}
 
 	resetDepositorForm();
@@ -1241,7 +1224,23 @@ async function runAction(kind, number, action) {
 	reloadInvoices(kind);
 }
 
+async function loadDepositorOptions(prefix) {
+	const select = document.getElementById(prefix + '-dep');
+	const selected = select.value;
+	const list = await api('/depositors');
+
+	select.innerHTML = '<option value="">Select a depositor</option>' + list
+			.map(depositor => '<option value="' + esc(depositor.id) + '"'
+					+ ' data-name="' + esc(depositor.name) + '">'
+					+ esc(depositor.name) + ' (' + esc(depositor.id) + ')</option>')
+			.join('');
+
+	select.value = selected;
+}
+
 async function loadInbound() {
+	await loadDepositorOptions('in');
+
 	const status = document.getElementById('in-filter').value;
 	const list = (await api('/inbound-invoice')).filter(i => !status || i.status === status);
 
@@ -1249,6 +1248,8 @@ async function loadInbound() {
 }
 
 async function loadOutbound() {
+	await loadDepositorOptions('out');
+
 	const status = document.getElementById('out-filter').value;
 	const list = (await api('/outbound-invoice')).filter(i => !status || i.status === status);
 
@@ -1258,20 +1259,21 @@ async function loadOutbound() {
 async function createInvoice(kind) {
 	const prefix = kind === 'inbound' ? 'in' : 'out';
 	const number = document.getElementById(prefix + '-number').value.trim();
-	const depositorId = document.getElementById(prefix + '-dep-id').value.trim();
-	const depositorName = document.getElementById(prefix + '-dep-name').value.trim();
-	const emailField = document.getElementById(prefix + '-dep-email');
+	const select = document.getElementById(prefix + '-dep');
+	const depositorId = select.value;
+	const depositorName = depositorId ? select.selectedOptions[0].dataset.name : null;
 	const items = readItems(prefix + '-items');
 
 	if (!number || items.length === 0) return notify('Number and at least one item are required', 'err', 'Invalid input');
 
-	const depositor = depositorId
-			? { id: depositorId, name: depositorName, email: emailField ? emailField.value.trim() : null }
-			: null;
+	if (!depositorId) return notify('Select a depositor', 'err', 'Invalid input');
+
+	const depositor = { id: depositorId, name: depositorName };
 
 	await post('/' + kind + '-invoice', { number, depositor, items });
 	notify('Invoice ' + number + ' created', 'ok', 'Success');
 	document.getElementById(prefix + '-number').value = '';
+	select.value = '';
 	document.getElementById(prefix + '-items').innerHTML = '';
 	addItemLine(prefix + '-items');
 	kind === 'inbound' ? loadInbound() : loadOutbound();

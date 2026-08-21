@@ -1,6 +1,5 @@
 package com.devrel.wms.knowledge;
 
-import com.devrel.wms.domain.Depositor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,7 +17,6 @@ public class DepositorKnowledgeRepository {
 
 	private static final String CONTENT_FIELD = "content";
 	private static final String METADATA_FIELD = "metadata";
-	private static final String INVENTORY_COLLECTION = "inventory";
 	private static final Set<String> RESERVED_METADATA = Set.of("depositorId", "type", "key");
 
 	private final MongoTemplate mongoTemplate;
@@ -37,13 +35,6 @@ public class DepositorKnowledgeRepository {
 
 	public List<DepositorKnowledgeEntry> findByDepositorId(String depositorId) {
 		return read(Query.query(Criteria.where(METADATA_FIELD + ".depositorId").is(depositorId)));
-	}
-
-	public List<Depositor> findDepositors() {
-		return mongoTemplate.findDistinct(new Query(), "depositor", INVENTORY_COLLECTION, Depositor.class)
-				.stream()
-				.sorted(Comparator.comparing(Depositor::id, Comparator.nullsLast(Comparator.naturalOrder())))
-				.toList();
 	}
 
 	private List<DepositorKnowledgeEntry> read(Query query) {

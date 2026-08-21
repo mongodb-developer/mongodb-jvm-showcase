@@ -1,6 +1,6 @@
 package com.devrel.wms.tool;
 
-import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.service.ReplenishmentService;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class ReplenishmentTool {
     """)
 	public String createReplenishment(
 			@ToolParam(description = "Depositor that owns the products, taken from the inventory entry")
-			Depositor depositor,
+			DepositorRef depositor,
 
 			@ToolParam(description = "Products and quantities that need replenishment. "
 					+ "Each product code must be the exact code as stored, for example '02'")

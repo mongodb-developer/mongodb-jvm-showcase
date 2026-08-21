@@ -1,6 +1,6 @@
 package com.devrel.wms.service;
 
-import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.repository.StockMovementRepository;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class StockMovementService {
 
 	public StockMovement register(
 			String productCode,
-			Depositor depositor,
+			DepositorRef depositor,
 			int quantity,
 			String invoiceNumber,
 			StockMovement.MovementType type

@@ -1,8 +1,9 @@
 package com.devrel.wms.event;
 
 import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Replenishment;
-import com.devrel.wms.service.InventoryService;
+import com.devrel.wms.service.DepositorService;
 import com.devrel.wms.service.ReplenishmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +19,13 @@ public class DepositorNotificationListener {
 
 	private final Logger logger = LoggerFactory.getLogger(DepositorNotificationListener.class);
 	private final ReplenishmentService replenishmentService;
-	private final InventoryService inventoryService;
+	private final DepositorService depositorService;
 
 	DepositorNotificationListener(
 			ReplenishmentService replenishmentService,
-			InventoryService inventoryService) {
+			DepositorService depositorService) {
 		this.replenishmentService = replenishmentService;
-		this.inventoryService = inventoryService;
+		this.depositorService = depositorService;
 	}
 
 	@Async
@@ -59,7 +60,7 @@ public class DepositorNotificationListener {
 		return draft.cc() == null || draft.cc().isEmpty() ? "-" : String.join(", ", draft.cc());
 	}
 
-	private String recipient(Replenishment.Notification draft, Depositor depositor) {
+	private String recipient(Replenishment.Notification draft, DepositorRef depositor) {
 		if (draft.to() != null && !draft.to().isBlank()) {
 			return draft.to();
 		}
@@ -68,7 +69,7 @@ public class DepositorNotificationListener {
 			return null;
 		}
 
-		Depositor registered = inventoryService.findDepositorById(depositor.id());
+		Depositor registered = depositorService.findById(depositor.id());
 
 		return registered == null ? null : registered.email();
 	}

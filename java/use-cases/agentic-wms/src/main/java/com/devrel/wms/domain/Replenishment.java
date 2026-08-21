@@ -9,7 +9,7 @@ import java.util.List;
 @Document(collection = "replenishments")
 public record Replenishment(
         @Id String id,
-        Depositor depositor,
+        DepositorRef depositor,
         List<ReplenishmentItem> items,
         String message,
         Status status,
