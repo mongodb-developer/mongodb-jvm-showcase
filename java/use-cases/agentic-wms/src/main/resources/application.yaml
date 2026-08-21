@@ -5,6 +5,8 @@ spring:
     uri: ${MONGODB_URI}
     database: agentic-wms
   ai:
+    tools:
+      throw-exception-on-error: true
     model:
       embedding: none
     openai:
