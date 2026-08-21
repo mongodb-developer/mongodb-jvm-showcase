@@ -10,7 +10,7 @@ WORKDIR /workspace
 COPY pom.xml .
 COPY src src
 
-RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests package
+RUN mvn -B -DskipTests package
 
 FROM ${RUNTIME_IMAGE}
 
