@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface InventoryRepository extends MongoRepository<Inventory, String> {
 	List<Inventory> findByProductCode(String productCode);
 
+	List<Inventory> findByDepositorId(String depositorId);
+
 	Optional<Inventory> findByProductCodeAndDepositorId(String productCode, String depositorId);
 
 	Optional<Inventory> findFirstByDepositorId(String depositorId);

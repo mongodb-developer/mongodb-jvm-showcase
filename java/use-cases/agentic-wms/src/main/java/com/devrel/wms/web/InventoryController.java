@@ -39,6 +39,11 @@ public class InventoryController {
 		return ResponseEntity.ok(inventoryService.findAll());
 	}
 
+	@GetMapping("/depositor/{depositorId}")
+	public ResponseEntity<List<Inventory>> findByDepositor(@PathVariable String depositorId) {
+		return ResponseEntity.ok(inventoryService.findByDepositor(depositorId));
+	}
+
 	@GetMapping("/{productCode}")
 	public ResponseEntity<List<Inventory>> findByProductCode(@PathVariable String productCode) {
 		return ResponseEntity.ok(inventoryService.findByProductCode(productCode));

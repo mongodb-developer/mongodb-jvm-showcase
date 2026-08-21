@@ -42,6 +42,10 @@ public class InventoryService {
 		return inventoryRepository.findByProductCode(productCode);
 	}
 
+	public List<Inventory> findByDepositor(String depositorId) {
+		return inventoryRepository.findByDepositorId(depositorId);
+	}
+
 	public Inventory findByProductCodeAndDepositor(String productCode, String depositorId) {
 		return inventoryRepository.findByProductCodeAndDepositorId(productCode, depositorId).orElse(null);
 	}

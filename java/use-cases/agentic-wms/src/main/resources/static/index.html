@@ -637,7 +637,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Code</th><th>Name</th><th>Id</th></tr></thead>
+						<thead><tr><th>Code</th><th>Name</th><th>Id</th><th></th></tr></thead>
 						<tbody id="p-body"></tbody>
 					</table>
 				</div>
@@ -696,8 +696,12 @@
 						<label>Filter by product code</label>
 						<input id="i-filter" placeholder="01">
 					</div>
+					<div class="field">
+						<label>Filter by depositor</label>
+						<select id="i-dep"></select>
+					</div>
 					<button class="btn ghost" onclick="loadInventory()">Search</button>
-					<button class="btn ghost" onclick="document.getElementById('i-filter').value='';loadInventory()">Clear</button>
+					<button class="btn ghost" onclick="clearInventoryFilters()">Clear</button>
 				</div>
 				<div class="table-wrap">
 					<table>
@@ -977,6 +981,21 @@ async function api(path, options) {
 	return text ? JSON.parse(text) : null;
 }
 
+async function findOptional(path) {
+	const response = await fetch(path);
+
+	if (response.status === 404) return null;
+
+	if (!response.ok) {
+		notify(response.statusText, 'err', response.status + ' Error');
+		throw new Error(response.statusText);
+	}
+
+	const text = await response.text();
+
+	return text ? JSON.parse(text) : null;
+}
+
 const post = (path, body) => api(path, {
 	method: 'POST',
 	headers: { 'Content-Type': 'application/json' },
@@ -1023,14 +1042,62 @@ function readItems(containerId) {
 	return readItemLines(document.getElementById(containerId));
 }
 
+const openProducts = new Set();
+
 async function loadProducts() {
 	const code = document.getElementById('p-filter').value.trim();
 	const list = code ? [await api('/products/code/' + encodeURIComponent(code))].filter(Boolean)
 			: await api('/products');
 
-	rows('p-body', list, 3, product =>
+	rows('p-body', list, 4, product =>
 		'<tr><td>' + esc(product.code) + '</td><td>' + esc(product.name) + '</td>' +
-			'<td class="mono">' + esc(product.id) + '</td></tr>');
+			'<td class="mono">' + esc(product.id) + '</td>' +
+			'<td><button class="btn ghost sm" onclick="toggleProductEditor(\'' + esc(product.id) + '\')">' +
+			(openProducts.has(product.id) ? 'Close' : 'Edit') + '</button></td></tr>' +
+			productEditorRow(product));
+}
+
+function productEditorRow(product) {
+	if (!openProducts.has(product.id)) return '';
+
+	return '<tr data-edit-product="' + esc(product.id) + '">' +
+		'<td colspan="4" style="padding-top:0;border-top:none">' +
+		'<div class="edit-box">' +
+		'<div class="grid">' +
+		'<div class="field"><label>Code</label>' +
+		'<input class="p-edit-code" value="' + esc(product.code) + '" disabled></div>' +
+		'<div class="field"><label>Name</label>' +
+		'<input class="p-edit-name" value="' + esc(product.name) + '"></div>' +
+		'</div>' +
+		'<div class="actions" style="margin-top:12px">' +
+		'<span class="spacer" style="flex:1"></span>' +
+		'<button class="btn sm" onclick="updateProduct(\'' + esc(product.id) + '\')">Save changes</button>' +
+		'<button class="btn ghost sm" onclick="toggleProductEditor(\'' + esc(product.id) + '\')">Cancel</button>' +
+		'</div></div></td></tr>';
+}
+
+function toggleProductEditor(id) {
+	openProducts.has(id) ? openProducts.delete(id) : openProducts.add(id);
+
+	loadProducts().catch(() => {});
+}
+
+async function updateProduct(id) {
+	const row = document.querySelector('tr[data-edit-product="' + id + '"]');
+	const code = row.querySelector('.p-edit-code').value.trim();
+	const name = row.querySelector('.p-edit-name').value.trim();
+
+	if (!name) return notify('Name is required', 'err', 'Invalid input');
+
+	await api('/products/' + encodeURIComponent(id), {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ name })
+	});
+
+	notify('Product ' + code + ' updated', 'ok', 'Success');
+	openProducts.delete(id);
+	loadProducts();
 }
 
 async function createProduct() {
@@ -1132,11 +1199,21 @@ async function saveDepositor() {
 }
 
 async function loadInventory() {
+	await loadDepositorOptions('i', 'All depositors');
+
 	const code = document.getElementById('i-filter').value.trim();
+	const depositorId = document.getElementById('i-dep').value;
 	let list;
 
-	if (code) {
+	if (code && depositorId) {
+		const inventory = await findOptional('/inventory/' + encodeURIComponent(code)
+				+ '/depositor/' + encodeURIComponent(depositorId));
+
+		list = inventory ? [inventory] : [];
+	} else if (code) {
 		list = await api('/inventory/' + encodeURIComponent(code));
+	} else if (depositorId) {
+		list = await api('/inventory/depositor/' + encodeURIComponent(depositorId));
 	} else {
 		list = await api('/inventory');
 	}
@@ -1148,6 +1225,12 @@ async function loadInventory() {
 		'<td>' + esc(names.get(inventory.productCode) || '-') + '</td>' +
 		'<td>' + depositorLabel(inventory.depositor) + '</td>' +
 		'<td class="num">' + esc(inventory.quantity) + '</td></tr>');
+}
+
+function clearInventoryFilters() {
+	document.getElementById('i-filter').value = '';
+	document.getElementById('i-dep').value = '';
+	loadInventory();
 }
 
 async function productNames() {
@@ -1249,12 +1332,12 @@ async function runAction(kind, number, action) {
 	reloadInvoices(kind);
 }
 
-async function loadDepositorOptions(prefix) {
+async function loadDepositorOptions(prefix, placeholder) {
 	const select = document.getElementById(prefix + '-dep');
 	const selected = select.value;
 	const list = await api('/depositors');
 
-	select.innerHTML = '<option value="">Select a depositor</option>' + list
+	select.innerHTML = '<option value="">' + esc(placeholder || 'Select a depositor') + '</option>' + list
 			.map(depositor => '<option value="' + esc(depositor.id) + '"'
 					+ ' data-name="' + esc(depositor.name) + '">'
 					+ esc(depositor.name) + ' (' + esc(depositor.code) + ')</option>')
@@ -1483,8 +1566,6 @@ function policyCard(policy) {
 		' <span class="mono">' + esc(policy.depositorId) + '</span></span>' +
 		'<span class="preview">' + esc(summary) + '</span>' +
 		badge(policy.type) +
-		'<span class="origin db">MongoDB</span>' +
-		'</div>' +
 		'<div class="policy-body">' +
 		attrsLabel(policy.attributes) +
 		'<div class="field" style="margin-top:12px"><label>Policy text used by the agent</label>' +
