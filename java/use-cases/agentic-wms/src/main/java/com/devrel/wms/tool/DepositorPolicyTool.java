@@ -33,19 +33,19 @@ public class DepositorPolicyTool {
     	language question about what you need to know.
     """)
 	public String getDepositorPolicies(
-			@ToolParam(description = ProductCodes.DEPOSITOR_ID_PARAM) String depositorId,
+			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM) String depositorCode,
 
 			@ToolParam(description = "Question about the depositor policies, for example "
 					+ "'What are the constraints to request 250 units today?'")
 			String question
 	) {
-		logger.info("##TOOL## - Searching policies of depositor {} for: {}", depositorId, question);
+		logger.info("##TOOL## - Searching policies of depositor {} for: {}", depositorCode, question);
 
 		List<Document> documents = depositorKnowledgeStore.search(
-				question, depositorId, REPLENISHMENT_TYPES, TOP_K);
+				question, depositorCode, REPLENISHMENT_TYPES, TOP_K);
 
 		if (documents.isEmpty()) {
-			return "No policy registered for depositor " + depositorId
+			return "No policy registered for depositor " + depositorCode
 					+ ". Use standard replenishment criteria.";
 		}
 

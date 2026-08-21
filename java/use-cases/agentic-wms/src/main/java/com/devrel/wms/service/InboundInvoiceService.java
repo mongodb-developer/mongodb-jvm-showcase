@@ -19,19 +19,30 @@ public class InboundInvoiceService {
 	private final InboundInvoiceRepository inboundInvoiceRepository;
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
+	private final DepositorService depositorService;
 
 	InboundInvoiceService(
 			InboundInvoiceRepository inboundInvoiceRepository,
 			InventoryService inventoryService,
-			StockMovementService stockMovementService) {
+			StockMovementService stockMovementService,
+			DepositorService depositorService) {
 		this.inboundInvoiceRepository = inboundInvoiceRepository;
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
+		this.depositorService = depositorService;
 	}
 
 	public InboundInvoice save(InboundInvoice inboundInvoice) {
+		InboundInvoice withDepositor = new InboundInvoice(
+				inboundInvoice.id(),
+				inboundInvoice.number(),
+				depositorService.toRef(inboundInvoice.depositor()),
+				inboundInvoice.items(),
+				inboundInvoice.status()
+		);
+
 		InboundInvoice save = inboundInvoiceRepository.save(
-				changeInboundStatus(inboundInvoice, InboundInvoice.InvoiceStatus.PENDING));
+				changeInboundStatus(withDepositor, InboundInvoice.InvoiceStatus.PENDING));
 
 		logger.info("inbound Invoice with Id {} saved", save.id());
 

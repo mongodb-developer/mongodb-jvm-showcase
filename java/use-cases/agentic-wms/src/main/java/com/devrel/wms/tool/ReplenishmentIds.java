@@ -18,7 +18,7 @@ public final class ReplenishmentIds {
 
 		Matcher matcher = ID.matcher(value);
 
-		return matcher.find() ? matcher.group() : value.trim();
+		return matcher.find() ? matcher.group() : null;
 	}
 
 	private ReplenishmentIds() {

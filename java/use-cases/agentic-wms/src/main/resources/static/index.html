@@ -1020,7 +1020,7 @@ function rows(tbody, list, columns, render) {
 const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + '</span>';
 const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
 const depositorLabel = depositor => depositor
-	? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.id) + ')</span>'
+	? esc(depositor.name) + ' <span class="mono">(' + esc(depositor.code) + ')</span>'
 	: '-';
 
 const itemLine = (productCode, quantity) => '<div class="item-line">' +
@@ -1343,6 +1343,7 @@ async function loadDepositorOptions(prefix, placeholder) {
 
 	select.innerHTML = '<option value="">' + esc(placeholder || 'Select a depositor') + '</option>' + list
 			.map(depositor => '<option value="' + esc(depositor.id) + '"'
+					+ ' data-code="' + esc(depositor.code) + '"'
 					+ ' data-name="' + esc(depositor.name) + '">'
 					+ esc(depositor.name) + ' (' + esc(depositor.code) + ')</option>')
 			.join('');
@@ -1373,14 +1374,18 @@ async function createInvoice(kind) {
 	const number = document.getElementById(prefix + '-number').value.trim();
 	const select = document.getElementById(prefix + '-dep');
 	const depositorId = select.value;
-	const depositorName = depositorId ? select.selectedOptions[0].dataset.name : null;
+	const selectedOption = depositorId ? select.selectedOptions[0] : null;
 	const items = readItems(prefix + '-items');
 
 	if (!number || items.length === 0) return notify('Number and at least one item are required', 'err', 'Invalid input');
 
 	if (!depositorId) return notify('Select a depositor', 'err', 'Invalid input');
 
-	const depositor = { id: depositorId, name: depositorName };
+	const depositor = {
+		id: depositorId,
+		code: selectedOption.dataset.code,
+		name: selectedOption.dataset.name
+	};
 
 	await post('/' + kind + '-invoice', { number, depositor, items });
 	notify('Invoice ' + number + ' created', 'ok', 'Success');

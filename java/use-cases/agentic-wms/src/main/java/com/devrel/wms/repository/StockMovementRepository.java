@@ -12,5 +12,7 @@ public interface StockMovementRepository extends MongoRepository<StockMovement, 
 
 	List<StockMovement> findByProductCodeAndDepositorId(String productCode, String depositorId);
 
+	List<StockMovement> findByProductCodeAndDepositorCode(String productCode, String depositorCode);
+
 	List<StockMovement> findByInvoiceNumber(String invoiceNumber);
 }

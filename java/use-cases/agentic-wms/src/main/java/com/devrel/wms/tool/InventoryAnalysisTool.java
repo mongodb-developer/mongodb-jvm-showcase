@@ -59,11 +59,11 @@ public class InventoryAnalysisTool {
     """)
 	public List<StockMovement> getStockMovementByDepositor(
 			@ToolParam(description = ProductCodes.PRODUCT_CODE_PARAM) String productCode,
-			@ToolParam(description = ProductCodes.DEPOSITOR_ID_PARAM) String depositorId) {
-		logger.info("##TOOL## - Getting stock movement by product {} and depositor {}", productCode, depositorId);
+			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM) String depositorCode) {
+		logger.info("##TOOL## - Getting stock movement by product {} and depositor {}", productCode, depositorCode);
 
-		return stockMovementService.findByProductCodeAndDepositor(
-				productCodes.require(productCode), depositorId);
+		return stockMovementService.findByProductCodeAndDepositorCode(
+				productCodes.require(productCode), depositorCode);
 	}
 
 	@Tool(description = """

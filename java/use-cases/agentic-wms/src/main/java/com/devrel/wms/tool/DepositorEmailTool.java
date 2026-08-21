@@ -5,6 +5,7 @@ import com.devrel.wms.agent.AgentLanguageSettings;
 import com.devrel.wms.domain.Depositor;
 import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Replenishment;
+import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.knowledge.DepositorKnowledgeRepository;
 import com.devrel.wms.service.DepositorService;
 import com.devrel.wms.service.ReplenishmentService;
@@ -66,11 +67,19 @@ public class DepositorEmailTool {
 
 		logger.info("##TOOL## - Drafting depositor email for replenishment {}", replenishmentId);
 
-		Replenishment replenishment = replenishmentService.findById(replenishmentId);
+		Replenishment replenishment = replenishmentId == null
+				? null
+				: replenishmentService.findById(replenishmentId);
 
 		if (replenishment == null) {
-			return "Replenishment not found: " + replenishmentId;
+			replenishment = replenishmentService.findLastPendingWithoutNotification();
 		}
+
+		if (replenishment == null) {
+			throw new NotFoundException("Replenishment not found: " + replenishmentId);
+		}
+
+		replenishmentId = replenishment.id();
 
 		if (replenishment.notification() != null) {
 			return "Email already drafted for replenishment %s. Nothing was changed. It will be sent when the request is approved."
@@ -99,13 +108,13 @@ public class DepositorEmailTool {
 	}
 
 	private List<String> copyList(Depositor depositor, String recipient) {
-		if (depositor == null || depositor.id() == null) {
+		if (depositor == null || depositor.code() == null) {
 			return List.of();
 		}
 
 		Set<String> copies = new LinkedHashSet<>();
 
-		depositorKnowledgeRepository.findByDepositorId(depositor.id()).forEach(entry -> {
+		depositorKnowledgeRepository.findByDepositorId(depositor.code()).forEach(entry -> {
 			if (entry.attributes() == null) {
 				return;
 			}
@@ -120,7 +129,7 @@ public class DepositorEmailTool {
 		copies.remove(recipient);
 
 		if (!copies.isEmpty()) {
-			logger.info("Depositor {} policies require copying {}", depositor.id(), copies);
+			logger.info("Depositor {} policies require copying {}", depositor.code(), copies);
 		}
 
 		return List.copyOf(copies);
@@ -154,7 +163,7 @@ public class DepositorEmailTool {
 		if (registered == null) {
 			logger.warn("Depositor {} is not registered. The email has no recipient", depositor.id());
 
-			return new Depositor(depositor.id(), null, depositor.name(), null);
+			return new Depositor(depositor.id(), depositor.code(), depositor.name(), null);
 		}
 
 		logger.info("Depositor {} resolved from the depositors collection", depositor.id());

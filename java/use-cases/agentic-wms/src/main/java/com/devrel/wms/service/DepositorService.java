@@ -1,6 +1,7 @@
 package com.devrel.wms.service;
 
 import com.devrel.wms.domain.Depositor;
+import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.DepositorRepository;
 import org.slf4j.Logger;
@@ -35,6 +36,27 @@ public class DepositorService {
 
 	public Depositor findById(String id) {
 		return depositorRepository.findById(id).orElse(null);
+	}
+
+	public Depositor findByCode(String code) {
+		return depositorRepository.findByCode(code).orElse(null);
+	}
+
+	public DepositorRef toRef(DepositorRef reference) {
+		if (reference == null) {
+			throw new IllegalArgumentException("Depositor is required");
+		}
+
+		Depositor depositor = reference.id() == null
+				? depositorRepository.findByCode(reference.code()).orElse(null)
+				: depositorRepository.findById(reference.id()).orElse(null);
+
+		if (depositor == null) {
+			throw new NotFoundException("Depositor not found: "
+					+ (reference.id() == null ? reference.code() : reference.id()));
+		}
+
+		return new DepositorRef(depositor.id(), depositor.code(), depositor.name());
 	}
 
 	public Depositor update(String id, Depositor depositor) {

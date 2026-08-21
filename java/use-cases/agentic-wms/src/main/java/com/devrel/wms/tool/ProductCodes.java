@@ -10,9 +10,9 @@ public class ProductCodes {
 			Exact product code as stored in the system, for example '02'.
 			Never include words or labels such as 'Product', 'SKU' or the product name.""";
 
-	static final String DEPOSITOR_ID_PARAM = """
-			Exact depositor identifier as stored in the system, for example 'bsp'.
-			Never use the depositor name.""";
+	static final String DEPOSITOR_CODE_PARAM = """
+			Exact depositor code as stored in the system, for example 'bsp'.
+			Take it from the 'code' field of the depositor, never from 'id' or 'name'.""";
 
 	private final ProductService productService;
 

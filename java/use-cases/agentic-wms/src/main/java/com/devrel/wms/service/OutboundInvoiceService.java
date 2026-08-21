@@ -22,22 +22,33 @@ public class OutboundInvoiceService {
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
 	private final ApplicationEventPublisher eventPublisher;
+	private final DepositorService depositorService;
 
 	OutboundInvoiceService(
 			OutboundInvoiceRepository outboundInvoiceRepository,
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
-			ApplicationEventPublisher eventPublisher
+			ApplicationEventPublisher eventPublisher,
+			DepositorService depositorService
 	) {
 		this.outboundInvoiceRepository = outboundInvoiceRepository;
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
 		this.eventPublisher = eventPublisher;
+		this.depositorService = depositorService;
 	}
 
 	public OutboundInvoice save(OutboundInvoice outboundInvoice) {
+		OutboundInvoice withDepositor = new OutboundInvoice(
+				outboundInvoice.id(),
+				outboundInvoice.number(),
+				depositorService.toRef(outboundInvoice.depositor()),
+				outboundInvoice.items(),
+				outboundInvoice.status()
+		);
+
 		OutboundInvoice save = outboundInvoiceRepository.save(
-				changeOutboundStatus(outboundInvoice, OutboundInvoice.InvoiceStatus.PENDING));
+				changeOutboundStatus(withDepositor, OutboundInvoice.InvoiceStatus.PENDING));
 
 		logger.info("outbound Invoice with Id {} saved", save.id());
 

@@ -42,6 +42,12 @@ public class ReplenishmentService {
 		return replenishmentRepository.findById(id).orElse(null);
 	}
 
+	public Replenishment findLastPendingWithoutNotification() {
+		return replenishmentRepository
+				.findFirstByStatusAndNotificationIsNullOrderByIdDesc(Replenishment.Status.PENDING)
+				.orElse(null);
+	}
+
 	public List<Replenishment> findPendingByDepositor(String depositorId) {
 		return replenishmentRepository.findByDepositorIdAndStatus(depositorId, Replenishment.Status.PENDING);
 	}

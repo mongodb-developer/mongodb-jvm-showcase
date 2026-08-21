@@ -2,6 +2,7 @@ package com.devrel.wms.tool;
 
 import com.devrel.wms.domain.DepositorRef;
 import com.devrel.wms.domain.Replenishment;
+import com.devrel.wms.service.DepositorService;
 import com.devrel.wms.service.ReplenishmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,15 @@ public class ReplenishmentTool {
 
 	private final ReplenishmentService replenishmentService;
 	private final ProductCodes productCodes;
+	private final DepositorService depositorService;
 
-	ReplenishmentTool(ReplenishmentService replenishmentService, ProductCodes productCodes) {
+	ReplenishmentTool(
+			ReplenishmentService replenishmentService,
+			ProductCodes productCodes,
+			DepositorService depositorService) {
 		this.replenishmentService = replenishmentService;
 		this.productCodes = productCodes;
+		this.depositorService = depositorService;
 	}
 
 	@Tool(description = """
@@ -33,8 +39,8 @@ public class ReplenishmentTool {
     	 The answer reports the created replenishment id and any skipped product.
     """)
 	public String createReplenishment(
-			@ToolParam(description = "Depositor that owns the products, taken from the inventory entry")
-			DepositorRef depositor,
+			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM)
+			String depositorCode,
 
 			@ToolParam(description = "Products and quantities that need replenishment. "
 					+ "Each product code must be the exact code as stored, for example '02'")
@@ -43,15 +49,13 @@ public class ReplenishmentTool {
 			@ToolParam(description = "Short explanation of why replenishment is necessary")
 			String message
 	) {
-		logger.info("##TOOL## - Creating replenishment for depositor {}", depositor == null ? null : depositor.id());
+		logger.info("##TOOL## - Creating replenishment for depositor {}", depositorCode);
 
-		if (depositor == null || depositor.id() == null) {
-			return "Depositor is required to create a replenishment.";
-		}
+		DepositorRef resolved = depositorService.toRef(new DepositorRef(null, depositorCode, null));
 
 		items.forEach(item -> productCodes.require(item.productCode()));
 
-		List<Replenishment> pending = replenishmentService.findPendingByDepositor(depositor.id());
+		List<Replenishment> pending = replenishmentService.findPendingByDepositor(resolved.id());
 
 		Set<String> covered = pending.stream()
 				.flatMap(replenishment -> replenishment.items().stream())
@@ -68,7 +72,7 @@ public class ReplenishmentTool {
 		}
 
 		Replenishment created = replenishmentService.save(
-				new Replenishment(null, depositor, newItems, message, Replenishment.Status.PENDING, null));
+				new Replenishment(null, resolved, newItems, message, Replenishment.Status.PENDING, null));
 
 		String skipped = items.stream()
 				.map(Replenishment.ReplenishmentItem::productCode)

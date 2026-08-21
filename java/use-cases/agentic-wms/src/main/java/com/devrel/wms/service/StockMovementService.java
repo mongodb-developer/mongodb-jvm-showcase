@@ -64,6 +64,10 @@ public class StockMovementService {
 		return stockMovementRepository.findByProductCodeAndDepositorId(productCode, depositorId);
 	}
 
+	public List<StockMovement> findByProductCodeAndDepositorCode(String productCode, String depositorCode) {
+		return stockMovementRepository.findByProductCodeAndDepositorCode(productCode, depositorCode);
+	}
+
 	public List<StockMovement> findByInvoiceNumber(String invoiceNumber) {
 		return stockMovementRepository.findByInvoiceNumber(invoiceNumber);
 	}
