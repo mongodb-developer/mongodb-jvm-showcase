@@ -38,6 +38,12 @@ devrel:
 wms:
   knowledge:
     ingest-on-startup: true
+  limits:
+    enabled: ${LIMITS_ENABLED:true}
+    per-ip-requests-per-minute: ${LIMITS_PER_IP_PER_MINUTE:10}
+    global-requests-per-day: ${LIMITS_GLOBAL_PER_DAY:100}
+    agent-runs-per-day: ${LIMITS_AGENT_RUNS_PER_DAY:50}
+    max-policy-text-length: ${LIMITS_MAX_POLICY_TEXT_LENGTH:2000}
 logging:
   level:
     org.springframework.data.mongodb.core: DEBUG

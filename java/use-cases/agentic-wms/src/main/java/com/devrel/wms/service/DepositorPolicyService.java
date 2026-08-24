@@ -5,6 +5,7 @@ import com.devrel.wms.knowledge.DepositorKnowledgeEntry;
 import com.devrel.wms.knowledge.DepositorKnowledgeRepository;
 import com.devrel.wms.knowledge.DepositorKnowledgeStore;
 import com.devrel.wms.knowledge.KnowledgeType;
+import com.devrel.wms.limits.DemoLimits;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +25,17 @@ public class DepositorPolicyService {
 	private final DepositorKnowledgeRepository depositorKnowledgeRepository;
 	private final DepositorKnowledgeStore depositorKnowledgeStore;
 	private final DepositorService depositorService;
+	private final DemoLimits limits;
 
 	DepositorPolicyService(
 			DepositorKnowledgeRepository depositorKnowledgeRepository,
 			DepositorKnowledgeStore depositorKnowledgeStore,
-			DepositorService depositorService) {
+			DepositorService depositorService,
+			DemoLimits limits) {
 		this.depositorKnowledgeRepository = depositorKnowledgeRepository;
 		this.depositorKnowledgeStore = depositorKnowledgeStore;
 		this.depositorService = depositorService;
+		this.limits = limits;
 	}
 
 	public List<DepositorKnowledgeEntry> findAll() {
@@ -63,6 +67,11 @@ public class DepositorPolicyService {
 	public DepositorKnowledgeEntry save(DepositorKnowledgeEntry entry) {
 		if (isBlank(entry.depositorId()) || isBlank(entry.key()) || isBlank(entry.text())) {
 			throw new IllegalArgumentException("Depositor, key and text are required to save a policy.");
+		}
+
+		if (limits.enabled() && entry.text().length() > limits.maxPolicyTextLength()) {
+			throw new IllegalArgumentException(
+					"Policy text is limited to %d characters.".formatted(limits.maxPolicyTextLength()));
 		}
 
 		DepositorKnowledgeEntry normalized = new DepositorKnowledgeEntry(
