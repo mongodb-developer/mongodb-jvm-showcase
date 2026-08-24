@@ -6,6 +6,7 @@ import com.devrel.wms.event.OutboundInvoiceCompleted;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.OutboundInvoiceRepository;
+import com.devrel.wms.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,22 +24,27 @@ public class OutboundInvoiceService {
 	private final StockMovementService stockMovementService;
 	private final ApplicationEventPublisher eventPublisher;
 	private final DepositorService depositorService;
+	private final ProductRepository productRepository;
 
 	OutboundInvoiceService(
 			OutboundInvoiceRepository outboundInvoiceRepository,
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
 			ApplicationEventPublisher eventPublisher,
-			DepositorService depositorService
+			DepositorService depositorService,
+			ProductRepository productRepository
 	) {
 		this.outboundInvoiceRepository = outboundInvoiceRepository;
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
 		this.eventPublisher = eventPublisher;
 		this.depositorService = depositorService;
+		this.productRepository = productRepository;
 	}
 
 	public OutboundInvoice save(OutboundInvoice outboundInvoice) {
+		validateProducts(outboundInvoice.items());
+
 		OutboundInvoice withDepositor = new OutboundInvoice(
 				outboundInvoice.id(),
 				outboundInvoice.number(),
@@ -73,6 +79,8 @@ public class OutboundInvoiceService {
 	}
 
 	public OutboundInvoice update(String number, OutboundInvoice outboundInvoice) {
+		validateProducts(outboundInvoice.items());
+
 		OutboundInvoice current = getOutbound(number);
 
 		if (current.status() != OutboundInvoice.InvoiceStatus.PENDING) {
@@ -149,4 +157,19 @@ public class OutboundInvoiceService {
 				.orElseThrow(() -> new NotFoundException("Invoice not found: " + number));
 	}
 
+	private void validateProducts(List<OutboundInvoice.InvoiceItem> items) {
+		if (items == null || items.isEmpty()) {
+			throw new IllegalArgumentException("At least one item is required");
+		}
+
+		for (OutboundInvoice.InvoiceItem item : items) {
+			if (item.productCode() == null || item.productCode().isBlank()) {
+				throw new IllegalArgumentException("Product code is required on every item");
+			}
+
+			if (productRepository.findByCode(item.productCode()).isEmpty()) {
+				throw new NotFoundException("Product not found: " + item.productCode());
+			}
+		}
+	}
 }

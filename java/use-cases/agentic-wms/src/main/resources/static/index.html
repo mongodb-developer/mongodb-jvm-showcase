@@ -732,23 +732,23 @@
 		</div>
 
 		<nav id="tabs">
-			<div class="group">Start</div>
-			<button data-tab="overview" class="active"><span class="ico">&#9788;</span>Overview</button>
+			<div class="group" data-i18n="nav.group.start">Start</div>
+			<button data-tab="overview" class="active" data-i18n-label="nav.overview"><span class="ico">&#9788;</span>Overview</button>
 
-			<div class="group">Warehouse</div>
-			<button data-tab="products"><span class="ico">&#9635;</span>Products</button>
-			<button data-tab="depositors"><span class="ico">&#9750;</span>Depositors</button>
-			<button data-tab="inventory"><span class="ico">&#9707;</span>Inventory</button>
-			<button data-tab="movements"><span class="ico">&#8646;</span>Stock Movements</button>
+			<div class="group" data-i18n="nav.group.warehouse">Warehouse</div>
+			<button data-tab="products" data-i18n-label="nav.products"><span class="ico">&#9635;</span>Products</button>
+			<button data-tab="depositors" data-i18n-label="nav.depositors"><span class="ico">&#9750;</span>Depositors</button>
+			<button data-tab="inventory" data-i18n-label="nav.inventory"><span class="ico">&#9707;</span>Inventory</button>
+			<button data-tab="movements" data-i18n-label="nav.movements"><span class="ico">&#8646;</span>Stock Movements</button>
 
-			<div class="group">Operations</div>
-			<button data-tab="inbound"><span class="ico">&#8600;</span>Inbound Invoices</button>
-			<button data-tab="outbound"><span class="ico">&#8599;</span>Outbound Invoices</button>
+			<div class="group" data-i18n="nav.group.operations">Operations</div>
+			<button data-tab="inbound" data-i18n-label="nav.inbound"><span class="ico">&#8600;</span>Inbound Invoices</button>
+			<button data-tab="outbound" data-i18n-label="nav.outbound"><span class="ico">&#8599;</span>Outbound Invoices</button>
 
-			<div class="group">Agent</div>
-			<button data-tab="policies"><span class="ico">&#9878;</span>Depositor Policies</button>
-			<button data-tab="replenishment"><span class="ico">&#9873;</span>Replenishment</button>
-			<button data-tab="agentruns"><span class="ico">&#9881;</span>Agent Runs</button>
+			<div class="group" data-i18n="nav.group.agent">Agent</div>
+			<button data-tab="policies" data-i18n-label="nav.policies"><span class="ico">&#9878;</span>Depositor Policies</button>
+			<button data-tab="replenishment" data-i18n-label="nav.replenishment"><span class="ico">&#9873;</span>Replenishment</button>
+			<button data-tab="agentruns" data-i18n-label="nav.agentruns"><span class="ico">&#9881;</span>Agent Runs</button>
 		</nav>
 
 		<div class="side-foot">
@@ -773,8 +773,8 @@
 
 		<section id="overview" class="active">
 			<div class="card">
-				<div class="card-head"><h2>What this is</h2></div>
-				<p class="lede">
+				<div class="card-head"><h2 data-i18n="overview.what">What this is</h2></div>
+				<p class="lede" data-i18n="overview.lede">
 					A simple <strong>Warehouse Management System</strong>: goods come in, goods go out, and
 					stock gets replenished. The twist is the last part &mdash; nobody asks for the
 					replenishment. When an outbound invoice is executed, an
@@ -784,21 +784,21 @@
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>How it works</h2></div>
+				<div class="card-head"><h2 data-i18n="overview.how">How it works</h2></div>
 				<div class="flow">
 					<div class="flow-lane">
 						<div class="node" id="flow-inbound">
-							<div class="node-title">Inbound</div>
+							<div class="node-title" data-i18n="flow.inbound">Inbound</div>
 							<div class="node-meta">&mdash;</div>
 						</div>
 						<div class="arrow">&#10230;</div>
 						<div class="node" id="flow-stock">
-							<div class="node-title">Stock</div>
+							<div class="node-title" data-i18n="flow.stock">Stock</div>
 							<div class="node-meta">&mdash;</div>
 						</div>
 						<div class="arrow">&#10230;</div>
 						<div class="node" id="flow-outbound">
-							<div class="node-title">Outbound</div>
+							<div class="node-title" data-i18n="flow.outbound">Outbound</div>
 							<div class="node-meta">&mdash;</div>
 						</div>
 					</div>
@@ -806,8 +806,8 @@
 					<div class="arrow down">&#10229;&#10230;</div>
 
 					<div class="trigger">
-						<div class="trigger-title">&#9889; The agent triggers itself here</div>
-						<div class="trigger-meta">
+						<div class="trigger-title" data-i18n="flow.trigger.title">&#9889; The agent triggers itself here</div>
+						<div class="trigger-meta" data-i18n="flow.trigger.meta">
 							Executing an outbound invoice publishes an <code>OutboundInvoiceCompleted</code>
 							event after the transaction commits. There is no &ldquo;run agent&rdquo; button.
 						</div>
@@ -816,7 +816,7 @@
 					<div class="arrow down">&#8595;</div>
 
 					<div class="node agent" id="flow-agent">
-						<div class="node-title">&#129302; Replenishment Agent</div>
+						<div class="node-title" data-i18n="flow.agent">&#129302; Replenishment Agent</div>
 						<div class="node-meta">&mdash;</div>
 						<div class="caps">
 							<span class="cap">ANALYSIS</span>
@@ -830,51 +830,51 @@
 					<div class="arrow down">&#8595;</div>
 
 					<div class="node human">
-						<div class="node-title">Human approves</div>
-						<div class="node-meta">then the e-mail goes out</div>
+						<div class="node-title" data-i18n="flow.human.title">Human approves</div>
+						<div class="node-meta" data-i18n="flow.human.meta">then the e-mail goes out</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>Start here</h2></div>
+				<div class="card-head"><h2 data-i18n="overview.start">Start here</h2></div>
 				<div class="steps" id="steps"></div>
 			</div>
 		</section>
 
 		<section id="products">
 			<div class="card">
-				<div class="card-head"><h2>New product</h2></div>
+				<div class="card-head"><h2 data-i18n="products.new">New product</h2></div>
 				<div class="card-body">
 					<div class="grid">
 						<div class="field">
-							<label>Code</label>
+							<label data-i18n="field.code">Code</label>
 							<input id="p-code" placeholder="01">
 						</div>
 						<div class="field">
-							<label>Name</label>
+							<label data-i18n="field.name">Name</label>
 							<input id="p-name" placeholder="Keyboard">
 						</div>
 					</div>
 					<div class="row" style="margin-top:16px">
-						<button class="btn" onclick="createProduct()">Create product</button>
+						<button class="btn" onclick="createProduct()" data-i18n="products.create">Create product</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>Products</h2></div>
+				<div class="card-head"><h2 data-i18n="products.list">Products</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by code</label>
+						<label data-i18n="filter.code">Filter by code</label>
 						<input id="p-filter" placeholder="01">
 					</div>
-					<button class="btn ghost" onclick="loadProducts()">Search</button>
-					<button class="btn ghost" onclick="document.getElementById('p-filter').value='';loadProducts()">Clear</button>
+					<button class="btn ghost" onclick="loadProducts()" data-i18n="action.search">Search</button>
+					<button class="btn ghost" onclick="document.getElementById('p-filter').value='';loadProducts()" data-i18n="action.clear">Clear</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Code</th><th>Name</th><th>Id</th><th></th></tr></thead>
+						<thead><tr><th data-i18n="field.code">Code</th><th data-i18n="field.name">Name</th><th data-i18n="field.id">Id</th><th></th></tr></thead>
 						<tbody id="p-body"></tbody>
 					</table>
 				</div>
@@ -883,42 +883,42 @@
 
 		<section id="depositors">
 			<div class="card">
-				<div class="card-head"><h2>New depositor</h2></div>
+				<div class="card-head"><h2 data-i18n="depositors.new">New depositor</h2></div>
 				<div class="card-body">
 					<div class="grid">
 						<div class="field">
-							<label>Code</label>
+							<label data-i18n="field.code">Code</label>
 							<input id="d-code" placeholder="amz">
 						</div>
 						<div class="field">
-							<label>Name</label>
+							<label data-i18n="field.name">Name</label>
 							<input id="d-name" placeholder="Amazon">
 						</div>
 						<div class="field">
-							<label>Email</label>
+							<label data-i18n="field.email">Email</label>
 							<input id="d-email" placeholder="supply@amazon.com">
 						</div>
 					</div>
 					<div class="row" style="margin-top:16px">
-						<button class="btn" onclick="saveDepositor()">Save depositor</button>
-						<button class="btn ghost" onclick="resetDepositorForm()">Clear</button>
+						<button class="btn" onclick="saveDepositor()" data-i18n="depositors.save">Save depositor</button>
+						<button class="btn ghost" onclick="resetDepositorForm()" data-i18n="action.clear">Clear</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>Depositors</h2></div>
+				<div class="card-head"><h2 data-i18n="depositors.list">Depositors</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by code or name</label>
+						<label data-i18n="filter.codename">Filter by code or name</label>
 						<input id="d-filter" placeholder="amz">
 					</div>
-					<button class="btn ghost" onclick="loadDepositors()">Search</button>
-					<button class="btn ghost" onclick="document.getElementById('d-filter').value='';loadDepositors()">Clear</button>
+					<button class="btn ghost" onclick="loadDepositors()" data-i18n="action.search">Search</button>
+					<button class="btn ghost" onclick="document.getElementById('d-filter').value='';loadDepositors()" data-i18n="action.clear">Clear</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Id</th><th>Code</th><th>Name</th><th>Email</th><th></th></tr></thead>
+						<thead><tr><th data-i18n="field.id">Id</th><th data-i18n="field.code">Code</th><th data-i18n="field.name">Name</th><th data-i18n="field.email">Email</th><th></th></tr></thead>
 						<tbody id="d-body"></tbody>
 					</table>
 				</div>
@@ -927,22 +927,22 @@
 
 		<section id="inventory">
 			<div class="card">
-				<div class="card-head"><h2>Inventory</h2></div>
+				<div class="card-head"><h2 data-i18n="inventory.list">Inventory</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by product code</label>
+						<label data-i18n="filter.productcode">Filter by product code</label>
 						<input id="i-filter" placeholder="01">
 					</div>
 					<div class="field">
-						<label>Filter by depositor</label>
+						<label data-i18n="filter.depositor">Filter by depositor</label>
 						<select id="i-dep"></select>
 					</div>
-					<button class="btn ghost" onclick="loadInventory()">Search</button>
-					<button class="btn ghost" onclick="clearInventoryFilters()">Clear</button>
+					<button class="btn ghost" onclick="loadInventory()" data-i18n="action.search">Search</button>
+					<button class="btn ghost" onclick="clearInventoryFilters()" data-i18n="action.clear">Clear</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Product code</th><th>Product name</th><th>Depositor</th><th class="num">Quantity</th></tr></thead>
+						<thead><tr><th data-i18n="field.productcode">Product code</th><th data-i18n="field.productname">Product name</th><th data-i18n="field.depositor">Depositor</th><th class="num" data-i18n="field.quantity">Quantity</th></tr></thead>
 						<tbody id="i-body"></tbody>
 					</table>
 				</div>
@@ -951,45 +951,45 @@
 
 		<section id="inbound">
 			<div class="card">
-				<div class="card-head"><h2>New inbound invoice</h2></div>
+				<div class="card-head"><h2 data-i18n="inbound.new">New inbound invoice</h2></div>
 				<div class="card-body">
 					<div class="grid">
 						<div class="field">
-							<label>Number</label>
+							<label data-i18n="field.number">Number</label>
 							<input id="in-number" placeholder="NF-1002">
 						</div>
 						<div class="field">
-							<label>Depositor</label>
+							<label data-i18n="field.depositor">Depositor</label>
 							<select id="in-dep"></select>
 						</div>
 					</div>
 					<div class="items-editor" id="in-items"></div>
 					<div class="row">
-						<button class="btn ghost sm" onclick="addItemLine('in-items')">Add item</button>
+						<button class="btn ghost sm" onclick="addItemLine('in-items')" data-i18n="action.additem">Add item</button>
 						<span class="spacer" style="flex:1"></span>
-						<button class="btn" onclick="createInvoice('inbound')">Create invoice</button>
+						<button class="btn" onclick="createInvoice('inbound')" data-i18n="invoice.create">Create invoice</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>Inbound invoices</h2></div>
+				<div class="card-head"><h2 data-i18n="inbound.list">Inbound invoices</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by status</label>
+						<label data-i18n="filter.status">Filter by status</label>
 						<select id="in-filter" onchange="loadInbound()">
-							<option value="">All</option>
+							<option value="" data-i18n="option.all">All</option>
 							<option>PENDING</option>
 							<option>RECEIVED</option>
 							<option>COMPLETED</option>
 							<option>FAILED</option>
 						</select>
 					</div>
-					<button class="btn ghost" onclick="loadInbound()">Refresh</button>
+					<button class="btn ghost" onclick="loadInbound()" data-i18n="action.refresh">Refresh</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+						<thead><tr><th data-i18n="field.number">Number</th><th data-i18n="field.depositor">Depositor</th><th data-i18n="field.items">Items</th><th data-i18n="field.status">Status</th><th data-i18n="field.actions">Actions</th></tr></thead>
 						<tbody id="in-body"></tbody>
 					</table>
 				</div>
@@ -998,45 +998,45 @@
 
 		<section id="outbound">
 			<div class="card">
-				<div class="card-head"><h2>New outbound invoice</h2></div>
+				<div class="card-head"><h2 data-i18n="outbound.new">New outbound invoice</h2></div>
 				<div class="card-body">
 					<div class="grid">
 						<div class="field">
-							<label>Number</label>
+							<label data-i18n="field.number">Number</label>
 							<input id="out-number" placeholder="NF-2001">
 						</div>
 						<div class="field">
-							<label>Depositor</label>
+							<label data-i18n="field.depositor">Depositor</label>
 							<select id="out-dep"></select>
 						</div>
 					</div>
 					<div class="items-editor" id="out-items"></div>
 					<div class="row">
-						<button class="btn ghost sm" onclick="addItemLine('out-items')">Add item</button>
+						<button class="btn ghost sm" onclick="addItemLine('out-items')" data-i18n="action.additem">Add item</button>
 						<span class="spacer" style="flex:1"></span>
-						<button class="btn" onclick="createInvoice('outbound')">Create invoice</button>
+						<button class="btn" onclick="createInvoice('outbound')" data-i18n="invoice.create">Create invoice</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>Outbound invoices</h2></div>
+				<div class="card-head"><h2 data-i18n="outbound.list">Outbound invoices</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by status</label>
+						<label data-i18n="filter.status">Filter by status</label>
 						<select id="out-filter" onchange="loadOutbound()">
-							<option value="">All</option>
+							<option value="" data-i18n="option.all">All</option>
 							<option>PENDING</option>
 							<option>RECEIVED</option>
 							<option>COMPLETED</option>
 							<option>FAILED</option>
 						</select>
 					</div>
-					<button class="btn ghost" onclick="loadOutbound()">Refresh</button>
+					<button class="btn ghost" onclick="loadOutbound()" data-i18n="action.refresh">Refresh</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Number</th><th>Depositor</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+						<thead><tr><th data-i18n="field.number">Number</th><th data-i18n="field.depositor">Depositor</th><th data-i18n="field.items">Items</th><th data-i18n="field.status">Status</th><th data-i18n="field.actions">Actions</th></tr></thead>
 						<tbody id="out-body"></tbody>
 					</table>
 				</div>
@@ -1045,26 +1045,26 @@
 
 		<section id="movements">
 			<div class="card">
-				<div class="card-head"><h2>Stock movements</h2></div>
+				<div class="card-head"><h2 data-i18n="movements.list">Stock movements</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Product code</label>
+						<label data-i18n="field.productcode">Product code</label>
 						<input id="m-product" placeholder="01">
 					</div>
 					<div class="field">
-						<label>Invoice number</label>
+						<label data-i18n="movements.invoicenumber">Invoice number</label>
 						<input id="m-invoice" placeholder="NF-1002">
 					</div>
 					<div class="field">
-						<label>Depositor</label>
+						<label data-i18n="field.depositor">Depositor</label>
 						<select id="m-dep"></select>
 					</div>
-					<button class="btn ghost" onclick="loadMovements()">Search</button>
-					<button class="btn ghost" onclick="clearMovementFilters()">Clear</button>
+					<button class="btn ghost" onclick="loadMovements()" data-i18n="action.search">Search</button>
+					<button class="btn ghost" onclick="clearMovementFilters()" data-i18n="action.clear">Clear</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Date</th><th>Type</th><th>Product code</th><th>Depositor</th><th class="num">Quantity</th><th>Invoice</th></tr></thead>
+						<thead><tr><th data-i18n="field.date">Date</th><th data-i18n="field.type">Type</th><th data-i18n="field.productcode">Product code</th><th data-i18n="field.depositor">Depositor</th><th class="num" data-i18n="field.quantity">Quantity</th><th data-i18n="field.invoice">Invoice</th></tr></thead>
 						<tbody id="m-body"></tbody>
 					</table>
 				</div>
@@ -1073,33 +1073,33 @@
 
 		<section id="policies">
 			<div class="card">
-				<div class="card-head"><h2>Agreed policies</h2></div>
+				<div class="card-head"><h2 data-i18n="policies.list">Agreed policies</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Depositor</label>
+						<label data-i18n="field.depositor">Depositor</label>
 						<select id="pol-dep" onchange="changePolicyDepositor()"></select>
 					</div>
-					<button class="btn ghost" onclick="loadPolicies()">Refresh</button>
+					<button class="btn ghost" onclick="loadPolicies()" data-i18n="action.refresh">Refresh</button>
 					<span class="spacer" style="flex:1"></span>
-					<button class="btn" onclick="toggleNewPolicy()">New policy</button>
+					<button class="btn" onclick="toggleNewPolicy()" data-i18n="policies.new">New policy</button>
 				</div>
 				<div class="card-body" id="pol-body"></div>
 			</div>
 
 			<div class="card" id="pol-new-card" hidden>
-				<div class="card-head"><h2>New policy</h2></div>
+				<div class="card-head"><h2 data-i18n="policies.new">New policy</h2></div>
 				<div class="card-body">
 					<div class="grid">
 						<div class="field">
-							<label>Depositor id</label>
+							<label data-i18n="policies.depositorid">Depositor id</label>
 							<input id="pol-new-dep" placeholder="amz">
 						</div>
 						<div class="field">
-							<label>Key</label>
+							<label data-i18n="policies.key">Key</label>
 							<input id="pol-new-key" placeholder="replenishment-minimum">
 						</div>
 						<div class="field">
-							<label>Type</label>
+							<label data-i18n="field.type">Type</label>
 							<select id="pol-new-type">
 								<option>REPLENISHMENT</option>
 								<option>INBOUND</option>
@@ -1109,29 +1109,29 @@
 						</div>
 					</div>
 					<div class="field" style="margin-top:12px">
-						<label>Policy text used by the agent</label>
+						<label data-i18n="policies.text">Policy text used by the agent</label>
 						<textarea id="pol-new-text"
-							placeholder="Replenishment orders for Amazon must contain at least 500 units per product."></textarea>
+							data-i18n-ph="policies.text.ph" placeholder="Replenishment orders for Amazon must contain at least 500 units per product."></textarea>
 					</div>
 					<div class="field" style="margin-top:12px">
-						<label>Attributes (JSON)</label>
+						<label data-i18n="policies.attributes">Attributes (JSON)</label>
 						<textarea id="pol-new-attrs" placeholder='{ "minimumQuantity": 500 }'></textarea>
 					</div>
 					<div class="row" style="margin-top:16px">
-						<button class="btn" onclick="createPolicy()">Create policy</button>
-						<button class="btn ghost" onclick="toggleNewPolicy()">Cancel</button>
+						<button class="btn" onclick="createPolicy()" data-i18n="policies.create">Create policy</button>
+						<button class="btn ghost" onclick="toggleNewPolicy()" data-i18n="action.cancel">Cancel</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="card">
-				<div class="card-head"><h2>What the agent retrieves</h2></div>
+				<div class="card-head"><h2 data-i18n="policies.retrieves">What the agent retrieves</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Question</label>
-						<input id="pol-question" placeholder="What are the constraints to request 500 units today?">
+						<label data-i18n="policies.question">Question</label>
+						<input id="pol-question" data-i18n-ph="policies.question.ph" placeholder="What are the constraints to request 500 units today?">
 					</div>
-					<button class="btn ghost" onclick="previewPolicies()">Search</button>
+					<button class="btn ghost" onclick="previewPolicies()" data-i18n="action.search">Search</button>
 				</div>
 				<div class="card-body" id="pol-preview"></div>
 			</div>
@@ -1139,23 +1139,23 @@
 
 		<section id="replenishment">
 			<div class="card">
-				<div class="card-head"><h2>Replenishments</h2></div>
+				<div class="card-head"><h2 data-i18n="replenishment.list">Replenishments</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by status</label>
+						<label data-i18n="filter.status">Filter by status</label>
 						<select id="r-filter" onchange="loadReplenishment()">
-							<option value="">All</option>
+							<option value="" data-i18n="option.all">All</option>
 							<option>PENDING</option>
 							<option>APPROVED</option>
 							<option>REJECTED</option>
 							<option>COMPLETED</option>
 						</select>
 					</div>
-					<button class="btn ghost" onclick="loadReplenishment()">Refresh</button>
+					<button class="btn ghost" onclick="loadReplenishment()" data-i18n="action.refresh">Refresh</button>
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th>Id</th><th>Depositor</th><th>Message</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+						<thead><tr><th data-i18n="field.id">Id</th><th data-i18n="field.depositor">Depositor</th><th data-i18n="replenishment.message">Message</th><th data-i18n="field.items">Items</th><th data-i18n="field.status">Status</th><th data-i18n="field.actions">Actions</th></tr></thead>
 						<tbody id="r-body"></tbody>
 					</table>
 				</div>
@@ -1164,18 +1164,18 @@
 
 		<section id="agentruns">
 			<div class="card">
-				<div class="card-head"><h2>Agent runs</h2></div>
+				<div class="card-head"><h2 data-i18n="agentruns.list">Agent runs</h2></div>
 				<div class="toolbar">
 					<div class="field">
-						<label>Filter by status</label>
+						<label data-i18n="filter.status">Filter by status</label>
 						<select id="a-filter" onchange="loadAgentRuns()">
-							<option value="">All</option>
+							<option value="" data-i18n="option.all">All</option>
 							<option>RUNNING</option>
 							<option>COMPLETED</option>
 							<option>FAILED</option>
 						</select>
 					</div>
-					<button class="btn ghost" onclick="loadAgentRuns()">Refresh</button>
+					<button class="btn ghost" onclick="loadAgentRuns()" data-i18n="action.refresh">Refresh</button>
 					<label class="auto-refresh">
 						<input type="checkbox" id="a-auto" checked> Auto refresh while running
 					</label>
@@ -1212,7 +1212,7 @@ async function api(path, options) {
 			detail = problem.detail || problem.message || detail;
 		} catch (ignored) {}
 
-		notify(detail, 'err', response.status + ' Error');
+		notify(detail, 'err', response.status + ' ' + t('toast.error'));
 		throw new Error(detail);
 	}
 
@@ -1228,7 +1228,7 @@ async function findOptional(path) {
 	if (response.status === 404) return null;
 
 	if (!response.ok) {
-		notify(response.statusText, 'err', response.status + ' Error');
+		notify(response.statusText, 'err', response.status + ' ' + t('toast.error'));
 		throw new Error(response.statusText);
 	}
 
@@ -1247,7 +1247,7 @@ function rows(tbody, list, columns, render) {
 	const target = document.getElementById(tbody);
 
 	if (!list || list.length === 0) {
-		target.innerHTML = '<tr><td class="empty" colspan="' + columns + '">No records found</td></tr>';
+		target.innerHTML = '<tr><td class="empty" colspan="' + columns + '">' + t('table.empty') + '</td></tr>';
 		return;
 	}
 
@@ -1260,10 +1260,43 @@ const depositorLabel = depositor => depositor
 	? esc(depositor.name)
 	: '-';
 
+let productOptions = [];
+
+async function ensureProductOptions(force) {
+	if (force) productOptions = [];
+	if (productOptions.length > 0) return productOptions;
+
+	productOptions = (await api('/products'))
+		.filter(product => product.code)
+		.sort((a, b) => a.code.localeCompare(b.code));
+
+	refreshItemSelects();
+
+	return productOptions;
+}
+
+function productOptionsHtml(selected) {
+	const known = productOptions.some(product => product.code === selected);
+	const missing = selected && !known
+		? '<option value="' + esc(selected) + '" selected>' + esc(selected) + '</option>'
+		: '';
+
+	return '<option value="">' + esc(t('option.selectproduct')) + '</option>' + missing +
+		productOptions.map(product =>
+			'<option value="' + esc(product.code) + '"' + (product.code === selected ? ' selected' : '') + '>' +
+			esc(product.code) + ' &middot; ' + esc(product.name) + '</option>').join('');
+}
+
+function refreshItemSelects() {
+	document.querySelectorAll('select.item-code').forEach(select => {
+		select.innerHTML = productOptionsHtml(select.value);
+	});
+}
+
 const itemLine = (productCode, quantity) => '<div class="item-line">' +
-	'<input placeholder="Product code" class="item-code" value="' + esc(productCode) + '">' +
-	'<input type="number" placeholder="Quantity" class="item-qty" value="' + esc(quantity) + '">' +
-	'<button class="btn ghost sm" onclick="this.parentElement.remove()">Remove</button>' +
+	'<select class="item-code">' + productOptionsHtml(productCode) + '</select>' +
+	'<input type="number" min="1" placeholder="' + esc(t('field.quantity')) + '" class="item-qty" value="' + esc(quantity) + '">' +
+	'<button class="btn ghost sm" onclick="this.parentElement.remove()">' + esc(t('action.remove')) + '</button>' +
 	'</div>';
 
 function addItemLine(containerId) {
@@ -1294,7 +1327,7 @@ async function loadProducts() {
 		'<tr><td>' + esc(product.code) + '</td><td>' + esc(product.name) + '</td>' +
 			'<td class="mono">' + esc(product.id) + '</td>' +
 			'<td><button class="btn ghost sm" onclick="toggleProductEditor(\'' + esc(product.id) + '\')">' +
-			(openProducts.has(product.id) ? 'Close' : 'Edit') + '</button></td></tr>' +
+			(openProducts.has(product.id) ? t('action.close') : t('action.edit')) + '</button></td></tr>' +
 			productEditorRow(product));
 }
 
@@ -1328,7 +1361,7 @@ async function updateProduct(id) {
 	const code = row.querySelector('.p-edit-code').value.trim();
 	const name = row.querySelector('.p-edit-name').value.trim();
 
-	if (!name) return notify('Name is required', 'err', 'Invalid input');
+	if (!name) return notify(t('validate.name'), 'err', t('toast.invalid'));
 
 	await api('/products/' + encodeURIComponent(id), {
 		method: 'PUT',
@@ -1336,7 +1369,8 @@ async function updateProduct(id) {
 		body: JSON.stringify({ name })
 	});
 
-	notify('Product ' + code + ' updated', 'ok', 'Success');
+	notify(t('toast.product.updated', { code: code }), 'ok', t('toast.success'));
+	await ensureProductOptions(true);
 	openProducts.delete(id);
 	loadProducts();
 }
@@ -1345,10 +1379,11 @@ async function createProduct() {
 	const code = document.getElementById('p-code').value.trim();
 	const name = document.getElementById('p-name').value.trim();
 
-	if (!code || !name) return notify('Code and name are required', 'err', 'Invalid input');
+	if (!code || !name) return notify(t('validate.codename'), 'err', t('toast.invalid'));
 
 	await post('/products', { code, name });
-	notify('Product ' + code + ' created', 'ok', 'Success');
+	notify(t('toast.product.created', { code: code }), 'ok', t('toast.success'));
+	await ensureProductOptions(true);
 	document.getElementById('p-code').value = '';
 	document.getElementById('p-name').value = '';
 	loadProducts();
@@ -1369,7 +1404,7 @@ async function loadDepositors() {
 			'<td>' + esc(depositor.name) + '</td>' +
 			'<td class="mono">' + esc(depositor.email) + '</td>' +
 			'<td><button class="btn ghost sm" onclick="toggleDepositorEditor(\'' + esc(depositor.id) + '\')">' +
-			(openDepositors.has(depositor.id) ? 'Close' : 'Edit') + '</button></td></tr>' +
+			(openDepositors.has(depositor.id) ? t('action.close') : t('action.edit')) + '</button></td></tr>' +
 			depositorEditorRow(depositor));
 }
 
@@ -1406,7 +1441,7 @@ async function updateDepositor(id) {
 	const name = row.querySelector('.d-edit-name').value.trim();
 	const email = row.querySelector('.d-edit-email').value.trim();
 
-	if (!name || !email) return notify('Name and email are required', 'err', 'Invalid input');
+	if (!name || !email) return notify(t('validate.nameemail'), 'err', t('toast.invalid'));
 
 	await api('/depositors/' + encodeURIComponent(id), {
 		method: 'PUT',
@@ -1414,7 +1449,7 @@ async function updateDepositor(id) {
 		body: JSON.stringify({ name, email })
 	});
 
-	notify('Depositor ' + code + ' updated', 'ok', 'Success');
+	notify(t('toast.depositor.updated', { code: code }), 'ok', t('toast.success'));
 	openDepositors.delete(id);
 	loadDepositors();
 }
@@ -1430,17 +1465,17 @@ async function saveDepositor() {
 	const name = document.getElementById('d-name').value.trim();
 	const email = document.getElementById('d-email').value.trim();
 
-	if (!code || !name || !email) return notify('Code, name and email are required', 'err', 'Invalid input');
+	if (!code || !name || !email) return notify(t('validate.codenameemail'), 'err', t('toast.invalid'));
 
 	await post('/depositors', { code, name, email });
-	notify('Depositor ' + code + ' created', 'ok', 'Success');
+	notify(t('toast.depositor.created', { code: code }), 'ok', t('toast.success'));
 
 	resetDepositorForm();
 	loadDepositors();
 }
 
 async function loadInventory() {
-	await loadDepositorOptions('i', 'All depositors');
+	await loadDepositorOptions('i', t('option.alldepositors'));
 
 	const code = document.getElementById('i-filter').value.trim();
 	const depositorId = document.getElementById('i-dep').value;
@@ -1501,9 +1536,9 @@ function invoiceActions(invoice, kind, executeLabel, executePath) {
 			+ esc(invoice.number) + '\',\'' + path + '\')">' + label + '</button>';
 
 	if (invoice.status === 'PENDING') {
-		return '<div class="actions">' + action('Check', 'check', true) +
+		return '<div class="actions">' + action(t('action.check'), 'check', true) +
 			'<button class="btn ghost sm" onclick="toggleInvoiceEditor(\'' + esc(key) + '\')">' +
-			(openInvoices.has(key) ? 'Close' : 'Edit') + '</button></div>';
+			(openInvoices.has(key) ? t('action.close') : t('action.edit')) + '</button></div>';
 	}
 
 	if (invoice.status === 'RECEIVED') {
@@ -1553,7 +1588,7 @@ async function saveInvoice(key) {
 	const row = document.querySelector('tr[data-edit="' + key + '"]');
 	const items = readItemLines(row.querySelector('.items-editor'));
 
-	if (items.length === 0) return notify('At least one item is required', 'err', 'Invalid input');
+	if (items.length === 0) return notify(t('validate.items'), 'err', t('toast.invalid'));
 
 	await api('/' + kind + '-invoice/' + encodeURIComponent(number), {
 		method: 'PUT',
@@ -1561,14 +1596,14 @@ async function saveInvoice(key) {
 		body: JSON.stringify({ items })
 	});
 
-	notify('Invoice ' + number + ' updated', 'ok', 'Success');
+	notify(t('toast.invoice.updated', { number: number }), 'ok', t('toast.success'));
 	openInvoices.delete(key);
 	reloadInvoices(kind);
 }
 
 async function runAction(kind, number, action) {
 	await post('/' + kind + '-invoice/' + encodeURIComponent(number) + '/' + action);
-	notify('Invoice ' + number + ': ' + action + ' done', 'ok', 'Success');
+	notify(t('toast.invoice.action', { number: number, action: action }), 'ok', t('toast.success'));
 	openInvoices.delete(invoiceKey(kind, number));
 	reloadInvoices(kind);
 }
@@ -1578,7 +1613,7 @@ async function loadDepositorOptions(prefix, placeholder) {
 	const selected = select.value;
 	const list = await api('/depositors');
 
-	select.innerHTML = '<option value="">' + esc(placeholder || 'Select a depositor') + '</option>' + list
+	select.innerHTML = '<option value="">' + esc(placeholder || t('option.selectdepositor')) + '</option>' + list
 			.map(depositor => '<option value="' + esc(depositor.id) + '"'
 					+ ' data-code="' + esc(depositor.code) + '"'
 					+ ' data-name="' + esc(depositor.name) + '">'
@@ -1589,21 +1624,23 @@ async function loadDepositorOptions(prefix, placeholder) {
 }
 
 async function loadInbound() {
+	await ensureProductOptions();
 	await loadDepositorOptions('in');
 
 	const status = document.getElementById('in-filter').value;
 	const list = (await api('/inbound-invoice')).filter(i => !status || i.status === status);
 
-	rows('in-body', list, 5, invoice => invoiceRow(invoice, 'inbound', 'Complete', 'complete'));
+	rows('in-body', list, 5, invoice => invoiceRow(invoice, 'inbound', t('action.complete'), 'complete'));
 }
 
 async function loadOutbound() {
+	await ensureProductOptions();
 	await loadDepositorOptions('out');
 
 	const status = document.getElementById('out-filter').value;
 	const list = (await api('/outbound-invoice')).filter(i => !status || i.status === status);
 
-	rows('out-body', list, 5, invoice => invoiceRow(invoice, 'outbound', 'Execute', 'execute'));
+	rows('out-body', list, 5, invoice => invoiceRow(invoice, 'outbound', t('action.execute'), 'execute'));
 }
 
 async function createInvoice(kind) {
@@ -1614,9 +1651,9 @@ async function createInvoice(kind) {
 	const selectedOption = depositorId ? select.selectedOptions[0] : null;
 	const items = readItems(prefix + '-items');
 
-	if (!number || items.length === 0) return notify('Number and at least one item are required', 'err', 'Invalid input');
+	if (!number || items.length === 0) return notify(t('validate.numberitems'), 'err', t('toast.invalid'));
 
-	if (!depositorId) return notify('Select a depositor', 'err', 'Invalid input');
+	if (!depositorId) return notify(t('validate.depositor'), 'err', t('toast.invalid'));
 
 	const depositor = {
 		id: depositorId,
@@ -1625,7 +1662,7 @@ async function createInvoice(kind) {
 	};
 
 	await post('/' + kind + '-invoice', { number, depositor, items });
-	notify('Invoice ' + number + ' created', 'ok', 'Success');
+	notify(t('toast.invoice.created', { number: number }), 'ok', t('toast.success'));
 	document.getElementById(prefix + '-number').value = '';
 	select.value = '';
 	document.getElementById(prefix + '-items').innerHTML = '';
@@ -1634,7 +1671,7 @@ async function createInvoice(kind) {
 }
 
 async function loadMovements() {
-	await loadDepositorOptions('m', 'All depositors');
+	await loadDepositorOptions('m', t('option.alldepositors'));
 
 	const params = new URLSearchParams();
 	const product = document.getElementById('m-product').value.trim();
@@ -1683,17 +1720,17 @@ function notificationRow(replenishment) {
 
 	if (!draft) return '';
 
-	const label = draft.sentAt ? 'See email' : 'See draft email';
+	const label = draft.sentAt ? t('mail.see') : t('mail.seedraft');
 
 	const state = draft.sentAt
-			? 'Sent at ' + stamp(draft.sentAt)
-			: 'Will be sent on approval';
+			? t('mail.sentat', { at: stamp(draft.sentAt) })
+			: t('mail.pending');
 
 	return '<tr><td colspan="6" style="padding-top:0;border-top:none">' +
 		'<details><summary class="mono" style="cursor:pointer">' +
 		'&#9993; ' + label + ' &middot; ' + esc(state) + '</summary>' +
 		'<div class="result" style="margin-top:8px">' +
-		'<strong>To:</strong> ' + esc(draft.to || 'to be resolved on approval') + '<br>' +
+		'<strong>To:</strong> ' + esc(draft.to || t('mail.toresolve')) + '<br>' +
 		((draft.cc || []).length ? '<strong>Cc:</strong> ' + esc(draft.cc.join(', ')) + '<br>' : '') +
 		'<strong>Subject:</strong> ' + esc(draft.subject) + '<br><br>' +
 		esc(draft.body) +
@@ -1706,7 +1743,7 @@ function replenishmentActions(replenishment) {
 			+ esc(replenishment.id) + '\', \'' + status + '\')">' + label + '</button>';
 
 	if (replenishment.status === 'PENDING') {
-		return '<div class="actions">' + action('Approve', 'APPROVED') + action('Reject', 'REJECTED', true) + '</div>';
+		return '<div class="actions">' + action(t('action.approve'), 'APPROVED') + action(t('action.reject'), 'REJECTED', true) + '</div>';
 	}
 
 	if (replenishment.status === 'APPROVED') {
@@ -1718,7 +1755,7 @@ function replenishmentActions(replenishment) {
 
 async function changeReplenishmentStatus(id, status) {
 	await post('/replenishment/' + encodeURIComponent(id) + '/status/' + status);
-	notify('Replenishment moved to ' + status, 'ok', 'Success');
+	notify(t('toast.replenishment', { status: status }), 'ok', t('toast.success'));
 	loadReplenishment();
 }
 
@@ -1883,7 +1920,7 @@ function readAttributes(value) {
 	try {
 		return JSON.parse(value);
 	} catch (ignored) {
-		notify('Attributes must be a valid JSON object', 'err', 'Invalid input');
+		notify(t('validate.attributes'), 'err', t('toast.invalid'));
 		throw new Error('invalid attributes');
 	}
 }
@@ -1893,7 +1930,7 @@ async function savePolicy(reference) {
 	const separator = reference.indexOf(':');
 	const text = card.querySelector('.pol-text').value.trim();
 
-	if (!text) return notify('Policy text is required', 'err', 'Invalid input');
+	if (!text) return notify(t('validate.policytext'), 'err', t('toast.invalid'));
 
 	await post('/depositor-policies', {
 		depositorId: reference.slice(0, separator),
@@ -1903,7 +1940,7 @@ async function savePolicy(reference) {
 		attributes: readAttributes(card.querySelector('.pol-attrs').value)
 	});
 
-	notify('Policy ' + reference + ' saved and re-embedded', 'ok', 'Success');
+	notify(t('toast.policy.saved', { reference: reference }), 'ok', t('toast.success'));
 	openPolicies.delete(reference);
 	loadPolicies();
 }
@@ -1934,7 +1971,7 @@ async function createPolicy() {
 	const text = document.getElementById('pol-new-text').value.trim();
 
 	if (!depositorId || !key || !text) {
-		return notify('Depositor, key and text are required', 'err', 'Invalid input');
+		return notify(t('validate.policyfields'), 'err', t('toast.invalid'));
 	}
 
 	await post('/depositor-policies', {
@@ -1945,7 +1982,7 @@ async function createPolicy() {
 		attributes: readAttributes(document.getElementById('pol-new-attrs').value)
 	});
 
-	notify('Policy ' + key + ' created for ' + depositorId, 'ok', 'Success');
+	notify(t('toast.policy.created', { key: key, depositor: depositorId }), 'ok', t('toast.success'));
 	document.getElementById('pol-new-card').hidden = true;
 	document.getElementById('pol-new-key').value = '';
 	document.getElementById('pol-new-text').value = '';
@@ -1960,7 +1997,7 @@ async function deletePolicy(reference) {
 	await del('/depositor-policies/' + encodeURIComponent(reference.slice(0, separator))
 			+ '/' + encodeURIComponent(reference.slice(separator + 1)));
 
-	notify('Policy ' + reference + ' deleted', 'ok', 'Success');
+	notify(t('toast.policy.deleted', { reference: reference }), 'ok', t('toast.success'));
 	openPolicies.delete(reference);
 	loadPolicies();
 }
@@ -1970,8 +2007,8 @@ async function previewPolicies() {
 	const question = document.getElementById('pol-question').value.trim();
 	const target = document.getElementById('pol-preview');
 
-	if (!depositorId) return notify('Select a depositor to run the search', 'err', 'Invalid input');
-	if (!question) return notify('Type a question', 'err', 'Invalid input');
+	if (!depositorId) return notify(t('validate.searchdepositor'), 'err', t('toast.invalid'));
+	if (!question) return notify(t('validate.question'), 'err', t('toast.invalid'));
 
 	const found = await api('/depositor-policies/' + encodeURIComponent(depositorId)
 			+ '/preview?question=' + encodeURIComponent(question));
@@ -2011,32 +2048,305 @@ document.getElementById('tabs').addEventListener('click', event => {
 	if (button) selectTab(button.dataset.tab);
 });
 
-const OVERVIEW_STEPS = [
-	{
-		title: 'Register a product',
-		hint: 'Anything you sell needs a code and a depositor that owns it.',
-		tab: 'products'
+const I18N = {
+
+	EN: {
+		'action.go': 'Go',
+		'action.close': 'Close',
+		'action.edit': 'Edit',
+		'action.check': 'Check',
+		'action.complete': 'Complete',
+		'action.execute': 'Execute',
+		'action.approve': 'Approve',
+		'action.reject': 'Reject',
+		'table.empty': 'No records found',
+		'theme.dark': 'Dark',
+		'theme.light': 'Light',
+		'option.alldepositors': 'All depositors',
+		'option.selectdepositor': 'Select a depositor',
+		'option.selectproduct': 'Select a product',
+		'action.remove': 'Remove',
+		'validate.name': 'Name is required',
+		'validate.codename': 'Code and name are required',
+		'validate.nameemail': 'Name and email are required',
+		'validate.codenameemail': 'Code, name and email are required',
+		'validate.items': 'At least one item is required',
+		'validate.numberitems': 'Number and at least one item are required',
+		'validate.depositor': 'Select a depositor',
+		'validate.attributes': 'Attributes must be a valid JSON object',
+		'validate.policytext': 'Policy text is required',
+		'validate.policyfields': 'Depositor, key and text are required',
+		'validate.searchdepositor': 'Select a depositor to run the search',
+		'validate.question': 'Type a question',
+		'mail.see': 'See email',
+		'mail.seedraft': 'See draft email',
+		'mail.sentat': 'Sent at {at}',
+		'mail.pending': 'Will be sent on approval',
+		'mail.toresolve': 'to be resolved on approval',
+		'toast.invalid': 'Invalid input',
+		'toast.error': 'Error',
+		'toast.product.updated': 'Product {code} updated',
+		'toast.product.created': 'Product {code} created',
+		'toast.depositor.updated': 'Depositor {code} updated',
+		'toast.depositor.created': 'Depositor {code} created',
+		'toast.invoice.updated': 'Invoice {number} updated',
+		'toast.invoice.created': 'Invoice {number} created',
+		'toast.invoice.action': 'Invoice {number}: {action} done',
+		'toast.replenishment': 'Replenishment moved to {status}',
+		'toast.policy.saved': 'Policy {reference} saved and re-embedded',
+		'toast.policy.created': 'Policy {key} created for {depositor}',
+		'toast.policy.deleted': 'Policy {reference} deleted',
+		'toast.success': 'Success',
+		'toast.language': 'Language changed to {language}',
+		'flow.count.invoices': '{count} invoice(s)',
+		'flow.count.movements': '{count} movement(s)',
+		'flow.count.runs': '{count} run(s) so far',
+		'steps.product.title': 'Register a product',
+		'steps.product.hint': 'Anything you sell needs a code and a depositor that owns it.',
+		'steps.inbound.title': 'Receive it with an inbound invoice',
+		'steps.inbound.hint': 'Create it, check it, then complete it. Completing is what puts the units in stock.',
+		'steps.policy.title': 'Agree on a replenishment policy',
+		'steps.policy.hint': 'Plain text, in your own words. The agent finds the right rule by vector search.',
+		'steps.outbound.title': 'Ship it with an outbound invoice',
+		'steps.outbound.hint': 'Create it, check it, then execute it. Take the stock low enough to be worth reordering.',
+		'steps.agent.title': 'Watch the agent run on its own',
+		'steps.agent.hint': 'It plans its tasks, decides whether to reorder and drafts the e-mail. Nobody asked it to.'
 	},
-	{
-		title: 'Receive it with an inbound invoice',
-		hint: 'Create it, check it, then complete it. Completing is what puts the units in stock.',
-		tab: 'inbound'
-	},
-	{
-		title: 'Agree on a replenishment policy',
-		hint: 'Plain text, in your own words. The agent finds the right rule by vector search.',
-		tab: 'policies'
-	},
-	{
-		title: 'Ship it with an outbound invoice',
-		hint: 'Create it, check it, then execute it. Take the stock low enough to be worth reordering.',
-		tab: 'outbound'
-	},
-	{
-		title: 'Watch the agent run on its own',
-		hint: 'It plans its tasks, decides whether to reorder and drafts the e-mail. Nobody asked it to.',
-		tab: 'agentruns'
+
+	PT_BR: {
+		'nav.group.start': 'Início',
+		'nav.group.warehouse': 'Armazém',
+		'nav.group.operations': 'Operações',
+		'nav.group.agent': 'Agente',
+		'nav.overview': 'Visão geral',
+		'nav.products': 'Produtos',
+		'nav.depositors': 'Depositantes',
+		'nav.inventory': 'Estoque',
+		'nav.movements': 'Movimentos de estoque',
+		'nav.inbound': 'Notas de entrada',
+		'nav.outbound': 'Notas de saída',
+		'nav.policies': 'Políticas do depositante',
+		'nav.replenishment': 'Reposição',
+		'nav.agentruns': 'Execuções do agente',
+
+		'field.code': 'Código',
+		'field.name': 'Nome',
+		'field.email': 'E-mail',
+		'field.number': 'Número',
+		'field.depositor': 'Depositante',
+		'field.type': 'Tipo',
+		'field.quantity': 'Quantidade',
+		'field.status': 'Situação',
+		'field.items': 'Itens',
+		'field.actions': 'Ações',
+		'field.id': 'Id',
+		'field.date': 'Data',
+		'field.invoice': 'Nota',
+		'field.productcode': 'Código do produto',
+		'field.productname': 'Nome do produto',
+
+		'filter.code': 'Filtrar por código',
+		'filter.status': 'Filtrar por situação',
+		'filter.codename': 'Filtrar por código ou nome',
+		'filter.productcode': 'Filtrar por código do produto',
+		'filter.depositor': 'Filtrar por depositante',
+
+		'option.all': 'Todas',
+		'option.alldepositors': 'Todos os depositantes',
+		'option.selectdepositor': 'Selecione um depositante',
+		'option.selectproduct': 'Selecione um produto',
+		'action.remove': 'Remover',
+
+		'action.search': 'Buscar',
+		'action.clear': 'Limpar',
+		'action.refresh': 'Atualizar',
+		'action.cancel': 'Cancelar',
+		'action.additem': 'Adicionar item',
+		'action.close': 'Fechar',
+		'action.edit': 'Editar',
+		'action.check': 'Conferir',
+		'action.complete': 'Completar',
+		'action.execute': 'Executar',
+		'action.approve': 'Aprovar',
+		'action.reject': 'Rejeitar',
+
+		'products.new': 'Novo produto',
+		'products.list': 'Produtos',
+		'products.create': 'Criar produto',
+
+		'depositors.new': 'Novo depositante',
+		'depositors.list': 'Depositantes',
+		'depositors.save': 'Salvar depositante',
+
+		'inventory.list': 'Estoque',
+
+		'inbound.new': 'Nova nota de entrada',
+		'inbound.list': 'Notas de entrada',
+		'outbound.new': 'Nova nota de saída',
+		'outbound.list': 'Notas de saída',
+		'invoice.create': 'Criar nota',
+
+		'movements.list': 'Movimentos de estoque',
+		'movements.invoicenumber': 'Número da nota',
+
+		'policies.list': 'Políticas acordadas',
+		'policies.new': 'Nova política',
+		'policies.create': 'Criar política',
+		'policies.retrieves': 'O que o agente recupera',
+		'policies.depositorid': 'Id do depositante',
+		'policies.key': 'Chave',
+		'policies.text': 'Texto da política usado pelo agente',
+		'policies.text.ph': 'Pedidos de reposição da Amazon devem conter no mínimo 500 unidades por produto.',
+		'policies.attributes': 'Atributos (JSON)',
+		'policies.question': 'Pergunta',
+		'policies.question.ph': 'Quais são as restrições para pedir 500 unidades hoje?',
+
+		'replenishment.list': 'Reposições',
+		'replenishment.message': 'Mensagem',
+
+		'agentruns.list': 'Execuções do agente',
+
+		'theme.dark': 'Escuro',
+		'theme.light': 'Claro',
+
+		'validate.name': 'O nome é obrigatório',
+		'validate.codename': 'Código e nome são obrigatórios',
+		'validate.nameemail': 'Nome e e-mail são obrigatórios',
+		'validate.codenameemail': 'Código, nome e e-mail são obrigatórios',
+		'validate.items': 'É necessário pelo menos um item',
+		'validate.numberitems': 'Número e pelo menos um item são obrigatórios',
+		'validate.depositor': 'Selecione um depositante',
+		'validate.attributes': 'Atributos precisam ser um objeto JSON válido',
+		'validate.policytext': 'O texto da política é obrigatório',
+		'validate.policyfields': 'Depositante, chave e texto são obrigatórios',
+		'validate.searchdepositor': 'Selecione um depositante para fazer a busca',
+		'validate.question': 'Escreva uma pergunta',
+
+		'mail.see': 'Ver e-mail',
+		'mail.seedraft': 'Ver rascunho do e-mail',
+		'mail.sentat': 'Enviado em {at}',
+		'mail.pending': 'Será enviado na aprovação',
+		'mail.toresolve': 'a definir na aprovação',
+
+		'toast.invalid': 'Dados inválidos',
+		'toast.error': 'Erro',
+		'toast.product.updated': 'Produto {code} atualizado',
+		'toast.product.created': 'Produto {code} criado',
+		'toast.depositor.updated': 'Depositante {code} atualizado',
+		'toast.depositor.created': 'Depositante {code} criado',
+		'toast.invoice.updated': 'Nota {number} atualizada',
+		'toast.invoice.created': 'Nota {number} criada',
+		'toast.invoice.action': 'Nota {number}: {action} concluído',
+		'toast.replenishment': 'Reposição movida para {status}',
+		'toast.policy.saved': 'Política {reference} salva e reindexada',
+		'toast.policy.created': 'Política {key} criada para {depositor}',
+		'toast.policy.deleted': 'Política {reference} excluída',
+
+		'overview.what': 'O que é isto',
+		'overview.lede': 'Um <strong>sistema de gestão de armazém</strong> simples: a mercadoria entra, '
+				+ 'a mercadoria sai e o estoque é reposto. A graça está na última parte &mdash; ninguém pede '
+				+ 'a reposição. Quando uma nota de saída é executada, um '
+				+ '<strong>agente de IA acorda por conta própria</strong>, olha o estoque, lê as regras '
+				+ 'acordadas com o depositante e decide se vale repor.',
+		'overview.how': 'Como funciona',
+		'overview.start': 'Comece aqui',
+
+		'flow.inbound': 'Entrada',
+		'flow.stock': 'Estoque',
+		'flow.outbound': 'Saída',
+		'flow.trigger.title': '&#9889; O agente se dispara sozinho aqui',
+		'flow.trigger.meta': 'Executar uma nota de saída publica um evento '
+				+ '<code>OutboundInvoiceCompleted</code> depois que a transação é confirmada. '
+				+ 'Não existe botão de &ldquo;rodar agente&rdquo;.',
+		'flow.agent': '&#129302; Agente de reposição',
+		'flow.human.title': 'Humano aprova',
+		'flow.human.meta': 'e então o e-mail é enviado',
+
+		'action.go': 'Ir',
+		'table.empty': 'Nenhum registro encontrado',
+		'toast.success': 'Tudo certo',
+		'toast.language': 'Idioma alterado para {language}',
+
+		'flow.count.invoices': '{count} nota(s)',
+		'flow.count.movements': '{count} movimento(s)',
+		'flow.count.runs': '{count} execução(ões) até agora',
+
+		'steps.product.title': 'Cadastre um produto',
+		'steps.product.hint': 'Tudo que você vende precisa de um código e de um depositante dono dele.',
+		'steps.inbound.title': 'Receba com uma nota de entrada',
+		'steps.inbound.hint': 'Crie, confira e então complete. Completar é o que coloca as unidades em estoque.',
+		'steps.policy.title': 'Combine uma política de reposição',
+		'steps.policy.hint': 'Texto livre, nas suas palavras. O agente acha a regra certa por busca vetorial.',
+		'steps.outbound.title': 'Despache com uma nota de saída',
+		'steps.outbound.hint': 'Crie, confira e então execute. Derrube o estoque o bastante para valer uma reposição.',
+		'steps.agent.title': 'Veja o agente rodar sozinho',
+		'steps.agent.hint': 'Ele planeja as tarefas, decide se repõe e redige o e-mail. Ninguém pediu.'
 	}
+};
+
+const UI_TEXT = new Map();
+const UI_LABEL = new Map();
+const UI_PLACEHOLDER = new Map();
+
+let uiLanguage = 'EN';
+
+function snapshotUiText() {
+	document.querySelectorAll('[data-i18n]').forEach(el => UI_TEXT.set(el, el.innerHTML));
+	document.querySelectorAll('[data-i18n-label]').forEach(el => UI_LABEL.set(el, el.lastChild.textContent));
+	document.querySelectorAll('[data-i18n-ph]').forEach(el => UI_PLACEHOLDER.set(el, el.placeholder));
+}
+
+function t(key, vars) {
+	const dictionary = I18N[uiLanguage] || {};
+	let text = dictionary[key] !== undefined ? dictionary[key]
+			: (I18N.EN[key] !== undefined ? I18N.EN[key] : key);
+
+	if (vars) {
+		Object.keys(vars).forEach(name => {
+			text = text.split('{' + name + '}').join(vars[name]);
+		});
+	}
+
+	return text;
+}
+
+function applyLanguage(language) {
+	uiLanguage = I18N[language] ? language : 'EN';
+	localStorage.setItem('wms-lang', uiLanguage);
+	document.documentElement.lang = uiLanguage === 'PT_BR' ? 'pt-BR' : 'en';
+
+	const dictionary = I18N[uiLanguage] || {};
+
+	UI_TEXT.forEach((original, el) => {
+		el.innerHTML = dictionary[el.dataset.i18n] !== undefined ? dictionary[el.dataset.i18n] : original;
+	});
+
+	UI_LABEL.forEach((original, el) => {
+		const translated = dictionary[el.dataset.i18nLabel];
+		el.lastChild.textContent = translated !== undefined ? translated : original;
+	});
+
+	UI_PLACEHOLDER.forEach((original, el) => {
+		const translated = dictionary[el.dataset.i18nPh];
+		el.placeholder = translated !== undefined ? translated : original;
+	});
+
+	markLanguage(uiLanguage);
+
+	const active = document.querySelector('nav button.active');
+
+	if (active) {
+		document.getElementById('page-title').textContent = active.lastChild.textContent.trim();
+		loaders[active.dataset.tab]().catch(() => {});
+	}
+}
+
+const OVERVIEW_STEPS = [
+	{ key: 'product', tab: 'products' },
+	{ key: 'inbound', tab: 'inbound' },
+	{ key: 'policy', tab: 'policies' },
+	{ key: 'outbound', tab: 'outbound' },
+	{ key: 'agent', tab: 'agentruns' }
 ];
 
 function renderSteps(done) {
@@ -2044,16 +2354,16 @@ function renderSteps(done) {
 		<div class="step ${done[index] ? 'done' : ''}">
 			<div class="step-num">${done[index] ? '&#10003;' : index + 1}</div>
 			<div class="step-text">
-				<div class="step-title">${step.title}</div>
-				<div class="step-hint">${step.hint}</div>
+				<div class="step-title">${t('steps.' + step.key + '.title')}</div>
+				<div class="step-hint">${t('steps.' + step.key + '.hint')}</div>
 			</div>
-			<button class="btn ghost sm" onclick="selectTab('${step.tab}')">Go</button>
+			<button class="btn ghost sm" onclick="selectTab('${step.tab}')">${t('action.go')}</button>
 		</div>`).join('');
 }
 
-function flowNode(id, count, label, doneWhen) {
+function flowNode(id, count, key, doneWhen) {
 	const node = document.getElementById(id);
-	node.querySelector('.node-meta').textContent = count + ' ' + label;
+	node.querySelector('.node-meta').textContent = t(key, { count: count });
 	node.classList.toggle('done', doneWhen);
 }
 
@@ -2067,10 +2377,10 @@ async function loadOverview() {
 	const executed = outbound.filter(invoice => invoice.status === 'COMPLETED').length;
 	const completedInbound = inbound.filter(invoice => invoice.status === 'COMPLETED').length;
 
-	flowNode('flow-inbound', inbound.length, 'invoice(s)', completedInbound > 0);
-	flowNode('flow-stock', movements.length, 'movement(s)', inStock > 0);
-	flowNode('flow-outbound', outbound.length, 'invoice(s)', executed > 0);
-	flowNode('flow-agent', runs.length, 'run(s) so far', runs.length > 0);
+	flowNode('flow-inbound', inbound.length, 'flow.count.invoices', completedInbound > 0);
+	flowNode('flow-stock', movements.length, 'flow.count.movements', inStock > 0);
+	flowNode('flow-outbound', outbound.length, 'flow.count.invoices', executed > 0);
+	flowNode('flow-agent', runs.length, 'flow.count.runs', runs.length > 0);
 
 	renderSteps([
 		products.length > 0,
@@ -2087,17 +2397,19 @@ function markLanguage(language) {
 }
 
 async function changeLanguage(language) {
-	markLanguage(await post('/settings/language/' + language));
-	notify('Agent language changed to ' + language, 'ok', 'Success');
+	applyLanguage(language);
+	notify(t('toast.language', { language: language }), 'ok', t('toast.success'));
+
+	await post('/settings/language/' + language);
 }
 
 async function loadLanguage() {
-	markLanguage(await api('/settings/language'));
+	return await api('/settings/language');
 }
 
 function applyTheme(theme) {
 	document.documentElement.dataset.theme = theme;
-	document.getElementById('theme-toggle').textContent = theme === 'light' ? 'Dark' : 'Light';
+	document.getElementById('theme-toggle').textContent = theme === 'light' ? t('theme.dark') : t('theme.light');
 	localStorage.setItem('wms-theme', theme);
 }
 
@@ -2108,8 +2420,17 @@ function toggleTheme() {
 applyTheme(localStorage.getItem('wms-theme') || 'dark');
 
 ['in-items', 'out-items'].forEach(addItemLine);
-loadLanguage().catch(() => {});
-loadOverview().catch(() => {});
+
+snapshotUiText();
+
+const storedLanguage = localStorage.getItem('wms-lang');
+
+if (storedLanguage) {
+	applyLanguage(storedLanguage);
+} else {
+	applyLanguage('EN');
+	loadLanguage().then(applyLanguage).catch(() => {});
+}
 </script>
 
 </body>

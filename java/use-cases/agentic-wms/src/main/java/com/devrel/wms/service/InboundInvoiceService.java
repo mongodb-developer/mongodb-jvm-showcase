@@ -5,6 +5,7 @@ import com.devrel.wms.domain.StockMovement;
 import com.devrel.wms.exception.ConflictException;
 import com.devrel.wms.exception.NotFoundException;
 import com.devrel.wms.repository.InboundInvoiceRepository;
+import com.devrel.wms.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,19 +21,24 @@ public class InboundInvoiceService {
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
 	private final DepositorService depositorService;
+	private final ProductRepository productRepository;
 
 	InboundInvoiceService(
 			InboundInvoiceRepository inboundInvoiceRepository,
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
-			DepositorService depositorService) {
+			DepositorService depositorService,
+			ProductRepository productRepository) {
 		this.inboundInvoiceRepository = inboundInvoiceRepository;
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
 		this.depositorService = depositorService;
+		this.productRepository = productRepository;
 	}
 
 	public InboundInvoice save(InboundInvoice inboundInvoice) {
+		validateProducts(inboundInvoice.items());
+
 		InboundInvoice withDepositor = new InboundInvoice(
 				inboundInvoice.id(),
 				inboundInvoice.number(),
@@ -67,6 +73,8 @@ public class InboundInvoiceService {
 	}
 
 	public InboundInvoice update(String number, InboundInvoice inboundInvoice) {
+		validateProducts(inboundInvoice.items());
+
 		InboundInvoice current = getInbound(number);
 
 		if (current.status() != InboundInvoice.InvoiceStatus.PENDING) {
@@ -142,5 +150,19 @@ public class InboundInvoiceService {
 				.orElseThrow(() -> new NotFoundException("Invoice not found: " + number));
 	}
 
+	private void validateProducts(List<InboundInvoice.InvoiceItem> items) {
+		if (items == null || items.isEmpty()) {
+			throw new IllegalArgumentException("At least one item is required");
+		}
 
+		for (InboundInvoice.InvoiceItem item : items) {
+			if (item.productCode() == null || item.productCode().isBlank()) {
+				throw new IllegalArgumentException("Product code is required on every item");
+			}
+
+			if (productRepository.findByCode(item.productCode()).isEmpty()) {
+				throw new NotFoundException("Product not found: " + item.productCode());
+			}
+		}
+	}
 }
