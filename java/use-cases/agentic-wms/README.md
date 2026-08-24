@@ -6,6 +6,8 @@ A simple Warehouse Management System that handles **inbound**, **outbound** and 
 
 ## How it works
 
+The **Overview** tab in the app shows this same flow, tracks how far you got and links to each step.
+
 Inbound and outbound follow the same three steps: create the invoice, check it, then confirm it. Confirming is what actually moves stock.
 
 ```mermaid
@@ -28,7 +30,7 @@ flowchart TD
 
 Nobody. There is no "run agent" button.
 
-Completing an outbound invoice (`POST /outbound-invoices/{number}/execute`) publishes an
+Completing an outbound invoice (`POST /outbound-invoice/{number}/execute`) publishes an
 `OutboundInvoiceCompleted` event after the transaction commits. `ReplenishmentAnalysisListener`
 picks it up asynchronously and runs the agent.
 

@@ -515,6 +515,169 @@
 		color: var(--text-soft);
 	}
 
+	/* ---------- overview ---------- */
+
+	.lede {
+		margin: 0;
+		padding: 18px;
+		font-size: 14px;
+		line-height: 1.65;
+		color: var(--text-soft);
+	}
+
+	.lede strong { color: var(--text); font-weight: 600; }
+
+	.flow {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0;
+		padding: 26px 18px 30px;
+	}
+
+	.flow-lane {
+		display: flex;
+		align-items: stretch;
+		gap: 0;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.node {
+		background: var(--surface-2);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-sm);
+		padding: 13px 17px;
+		min-width: 132px;
+		text-align: center;
+	}
+
+	.node .node-title {
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .8px;
+		color: var(--text);
+	}
+
+	.node .node-meta {
+		margin-top: 5px;
+		font-size: 11.5px;
+		color: var(--muted);
+	}
+
+	.node.done { border-color: var(--accent); background: var(--accent-soft); }
+	.node.done .node-meta { color: var(--accent); font-weight: 600; }
+
+	.node.agent {
+		border-color: var(--info);
+		background: color-mix(in srgb, var(--info) 10%, transparent);
+		min-width: 300px;
+	}
+
+	.node.agent .node-title { color: var(--info); }
+
+	.node.human { border-style: dashed; }
+
+	.arrow {
+		align-self: center;
+		color: var(--muted);
+		padding: 0 12px;
+		font-size: 15px;
+	}
+
+	.arrow.down { padding: 8px 0; }
+
+	.trigger {
+		border: 1px solid var(--warn);
+		background: color-mix(in srgb, var(--warn) 13%, transparent);
+		border-radius: var(--radius-sm);
+		padding: 11px 18px;
+		text-align: center;
+		max-width: 430px;
+	}
+
+	.trigger .trigger-title {
+		font-size: 11.5px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: .8px;
+		color: var(--warn);
+	}
+
+	.trigger .trigger-meta {
+		margin-top: 5px;
+		font-size: 11.5px;
+		color: var(--text-soft);
+		line-height: 1.5;
+	}
+
+	.caps {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		justify-content: center;
+		margin-top: 10px;
+	}
+
+	.cap {
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: .5px;
+		padding: 3px 8px;
+		border-radius: 999px;
+		border: 1px solid var(--border-strong);
+		background: var(--surface);
+		color: var(--text-soft);
+	}
+
+	.steps { padding: 6px 0 8px; }
+
+	.step {
+		display: flex;
+		align-items: center;
+		gap: 13px;
+		padding: 13px 18px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.step:last-child { border-bottom: 0; }
+
+	.step-num {
+		flex: none;
+		width: 25px;
+		height: 25px;
+		border-radius: 50%;
+		border: 1px solid var(--border-strong);
+		color: var(--muted);
+		display: grid;
+		place-items: center;
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	.step.done .step-num {
+		border-color: var(--accent);
+		background: var(--accent);
+		color: var(--accent-ink);
+	}
+
+	.step-text { flex: 1; min-width: 0; }
+	.step-text .step-title { font-size: 13.5px; font-weight: 600; }
+
+	.step-text .step-hint {
+		font-size: 12px;
+		color: var(--muted);
+		margin-top: 3px;
+		line-height: 1.5;
+	}
+
+	@media (max-width: 720px) {
+		.arrow { display: none; }
+		.flow-lane { flex-direction: column; gap: 10px; }
+		.node.agent { min-width: 0; }
+	}
+
 	/* ---------- toast ---------- */
 
 	#toast {
@@ -569,8 +732,11 @@
 		</div>
 
 		<nav id="tabs">
+			<div class="group">Start</div>
+			<button data-tab="overview" class="active"><span class="ico">&#9788;</span>Overview</button>
+
 			<div class="group">Warehouse</div>
-			<button data-tab="products" class="active"><span class="ico">&#9635;</span>Products</button>
+			<button data-tab="products"><span class="ico">&#9635;</span>Products</button>
 			<button data-tab="depositors"><span class="ico">&#9750;</span>Depositors</button>
 			<button data-tab="inventory"><span class="ico">&#9707;</span>Inventory</button>
 			<button data-tab="movements"><span class="ico">&#8646;</span>Stock Movements</button>
@@ -594,7 +760,7 @@
 	<div class="content">
 
 		<div class="topbar">
-			<h1 id="page-title">Products</h1>
+			<h1 id="page-title">Overview</h1>
 			<span class="spacer"></span>
 			<div class="lang">
 				<button class="btn ghost sm" data-lang="EN" onclick="changeLanguage('EN')" title="Agent answers in English">&#127482;&#127480;</button>
@@ -605,7 +771,78 @@
 
 		<main>
 
-		<section id="products" class="active">
+		<section id="overview" class="active">
+			<div class="card">
+				<div class="card-head"><h2>What this is</h2></div>
+				<p class="lede">
+					A simple <strong>Warehouse Management System</strong>: goods come in, goods go out, and
+					stock gets replenished. The twist is the last part &mdash; nobody asks for the
+					replenishment. When an outbound invoice is executed, an
+					<strong>AI agent wakes up on its own</strong>, looks at the stock, reads the rules agreed
+					with the depositor and decides whether to reorder.
+				</p>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>How it works</h2></div>
+				<div class="flow">
+					<div class="flow-lane">
+						<div class="node" id="flow-inbound">
+							<div class="node-title">Inbound</div>
+							<div class="node-meta">&mdash;</div>
+						</div>
+						<div class="arrow">&#10230;</div>
+						<div class="node" id="flow-stock">
+							<div class="node-title">Stock</div>
+							<div class="node-meta">&mdash;</div>
+						</div>
+						<div class="arrow">&#10230;</div>
+						<div class="node" id="flow-outbound">
+							<div class="node-title">Outbound</div>
+							<div class="node-meta">&mdash;</div>
+						</div>
+					</div>
+
+					<div class="arrow down">&#10229;&#10230;</div>
+
+					<div class="trigger">
+						<div class="trigger-title">&#9889; The agent triggers itself here</div>
+						<div class="trigger-meta">
+							Executing an outbound invoice publishes an <code>OutboundInvoiceCompleted</code>
+							event after the transaction commits. There is no &ldquo;run agent&rdquo; button.
+						</div>
+					</div>
+
+					<div class="arrow down">&#8595;</div>
+
+					<div class="node agent" id="flow-agent">
+						<div class="node-title">&#129302; Replenishment Agent</div>
+						<div class="node-meta">&mdash;</div>
+						<div class="caps">
+							<span class="cap">ANALYSIS</span>
+							<span class="cap">POLICY</span>
+							<span class="cap">DECISION</span>
+							<span class="cap">REPLENISHMENT</span>
+							<span class="cap">NOTIFICATION</span>
+						</div>
+					</div>
+
+					<div class="arrow down">&#8595;</div>
+
+					<div class="node human">
+						<div class="node-title">Human approves</div>
+						<div class="node-meta">then the e-mail goes out</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-head"><h2>Start here</h2></div>
+				<div class="steps" id="steps"></div>
+			</div>
+		</section>
+
+		<section id="products">
 			<div class="card">
 				<div class="card-head"><h2>New product</h2></div>
 				<div class="card-body">
@@ -1753,22 +1990,96 @@ const loaders = {
 	outbound: loadOutbound,
 	movements: loadMovements,
 	replenishment: loadReplenishment,
-	agentruns: loadAgentRuns
+	agentruns: loadAgentRuns,
+	overview: loadOverview
 };
 
-document.getElementById('tabs').addEventListener('click', event => {
-	const button = event.target.closest('button[data-tab]');
+function selectTab(tab) {
+	const button = document.querySelector('nav button[data-tab="' + tab + '"]');
 	if (!button) return;
-
-	const tab = button.dataset.tab;
 
 	document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b === button));
 	document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === tab));
-	document.getElementById('page-title').textContent = button.textContent.trim();
+	document.getElementById('page-title').textContent = button.lastChild.textContent.trim();
 
 	clearTimeout(autoRefreshTimer);
 	loaders[tab]().catch(() => {});
+}
+
+document.getElementById('tabs').addEventListener('click', event => {
+	const button = event.target.closest('button[data-tab]');
+	if (button) selectTab(button.dataset.tab);
 });
+
+const OVERVIEW_STEPS = [
+	{
+		title: 'Register a product',
+		hint: 'Anything you sell needs a code and a depositor that owns it.',
+		tab: 'products'
+	},
+	{
+		title: 'Receive it with an inbound invoice',
+		hint: 'Create it, check it, then complete it. Completing is what puts the units in stock.',
+		tab: 'inbound'
+	},
+	{
+		title: 'Agree on a replenishment policy',
+		hint: 'Plain text, in your own words. The agent finds the right rule by vector search.',
+		tab: 'policies'
+	},
+	{
+		title: 'Ship it with an outbound invoice',
+		hint: 'Create it, check it, then execute it. Take the stock low enough to be worth reordering.',
+		tab: 'outbound'
+	},
+	{
+		title: 'Watch the agent run on its own',
+		hint: 'It plans its tasks, decides whether to reorder and drafts the e-mail. Nobody asked it to.',
+		tab: 'agentruns'
+	}
+];
+
+function renderSteps(done) {
+	document.getElementById('steps').innerHTML = OVERVIEW_STEPS.map((step, index) => `
+		<div class="step ${done[index] ? 'done' : ''}">
+			<div class="step-num">${done[index] ? '&#10003;' : index + 1}</div>
+			<div class="step-text">
+				<div class="step-title">${step.title}</div>
+				<div class="step-hint">${step.hint}</div>
+			</div>
+			<button class="btn ghost sm" onclick="selectTab('${step.tab}')">Go</button>
+		</div>`).join('');
+}
+
+function flowNode(id, count, label, doneWhen) {
+	const node = document.getElementById(id);
+	node.querySelector('.node-meta').textContent = count + ' ' + label;
+	node.classList.toggle('done', doneWhen);
+}
+
+async function loadOverview() {
+	const [products, inventory, movements, inbound, outbound, policies, runs] = await Promise.all([
+		api('/products'), api('/inventory'), api('/stock-movements'), api('/inbound-invoice'),
+		api('/outbound-invoice'), api('/depositor-policies'), api('/agent-runs')
+	]);
+
+	const inStock = inventory.filter(item => item.quantity > 0).length;
+	const executed = outbound.filter(invoice => invoice.status === 'COMPLETED').length;
+	const completedInbound = inbound.filter(invoice => invoice.status === 'COMPLETED').length;
+
+	flowNode('flow-inbound', inbound.length, 'invoice(s)', completedInbound > 0);
+	flowNode('flow-stock', movements.length, 'movement(s)', inStock > 0);
+	flowNode('flow-outbound', outbound.length, 'invoice(s)', executed > 0);
+	flowNode('flow-agent', runs.length, 'run(s) so far', runs.length > 0);
+
+	renderSteps([
+		products.length > 0,
+		completedInbound > 0,
+		policies.length > 0,
+		executed > 0,
+		runs.length > 0
+	]);
+}
 
 function markLanguage(language) {
 	document.querySelectorAll('.lang button')
@@ -1798,7 +2109,7 @@ applyTheme(localStorage.getItem('wms-theme') || 'dark');
 
 ['in-items', 'out-items'].forEach(addItemLine);
 loadLanguage().catch(() => {});
-loadProducts().catch(() => {});
+loadOverview().catch(() => {});
 </script>
 
 </body>
