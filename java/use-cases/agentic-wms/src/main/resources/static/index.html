@@ -98,7 +98,16 @@
 	}
 
 	.brand .title { font-size: 14px; font-weight: 600; letter-spacing: .2px; }
-	.brand .sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+	.brand .sub {
+		display: block;
+		font-size: 10px;
+		color: var(--muted);
+		text-transform: uppercase;
+		letter-spacing: .8px;
+		text-decoration: none;
+	}
+
+	.brand .sub:hover { color: var(--accent); }
 
 	nav { padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
 
@@ -727,7 +736,8 @@
 			<span class="mark">w</span>
 			<div>
 				<div class="title">Agentic WMS</div>
-				<div class="sub">MongoDB JVM showcase</div>
+				<a class="sub" href="https://github.com/mongodb-developer/mongodb-jvm-showcase"
+						target="_blank" rel="noopener">MongoDB JVM showcase</a>
 			</div>
 		</div>
 
@@ -2066,6 +2076,7 @@ const I18N = {
 		'option.selectdepositor': 'Select a depositor',
 		'option.selectproduct': 'Select a product',
 		'action.remove': 'Remove',
+		'field.quantity': 'Quantity',
 		'validate.name': 'Name is required',
 		'validate.codename': 'Code and name are required',
 		'validate.nameemail': 'Name and email are required',

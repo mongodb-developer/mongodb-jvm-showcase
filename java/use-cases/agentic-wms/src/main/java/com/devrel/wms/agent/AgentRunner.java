@@ -116,7 +116,8 @@ public class AgentRunner {
                 %s
                 """.formatted(goal, capabilityCatalog(definition), agentLanguageSettings.instruction()))
 				.call()
-				.entity(new ParameterizedTypeReference<List<PlannedTask>>() {});
+				.entity(new ParameterizedTypeReference<>() {
+				});
 
 		if (planned == null || planned.isEmpty()) {
 			throw new IllegalStateException("Planner returned no task for goal: " + goal);
