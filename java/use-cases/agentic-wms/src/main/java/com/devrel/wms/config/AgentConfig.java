@@ -33,6 +33,13 @@ public class AgentConfig {
 			
 			Analyze current stock, recent consumption, and outbound frequency to determine whether a product may run out soon.
 			
+			Apply any depositor policies retrieved during the analysis when making the decision.
+			
+			If a policy defines a delivery lead time, compare it with the estimated stock coverage based on recent consumption.
+			If the stock is likely to run out before a new shipment could arrive, replenishment is required.
+			
+			Recent inbound deliveries alone are not evidence that inventory is healthy.
+   
 			Do not create a replenishment just because an outbound operation occurred. Avoid unnecessary or duplicate replenishments.
 			
 			Create a `replenishment` only when there is clear evidence that a product is out of stock or likely to run out soon.
@@ -96,9 +103,10 @@ public class AgentConfig {
 			1. Identify the products affected by the outbound invoice. [ANALYSIS]
 			2. Check the current inventory for the affected products for the specific depositor. [ANALYSIS]
 			3. Analyze recent stock movements and consumption for the specific depositor. [ANALYSIS]
-			4. Determine whether replenishment is required. [DECISION]
-			5. Create a replenishment request complying with the depositor policies. [REPLENISHMENT]
-			6. Write the notification email for the depositor if a replenishment request was created. [NOTIFICATION]
+		  	4. Read the replenishment policies for the specific depositor. [POLICY]
+		  	5. Determine whether replenishment is required based on inventory, consumption and applicable depositor policies. [DECISION]
+		  	6. Create a replenishment request complying with the depositor policies if required. [REPLENISHMENT]
+		  	7. Write the notification email for the depositor if a replenishment request was created. [NOTIFICATION]
 
 			Return only the execution plan.
 
@@ -181,7 +189,8 @@ public class AgentConfig {
 								List.of(depositorEmailTool)),
 						new AgentCapability(
 								"DECISION",
-								"Decide, based on the results of previous tasks, whether replenishment is required. Uses no tool.",
+								"Decide, based on the results of previous tasks and applicable depositor policies, "
+										+ "whether replenishment is required. Uses no tool.",
 								List.of())
 				)
 		);

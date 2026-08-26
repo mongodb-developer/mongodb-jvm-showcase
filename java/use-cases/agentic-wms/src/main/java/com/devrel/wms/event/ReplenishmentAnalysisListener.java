@@ -18,24 +18,24 @@ public class ReplenishmentAnalysisListener {
 
 	private final Logger logger = LoggerFactory.getLogger(ReplenishmentAnalysisListener.class);
 	private final AgentRunner agentRunner;
-	private final AgentDefinition replenishmentAgent;
+	private final AgentDefinition replenishmentAgentDefinition;
 	private final AgentRunRepository agentRunRepository;
 	private final DemoLimits limits;
 
 	ReplenishmentAnalysisListener(
 			AgentRunner agentRunner,
-			AgentDefinition replenishmentAgent,
+			AgentDefinition replenishmentAgentDefinition,
 			AgentRunRepository agentRunRepository,
 			DemoLimits limits) {
 		this.agentRunner = agentRunner;
-		this.replenishmentAgent = replenishmentAgent;
+		this.replenishmentAgentDefinition = replenishmentAgentDefinition;
 		this.agentRunRepository = agentRunRepository;
 		this.limits = limits;
 	}
 
 	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void analyze(OutboundInvoiceCompleted event) {
+	public void onOutboundInvoiceCompleted(OutboundInvoiceCompleted event) {
 		String number = event.number();
 
 		// THIS IS FOR RATE LIMIT.
@@ -49,7 +49,7 @@ public class ReplenishmentAnalysisListener {
 		logger.info("Starting replenishment analysis for invoice {}", number);
 
 		try {
-			agentRunner.run(replenishmentAgent, number);
+			agentRunner.run(replenishmentAgentDefinition, number);
 		} catch (Exception exception) {
 			logger.error("Replenishment analysis failed for invoice {}", number, exception);
 		}

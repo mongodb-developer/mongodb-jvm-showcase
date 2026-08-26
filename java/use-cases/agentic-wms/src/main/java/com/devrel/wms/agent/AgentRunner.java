@@ -44,7 +44,7 @@ public class AgentRunner {
 
 		for (int index = 0; index < tasks.size(); index++) {
 			String description = tasks.get(index).description();
-			String capability = tasks.get(index).tool();
+			String capability = tasks.get(index).capability();
 			LocalDateTime startedAt = LocalDateTime.now();
 
 			try {
@@ -76,7 +76,7 @@ public class AgentRunner {
 			AgentRun.AgentTask task = tasks.get(index);
 
 			tasks.set(index, new AgentRun.AgentTask(
-					task.description(), AgentRun.TaskStatus.SKIPPED, task.tool(), null, null, null));
+					task.description(), AgentRun.TaskStatus.SKIPPED, task.capability(), null, null, null));
 		}
 	}
 

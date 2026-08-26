@@ -27,7 +27,7 @@ public record AgentRun(
     public record AgentTask(
             String description,
             TaskStatus status,
-            String tool,
+            String capability,
             String result,
             LocalDateTime startedAt,
             LocalDateTime completedAt
