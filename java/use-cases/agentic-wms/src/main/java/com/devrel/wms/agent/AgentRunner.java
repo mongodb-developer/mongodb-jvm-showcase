@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 @Service
 public class AgentRunner {
 
+	private static final String DECISION_CAPABILITY = "DECISION";
+	private static final String NO_REPLENISHMENT_TOKEN = "REPLENISHMENT_NOT_REQUIRED";
+
 	private final Logger logger = LoggerFactory.getLogger(AgentRunner.class);
 	private final AgentRunService agentRunService;
 	private final AgentLanguageSettings agentLanguageSettings;
@@ -52,6 +55,15 @@ public class AgentRunner {
 
 				tasks.set(index, new AgentRun.AgentTask(
 						description, AgentRun.TaskStatus.COMPLETED, capability, result, startedAt, LocalDateTime.now()));
+
+				if (decidedToStop(capability, result)) {
+					logger.info("Agent run {} decided that no replenishment is required", agentRun.id());
+
+					skipRemaining(tasks, index + 1);
+
+					return agentRunService.save(finish(
+							agentRun, tasks, AgentRun.Status.COMPLETED, summarize(definition, goal, tasks)));
+				}
 			} catch (Exception exception) {
 				logger.error("Agent run {} failed on task: {}", agentRun.id(), description, exception);
 
@@ -69,6 +81,12 @@ public class AgentRunner {
 
 		return agentRunService.save(finish(
 				agentRun, tasks, AgentRun.Status.COMPLETED, summarize(definition, goal, tasks)));
+	}
+
+	private boolean decidedToStop(String capability, String result) {
+		return DECISION_CAPABILITY.equals(capability)
+				&& result != null
+				&& result.contains(NO_REPLENISHMENT_TOKEN);
 	}
 
 	private void skipRemaining(List<AgentRun.AgentTask> tasks, int from) {

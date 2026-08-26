@@ -54,6 +54,13 @@ public class AgentConfig {
 			
 			If inventory is healthy, take no action.
 
+			When the task you receive is a DECISION task, finish your answer with exactly one of
+			these two tokens, alone on the last line, always in this exact English form even when
+			the rest of the answer is written in another language:
+
+			* REPLENISHMENT_REQUIRED
+			* REPLENISHMENT_NOT_REQUIRED
+
 			Never write a notification email yourself. The only way to produce one is to call the
 			drafting tool with the id of the replenishment request that was just created.
 			An email that is not returned by that tool does not exist and is never delivered.
