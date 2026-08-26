@@ -332,6 +332,24 @@
 		top: 0;
 	}
 
+	th[data-sort] {
+		cursor: pointer;
+		user-select: none;
+	}
+
+	th[data-sort]:hover { color: var(--text); }
+
+	th[data-sort]::after {
+		content: '\2195';
+		margin-left: 6px;
+		opacity: .3;
+		font-size: 11px;
+	}
+
+	th[data-sort].sorted { color: var(--accent); }
+	th[data-sort].sorted::after { content: '\2191'; opacity: 1; }
+	th[data-sort].sorted.descending::after { content: '\2193'; }
+
 	td {
 		padding: 12px 18px;
 		border-bottom: 1px solid var(--border);
@@ -884,7 +902,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.code">Code</th><th data-i18n="field.name">Name</th><th data-i18n="field.id">Id</th><th></th></tr></thead>
+						<thead><tr><th data-i18n="field.code" data-sort="code">Code</th><th data-i18n="field.name" data-sort="name">Name</th><th data-i18n="field.id" data-sort="id">Id</th><th></th></tr></thead>
 						<tbody id="p-body"></tbody>
 					</table>
 				</div>
@@ -928,7 +946,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.id">Id</th><th data-i18n="field.code">Code</th><th data-i18n="field.name">Name</th><th data-i18n="field.email">Email</th><th></th></tr></thead>
+						<thead><tr><th data-i18n="field.id" data-sort="id">Id</th><th data-i18n="field.code" data-sort="code">Code</th><th data-i18n="field.name" data-sort="name">Name</th><th data-i18n="field.email" data-sort="email">Email</th><th></th></tr></thead>
 						<tbody id="d-body"></tbody>
 					</table>
 				</div>
@@ -952,7 +970,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.productcode">Product code</th><th data-i18n="field.productname">Product name</th><th data-i18n="field.depositor">Depositor</th><th class="num" data-i18n="field.quantity">Quantity</th></tr></thead>
+						<thead><tr><th data-i18n="field.productcode" data-sort="productCode">Product code</th><th data-i18n="field.depositor" data-sort="depositor.name">Depositor</th><th class="num" data-i18n="field.quantity" data-sort="quantity">Quantity</th></tr></thead>
 						<tbody id="i-body"></tbody>
 					</table>
 				</div>
@@ -999,7 +1017,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.number">Number</th><th data-i18n="field.depositor">Depositor</th><th data-i18n="field.items">Items</th><th data-i18n="field.status">Status</th><th data-i18n="field.actions">Actions</th></tr></thead>
+						<thead><tr><th data-i18n="field.number" data-sort="number">Number</th><th data-i18n="field.depositor" data-sort="depositor.name">Depositor</th><th data-i18n="field.status" data-sort="status">Status</th></tr></thead>
 						<tbody id="in-body"></tbody>
 					</table>
 				</div>
@@ -1046,7 +1064,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.number">Number</th><th data-i18n="field.depositor">Depositor</th><th data-i18n="field.items">Items</th><th data-i18n="field.status">Status</th><th data-i18n="field.actions">Actions</th></tr></thead>
+						<thead><tr><th data-i18n="field.number" data-sort="number">Number</th><th data-i18n="field.depositor" data-sort="depositor.name">Depositor</th><th data-i18n="field.status" data-sort="status">Status</th></tr></thead>
 						<tbody id="out-body"></tbody>
 					</table>
 				</div>
@@ -1074,7 +1092,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.date">Date</th><th data-i18n="field.type">Type</th><th data-i18n="field.productcode">Product code</th><th data-i18n="field.depositor">Depositor</th><th class="num" data-i18n="field.quantity">Quantity</th><th data-i18n="field.invoice">Invoice</th></tr></thead>
+						<thead><tr><th data-i18n="field.date" data-sort="date">Date</th><th data-i18n="field.type" data-sort="type">Type</th><th data-i18n="field.productcode" data-sort="productCode">Product code</th><th data-i18n="field.depositor" data-sort="depositor.name">Depositor</th><th class="num" data-i18n="field.quantity" data-sort="quantity">Quantity</th><th data-i18n="field.invoice" data-sort="invoiceNumber">Invoice</th></tr></thead>
 						<tbody id="m-body"></tbody>
 					</table>
 				</div>
@@ -1165,7 +1183,7 @@
 				</div>
 				<div class="table-wrap">
 					<table>
-						<thead><tr><th data-i18n="field.id">Id</th><th data-i18n="field.depositor">Depositor</th><th data-i18n="replenishment.message">Message</th><th data-i18n="field.items">Items</th><th data-i18n="field.status">Status</th><th data-i18n="field.actions">Actions</th></tr></thead>
+						<thead><tr><th data-i18n="field.id" data-sort="id">Id</th><th data-i18n="field.depositor" data-sort="depositor.name">Depositor</th><th data-i18n="replenishment.message" data-sort="message">Message</th><th data-i18n="field.status" data-sort="status">Status</th></tr></thead>
 						<tbody id="r-body"></tbody>
 					</table>
 				</div>
@@ -1253,16 +1271,90 @@ const post = (path, body) => api(path, {
 	body: body === undefined ? undefined : JSON.stringify(body)
 });
 
+const TABLE_STATE = new Map();
+
 function rows(tbody, list, columns, render) {
+	const state = TABLE_STATE.get(tbody) || { key: null, direction: 1 };
+
+	state.list = list || [];
+	state.columns = columns;
+	state.render = render;
+	TABLE_STATE.set(tbody, state);
+
+	paintRows(tbody);
+}
+
+function paintRows(tbody) {
+	const state = TABLE_STATE.get(tbody);
 	const target = document.getElementById(tbody);
 
-	if (!list || list.length === 0) {
-		target.innerHTML = '<tr><td class="empty" colspan="' + columns + '">' + t('table.empty') + '</td></tr>';
+	if (!state || !target) return;
+
+	markSortedHeaders(tbody);
+
+	if (state.list.length === 0) {
+		target.innerHTML = '<tr><td class="empty" colspan="' + state.columns + '">' + t('table.empty') + '</td></tr>';
 		return;
 	}
 
-	target.innerHTML = list.map(render).join('');
+	const list = state.key ? [...state.list].sort(comparator(state)) : state.list;
+
+	target.innerHTML = list.map(state.render).join('');
 }
+
+function comparator(state) {
+	return (first, second) => {
+		const a = valueAt(first, state.key);
+		const b = valueAt(second, state.key);
+		const emptyA = a === null || a === undefined || a === '';
+		const emptyB = b === null || b === undefined || b === '';
+
+		if (emptyA || emptyB) return emptyA && emptyB ? 0 : (emptyA ? 1 : -1);
+
+		if (typeof a === 'number' && typeof b === 'number') return (a - b) * state.direction;
+
+		return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
+				* state.direction;
+	};
+}
+
+function valueAt(item, path) {
+	return path.split('.').reduce((value, part) =>
+			(value === null || value === undefined ? value : value[part]), item);
+}
+
+function markSortedHeaders(tbody) {
+	const state = TABLE_STATE.get(tbody);
+	const table = document.getElementById(tbody).closest('table');
+
+	if (!table) return;
+
+	table.querySelectorAll('th[data-sort]').forEach(header => {
+		const active = state.key === header.dataset.sort;
+
+		header.classList.toggle('sorted', active);
+		header.classList.toggle('descending', active && state.direction === -1);
+	});
+}
+
+document.addEventListener('click', event => {
+	const header = event.target.closest('th[data-sort]');
+	if (!header) return;
+
+	const tbody = header.closest('table').querySelector('tbody');
+	if (!tbody || !TABLE_STATE.has(tbody.id)) return;
+
+	const state = TABLE_STATE.get(tbody.id);
+
+	if (state.key === header.dataset.sort) {
+		state.direction = -state.direction;
+	} else {
+		state.key = header.dataset.sort;
+		state.direction = 1;
+	}
+
+	paintRows(tbody.id);
+});
 
 const badge = value => '<span class="badge ' + esc(value) + '">' + esc(value) + '</span>';
 const itemsLabel = items => (items || []).map(i => esc(i.productCode) + ' &times; ' + esc(i.quantity)).join(', ');
