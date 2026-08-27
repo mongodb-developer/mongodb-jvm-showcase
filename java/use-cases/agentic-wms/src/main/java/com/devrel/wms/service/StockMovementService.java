@@ -25,14 +25,14 @@ public class StockMovementService {
 		this.stockMovementSearchRepository = stockMovementSearchRepository;
 	}
 
-	public StockMovement register(
+	public void register(
 			String productCode,
 			DepositorRef depositor,
 			int quantity,
 			String invoiceNumber,
 			StockMovement.MovementType type
 	) {
-		StockMovement save = stockMovementRepository.save(new StockMovement(
+		stockMovementRepository.save(new StockMovement(
 				null,
 				LocalDateTime.now(),
 				productCode,
@@ -45,7 +45,6 @@ public class StockMovementService {
 		logger.info("Stock movement {} of {} unit(s) for product code {} and depositor {} registered",
 				type, quantity, productCode, depositor == null ? null : depositor.id());
 
-		return save;
 	}
 
 	public List<StockMovement> findAll() {

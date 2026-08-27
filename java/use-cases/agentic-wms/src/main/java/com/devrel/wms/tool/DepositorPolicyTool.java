@@ -39,7 +39,6 @@ public class DepositorPolicyTool {
 					+ "'What are the constraints to request 250 units today?'")
 			String question
 	) {
-		logger.info("##TOOL## - Searching policies of depositor {} for: {}", depositorCode, question);
 
 		List<Document> documents = depositorKnowledgeStore.search(
 				question, depositorCode, REPLENISHMENT_TYPES, TOP_K);

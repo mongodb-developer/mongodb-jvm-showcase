@@ -65,8 +65,6 @@ public class DepositorEmailTool {
 	) {
 		String replenishmentId = ReplenishmentIds.sanitize(id);
 
-		logger.info("##TOOL## - Drafting depositor email for replenishment {}", replenishmentId);
-
 		Replenishment replenishment = replenishmentId == null
 				? null
 				: replenishmentService.findById(replenishmentId);

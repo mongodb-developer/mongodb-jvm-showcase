@@ -36,8 +36,6 @@ public class InventoryAnalysisTool {
     """)
 	public List<Inventory> getInventoryByProductCode(
 			@ToolParam(description = ProductCodes.PRODUCT_CODE_PARAM) String productCode) {
-		logger.info("##TOOL## - Calling Inventory Product Code for product {}", productCode);
-
 		return inventoryService.findByProductCode(productCodes.require(productCode));
 	}
 
@@ -47,8 +45,6 @@ public class InventoryAnalysisTool {
     """)
 	public List<StockMovement> getStockMovement(
 			@ToolParam(description = ProductCodes.PRODUCT_CODE_PARAM) String productCode) {
-		logger.info("##TOOL## - Getting stock movement by product number {}", productCode);
-
 		return stockMovementService.findByProductCode(productCodes.require(productCode));
 	}
 
@@ -73,8 +69,6 @@ public class InventoryAnalysisTool {
     """)
 	public List<StockMovement> getStockMovementByInvoiceNumber(
 			@ToolParam(description = "Outbound invoice number") String invoiceNumber) {
-		logger.info("##TOOL## - Getting stock movement by invoice number {}", invoiceNumber);
-
 		return stockMovementService.findByInvoiceNumber(invoiceNumber);
 	}
 }

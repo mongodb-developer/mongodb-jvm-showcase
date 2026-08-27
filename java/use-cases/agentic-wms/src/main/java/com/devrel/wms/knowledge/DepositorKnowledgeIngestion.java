@@ -15,21 +15,21 @@ public class DepositorKnowledgeIngestion {
 
 	private static final List<DepositorKnowledgeEntry> ENTRIES = List.of(
 			new DepositorKnowledgeEntry(
-					"bsp",
+					"nk",
 					"replenishment-minimum",
 					KnowledgeType.REPLENISHMENT,
 					"""
-					Replenishment orders for Braspress must contain at least 100 units per product.
+					Replenishment orders for Nike must contain at least 100 units per product.
 					Orders below this threshold are rejected by their logistics team and must be
 					consolidated with the next replenishment cycle.""",
 					Map.of("minimumQuantity", 100)
 			),
 			new DepositorKnowledgeEntry(
-					"bsp",
+					"nk",
 					"replenishment-leadtime",
 					KnowledgeType.REPLENISHMENT,
 					"""
-					Braspress delivers to our warehouse in 2 business days on average.
+					Nike delivers to our warehouse in 2 business days on average.
 					During December the lead time extends to 5 business days due to peak season,
 					so replenishment must be anticipated.""",
 					Map.of("leadTimeDays", 2, "peakLeadTimeDays", 5)
@@ -48,9 +48,9 @@ public class DepositorKnowledgeIngestion {
 					"replenishment-leadtime",
 					KnowledgeType.REPLENISHMENT,
 					"""
-					Amazon delivers to our warehouse in 5 business days on average.
+					Amazon delivers to our warehouse in 7 business days on average.
 					Requests created on Friday are only processed on the following Monday.""",
-					Map.of("leadTimeDays", 5)
+					Map.of("leadTimeDays", 7)
 			)
 	);
 

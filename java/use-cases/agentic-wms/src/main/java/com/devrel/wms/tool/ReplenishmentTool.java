@@ -49,8 +49,6 @@ public class ReplenishmentTool {
 			@ToolParam(description = "Short explanation of why replenishment is necessary")
 			String message
 	) {
-		logger.info("##TOOL## - Creating replenishment for depositor {}", depositorCode);
-
 		DepositorRef resolved = depositorService.toRef(new DepositorRef(null, depositorCode, null));
 
 		items.forEach(item -> productCodes.require(item.productCode()));
