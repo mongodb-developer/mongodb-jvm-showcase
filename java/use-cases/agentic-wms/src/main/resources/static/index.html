@@ -1965,18 +1965,19 @@ function policyCard(policy) {
 		' <span class="mono">' + esc(policy.depositorId) + '</span></span>' +
 		'<span class="preview">' + esc(summary) + '</span>' +
 		badge(policy.type) +
+		'</div>' +
 		'<div class="policy-body">' +
 		attrsLabel(policy.attributes) +
-		'<div class="field" style="margin-top:12px"><label>Policy text used by the agent</label>' +
+		'<div class="field" style="margin-top:12px"><label>' + esc(t('policies.text')) + '</label>' +
 		'<textarea class="pol-text">' + esc(policy.text) + '</textarea></div>' +
-		'<div class="field"><label>Attributes (JSON)</label>' +
+		'<div class="field"><label>' + esc(t('policies.attributes')) + '</label>' +
 		'<textarea class="pol-attrs">' + esc(JSON.stringify(policy.attributes || {}, null, 2)) + '</textarea></div>' +
-		'<div class="field"><label>Type</label>' + typeSelect('pol-type', policy.type) + '</div>' +
+		'<div class="field"><label>' + esc(t('field.type')) + '</label>' + typeSelect('pol-type', policy.type) + '</div>' +
 		'<div class="actions">' +
-		'<button class="btn sm" onclick="savePolicy(\'' + esc(reference) + '\')">Save</button>' +
-		'<button class="btn ghost sm" onclick="cancelPolicy(\'' + esc(reference) + '\')">Cancel</button>' +
+		'<button class="btn sm" onclick="savePolicy(\'' + esc(reference) + '\')">' + esc(t('action.save')) + '</button>' +
+		'<button class="btn ghost sm" onclick="cancelPolicy(\'' + esc(reference) + '\')">' + esc(t('action.cancel')) + '</button>' +
 		'<span class="spacer"></span>' +
-		'<button class="btn ghost sm" onclick="deletePolicy(\'' + esc(reference) + '\')">Delete</button>' +
+		'<button class="btn ghost sm" onclick="deletePolicy(\'' + esc(reference) + '\')">' + esc(t('action.delete')) + '</button>' +
 		'</div></div></div>';
 }
 
@@ -2168,6 +2169,12 @@ const I18N = {
 		'option.selectdepositor': 'Select a depositor',
 		'option.selectproduct': 'Select a product',
 		'action.remove': 'Remove',
+		'action.save': 'Save',
+		'action.delete': 'Delete',
+		'action.cancel': 'Cancel',
+		'field.type': 'Type',
+		'policies.text': 'Policy text used by the agent',
+		'policies.attributes': 'Attributes (JSON)',
 		'field.quantity': 'Quantity',
 		'validate.name': 'Name is required',
 		'validate.codename': 'Code and name are required',
@@ -2259,6 +2266,8 @@ const I18N = {
 		'option.selectdepositor': 'Selecione um depositante',
 		'option.selectproduct': 'Selecione um produto',
 		'action.remove': 'Remover',
+		'action.save': 'Salvar',
+		'action.delete': 'Excluir',
 
 		'action.search': 'Buscar',
 		'action.clear': 'Limpar',
