@@ -2142,9 +2142,23 @@ function selectTab(tab) {
 	document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === tab));
 	document.getElementById('page-title').textContent = button.lastChild.textContent.trim();
 
+	if (location.hash.slice(1) !== tab) location.hash = tab;
+
 	clearTimeout(autoRefreshTimer);
 	loaders[tab]().catch(() => {});
 }
+
+function activeTab() {
+	const button = document.querySelector('nav button.active');
+
+	return button ? button.dataset.tab : null;
+}
+
+window.addEventListener('hashchange', () => {
+	const tab = location.hash.slice(1);
+
+	if (tab && loaders[tab] && tab !== activeTab()) selectTab(tab);
+});
 
 document.getElementById('tabs').addEventListener('click', event => {
 	const button = event.target.closest('button[data-tab]');
@@ -2534,6 +2548,15 @@ applyTheme(localStorage.getItem('wms-theme') || 'dark');
 ['in-items', 'out-items'].forEach(addItemLine);
 
 snapshotUiText();
+
+const initialTab = location.hash.slice(1);
+
+if (initialTab && loaders[initialTab]) {
+	document.querySelectorAll('nav button')
+			.forEach(button => button.classList.toggle('active', button.dataset.tab === initialTab));
+	document.querySelectorAll('section')
+			.forEach(section => section.classList.toggle('active', section.id === initialTab));
+}
 
 const storedLanguage = localStorage.getItem('wms-lang');
 
