@@ -660,7 +660,7 @@
 
 	.steps { padding: 6px 0 8px; }
 
-	.step {
+	.steps .step {
 		display: flex;
 		align-items: center;
 		gap: 13px;
@@ -668,7 +668,7 @@
 		border-bottom: 1px solid var(--border);
 	}
 
-	.step:last-child { border-bottom: 0; }
+	.steps .step:last-child { border-bottom: 0; }
 
 	.step-num {
 		flex: none;
@@ -683,7 +683,7 @@
 		font-weight: 700;
 	}
 
-	.step.done .step-num {
+	.steps .step.done .step-num {
 		border-color: var(--accent);
 		background: var(--accent);
 		color: var(--accent-ink);
@@ -734,6 +734,7 @@
 	.toast.ok { border-left-color: var(--accent); }
 	.toast.err { border-left-color: var(--danger); }
 	.toast strong { display: block; margin-bottom: 3px; }
+	.toast .btn { margin-top: 11px; }
 
 	@media (max-width: 900px) {
 		.app { flex-direction: column; }
@@ -1222,12 +1223,26 @@
 const esc = value => String(value ?? '')
 	.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-function notify(message, kind, title) {
+function notify(message, kind, title, action) {
 	const box = document.createElement('div');
 	box.className = 'toast ' + kind;
 	box.innerHTML = '<strong>' + esc(title) + '</strong>' + esc(message);
+
+	if (action) {
+		const button = document.createElement('button');
+
+		button.className = 'btn sm';
+		button.textContent = action.label;
+		button.onclick = () => {
+			box.remove();
+			action.run();
+		};
+
+		box.appendChild(button);
+	}
+
 	document.getElementById('toast').appendChild(box);
-	setTimeout(() => box.remove(), 5000);
+	setTimeout(() => box.remove(), action ? 15000 : 5000);
 }
 
 async function api(path, options) {
@@ -1705,7 +1720,16 @@ async function saveInvoice(key) {
 
 async function runAction(kind, number, action) {
 	await post('/' + kind + '-invoice/' + encodeURIComponent(number) + '/' + action);
-	notify(t('toast.invoice.action', { number: number, action: action }), 'ok', t('toast.success'));
+
+	if (kind === 'outbound' && action === 'execute') {
+		notify(t('toast.agent.message', { number: number }), 'ok', t('toast.agent.title'), {
+			label: t('action.viewagentrun'),
+			run: () => selectTab('agentruns')
+		});
+	} else {
+		notify(t('toast.invoice.action', { number: number, action: action }), 'ok', t('toast.success'));
+	}
+
 	openInvoices.delete(invoiceKey(kind, number));
 	reloadInvoices(kind);
 }
@@ -2220,6 +2244,9 @@ const I18N = {
 		'toast.policy.saved': 'Policy {reference} saved and re-embedded',
 		'toast.policy.created': 'Policy {key} created for {depositor}',
 		'toast.policy.deleted': 'Policy {reference} deleted',
+		'toast.agent.title': 'The agent is on it',
+		'toast.agent.message': 'Outbound {number} completed. The replenishment agent woke up on its own and is analysing the stock right now.',
+		'action.viewagentrun': 'Watch it run',
 		'toast.success': 'Success',
 		'toast.language': 'Language changed to {language}',
 		'flow.count.invoices': '{count} invoice(s)',
@@ -2354,6 +2381,9 @@ const I18N = {
 		'mail.pending': 'Será enviado na aprovação',
 		'mail.toresolve': 'a definir na aprovação',
 
+		'toast.agent.title': 'O agente assumiu',
+		'toast.agent.message': 'Nota {number} concluída. O agente de reposição acordou sozinho e está analisando o estoque agora.',
+		'action.viewagentrun': 'Acompanhar a execução',
 		'toast.invalid': 'Dados inválidos',
 		'toast.error': 'Erro',
 		'toast.product.updated': 'Produto {code} atualizado',

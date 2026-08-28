@@ -81,7 +81,7 @@ public class InboundInvoiceService {
 			throw new ConflictException("Only a pending invoice can be edited: " + number);
 		}
 
-		if (inboundInvoice.items() == null || inboundInvoice.items().isEmpty()) {
+		if (inboundInvoice.items().isEmpty()) {
 			throw new IllegalArgumentException("Invoice must have at least one item: " + number);
 		}
 

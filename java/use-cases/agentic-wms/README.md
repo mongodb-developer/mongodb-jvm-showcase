@@ -2,8 +2,7 @@
 
 A simple Warehouse Management System that handles **inbound**, **outbound** and **replenishment** — with an AI agent that decides on its own when stock needs to be replenished.
 
-**Live demo:** https://agentic-wms-39763860545.southamerica-west1.run.app/
-
+**Live demo:** [mdb.link/agentic-wms](https://mdb.link/agentic-wms)
 ## How it works
 
 The **Overview** tab in the app shows this same flow, tracks how far you got and links to each step.
