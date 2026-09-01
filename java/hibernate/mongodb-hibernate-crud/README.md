@@ -3,6 +3,11 @@
 A simple project designed to explore CRUD operations using Hibernate with MongoDB.
 The project uses MongoDB Hibernate 1.0.0-alpha1, which adds support for associations, joins, embedded objects, cascading operations, optimistic locking, and additional query capabilities.
 
+You can read more on:
+- [`Getting Started With Hibernate ORM and MongoDB`](https://foojay.io/today/getting-started-with-hibernate-orm-and-mongodb/)
+
+- [`Modeling Relationships With Hibernate ORM and MongoDB`](https://foojay.io/today/modeling-relationships-with-hibernate-orm-and-mongodb/)
+
 ## Prerequisites
 
 Before running the project, make sure you have:
