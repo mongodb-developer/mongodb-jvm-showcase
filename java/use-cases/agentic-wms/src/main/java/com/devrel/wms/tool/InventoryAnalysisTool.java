@@ -1,8 +1,12 @@
 package com.devrel.wms.tool;
 
+import com.devrel.wms.domain.Depositor;
 import com.devrel.wms.domain.Inventory;
+import com.devrel.wms.domain.Replenishment;
 import com.devrel.wms.domain.StockMovement;
+import com.devrel.wms.service.DepositorService;
 import com.devrel.wms.service.InventoryService;
+import com.devrel.wms.service.ReplenishmentService;
 import com.devrel.wms.service.StockMovementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +24,20 @@ public class InventoryAnalysisTool {
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
 	private final ProductCodes productCodes;
+	private final ReplenishmentService replenishmentService;
+	private final DepositorService depositorService;
 
 	InventoryAnalysisTool(
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
-			ProductCodes productCodes) {
+			ProductCodes productCodes,
+			ReplenishmentService replenishmentService,
+			DepositorService depositorService) {
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
 		this.productCodes = productCodes;
+		this.replenishmentService = replenishmentService;
+		this.depositorService = depositorService;
 	}
 
 	@Tool(description = """
@@ -70,5 +80,16 @@ public class InventoryAnalysisTool {
 	public List<StockMovement> getStockMovementByInvoiceNumber(
 			@ToolParam(description = "Outbound invoice number") String invoiceNumber) {
 		return stockMovementService.findByInvoiceNumber(invoiceNumber);
+	}
+
+	@Tool(description = """
+    	Get the replenishment requests already pending for a depositor.
+    	A product covered by a pending request must not be replenished again.
+    """)
+	public List<Replenishment> getPendingReplenishments(
+			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM) String depositorCode) {
+		Depositor depositor = depositorService.findByCode(depositorCode);
+
+		return depositor == null ? List.of() : replenishmentService.findPendingByDepositor(depositor.id());
 	}
 }

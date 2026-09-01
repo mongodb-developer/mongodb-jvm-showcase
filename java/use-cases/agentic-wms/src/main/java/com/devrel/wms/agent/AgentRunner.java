@@ -18,6 +18,8 @@ public class AgentRunner {
 
 	private static final String DECISION_CAPABILITY = "DECISION";
 	private static final String NO_REPLENISHMENT_TOKEN = "REPLENISHMENT_NOT_REQUIRED";
+	private static final String REPLENISHMENT_CAPABILITY = "REPLENISHMENT";
+	private static final String NOT_CREATED_TOKEN = "NO_REPLENISHMENT_CREATED";
 
 	private final Logger logger = LoggerFactory.getLogger(AgentRunner.class);
 	private final AgentRunService agentRunService;
@@ -84,9 +86,15 @@ public class AgentRunner {
 	}
 
 	private boolean decidedToStop(String capability, String result) {
-		return DECISION_CAPABILITY.equals(capability)
-				&& result != null
-				&& result.contains(NO_REPLENISHMENT_TOKEN);
+		if (result == null) {
+			return false;
+		}
+
+		if (DECISION_CAPABILITY.equals(capability)) {
+			return result.contains(NO_REPLENISHMENT_TOKEN);
+		}
+
+		return REPLENISHMENT_CAPABILITY.equals(capability) && result.contains(NOT_CREATED_TOKEN);
 	}
 
 	private void skipRemaining(List<AgentRun.AgentTask> tasks, int from) {

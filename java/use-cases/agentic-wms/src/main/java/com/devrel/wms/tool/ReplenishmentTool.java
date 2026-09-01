@@ -65,7 +65,7 @@ public class ReplenishmentTool {
 				.toList();
 
 		if (newItems.isEmpty()) {
-			return "No replenishment created. All requested products are already covered by pending requests: "
+			return "NO_REPLENISHMENT_CREATED. All requested products are already covered by pending requests: "
 					+ pendingReference(pending) + ".";
 		}
 

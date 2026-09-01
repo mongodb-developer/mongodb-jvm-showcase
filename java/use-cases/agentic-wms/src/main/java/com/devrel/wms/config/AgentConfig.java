@@ -61,6 +61,11 @@ public class AgentConfig {
 			* REPLENISHMENT_REQUIRED
 			* REPLENISHMENT_NOT_REQUIRED
 
+			Never write those two tokens in a task that is not a DECISION task.
+
+			Whenever a tool answer contains a word in UPPER_SNAKE_CASE, repeat that word unchanged
+			as the last line of your answer. It is a status code and losing it breaks the execution.
+
 			Never write a notification email yourself. The only way to produce one is to call the
 			drafting tool with the id of the replenishment request that was just created.
 			An email that is not returned by that tool does not exist and is never delivered.
