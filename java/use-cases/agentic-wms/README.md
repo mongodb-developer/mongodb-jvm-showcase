@@ -2,7 +2,14 @@
 
 A simple Warehouse Management System that handles **inbound**, **outbound** and **replenishment** — with an AI agent that decides on its own when stock needs to be replenished.
 
-**Live demo:** [mdb.link/agentic-wms](https://mdb.link/agentic-wms)
+You can read more on:
+- [Building an Agentic Warehouse Management System — Part 1: Where AI Agents Add Value](https://foojay.io/today/building-an-agentic-warehouse-management-system-part-1-where-ai-agents-add-value/).
+- [Building an Agentic Warehouse Management System — Part 2: Java and Spring AI](https://foojay.io/today/building-an-agentic-warehouse-management-system-part-2-java-and-spring-ai/).
+- [Building an Agentic Warehouse Management System — Part 3: Tools, Decisions, and Actions](https://foojay.io/today/building-an-agentic-warehouse-management-system-part-3-tools-decisions-and-actions/).
+
+Wanna try the application?
+- **Live demo:** [mdb.link/agentic-wms](https://mdb.link/agentic-wms)
+
 ## How it works
 
 The **Overview** tab in the app shows this same flow, tracks how far you got and links to each step.
