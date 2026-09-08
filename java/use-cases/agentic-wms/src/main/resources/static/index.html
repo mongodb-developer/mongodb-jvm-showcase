@@ -736,6 +736,27 @@
 	.toast strong { display: block; margin-bottom: 3px; }
 	.toast .btn { margin-top: 11px; }
 
+	#busy {
+		position: fixed;
+		inset: 0;
+		z-index: 200;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, .35);
+		cursor: progress;
+	}
+	#busy.on { display: flex; }
+	#busy .spin {
+		width: 34px;
+		height: 34px;
+		border: 3px solid rgba(255, 255, 255, .35);
+		border-top-color: #fff;
+		border-radius: 50%;
+		animation: busy-spin .7s linear infinite;
+	}
+	@keyframes busy-spin { to { transform: rotate(360deg); } }
+
 	@media (max-width: 900px) {
 		.app { flex-direction: column; }
 		aside { width: 100%; flex: none; height: auto; position: static; }
@@ -747,6 +768,8 @@
 </style>
 </head>
 <body>
+
+<div id="busy"><div class="spin"></div></div>
 
 <div class="app">
 
@@ -1245,7 +1268,23 @@ function notify(message, kind, title, action) {
 	setTimeout(() => box.remove(), action ? 15000 : 5000);
 }
 
+let busyCount = 0;
+
+function busy(active) {
+	busyCount = Math.max(0, busyCount + (active ? 1 : -1));
+	document.getElementById('busy').classList.toggle('on', busyCount > 0);
+}
+
 async function api(path, options) {
+	busy(true);
+	try {
+		return await request(path, options);
+	} finally {
+		busy(false);
+	}
+}
+
+async function request(path, options) {
 	const response = await fetch(path, options);
 
 	if (!response.ok) {
