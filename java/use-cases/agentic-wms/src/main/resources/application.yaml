@@ -10,7 +10,7 @@ spring:
     model:
       embedding: none
     openai:
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
       api-key: ${OPENAI_API_KEY}
       chat:
         model: ${OPENAI_CHAT_MODEL:gpt-4.1}
@@ -26,7 +26,7 @@ spring:
     mongodb:
       auto-index-creation: false
 voyage:
-  base-url: ${VOYAGE_BASE_URL}
+  base-url: ${VOYAGE_BASE_URL:https://api.voyageai.com/v1/embeddings}
   api-key: ${VOYAGE_API_KEY}
   model: ${VOYAGE_MODEL:voyage-4}
   dimensions: ${VOYAGE_DIMENSIONS:1024}

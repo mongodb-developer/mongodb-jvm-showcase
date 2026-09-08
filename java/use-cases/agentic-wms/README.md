@@ -71,7 +71,6 @@ You need a MongoDB Atlas cluster, an OpenAI key and a Voyage AI key.
 ```bash
 export MONGODB_URI="mongodb+srv://..."
 export OPENAI_API_KEY="sk-..."
-export VOYAGE_BASE_URL="https://api.voyageai.com/v1"
 export VOYAGE_API_KEY="pa-..."
 
 mvn spring-boot:run

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +41,11 @@ public class GlobalExceptionHandler {
 		logger.warn("Duplicate key rejected: {}", exception.getMostSpecificCause().getMessage());
 
 		return problemDetail(HttpStatus.CONFLICT, "Duplicated key", duplicatedKeyDetail(exception));
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ProblemDetail handleNoResource(NoResourceFoundException exception) {
+		return problemDetail(HttpStatus.NOT_FOUND, "Resource not found", exception.getMessage());
 	}
 
 	@ExceptionHandler(Exception.class)
