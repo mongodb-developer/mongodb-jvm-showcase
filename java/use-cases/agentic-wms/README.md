@@ -32,68 +32,49 @@ flowchart TD
     K -->|human approves| L[Email sent to depositor]
 ```
 
-## Who triggers the agent
+## The agent
 
-Nobody. There is no "run agent" button.
+Nobody triggers it. There is no "run agent" button — completing an outbound invoice does it:
 
-Completing an outbound invoice (`POST /outbound-invoice/{number}/execute`) publishes an
-`OutboundInvoiceCompleted` event after the transaction commits. `ReplenishmentAnalysisListener`
-picks it up asynchronously and runs the agent.
+```
+outbound completed
+        ↓
+   ANALYSIS      → reads inventory and stock movements
+        ↓
+   POLICY        → reads the depositor's rules (vector search)
+        ↓
+   DECISION      → replenishment needed?
+        ↓
+   REPLENISHMENT → creates the request
+        ↓
+   NOTIFICATION  → drafts the email
+        ↓
+   human approves → email sent
+```
 
-The agent then plans and executes its own tasks, picking one capability per task:
-
-| Capability | What it does |
-|---|---|
-| `ANALYSIS` | Reads inventory and stock movements. Read-only. |
-| `POLICY` | Reads the depositor's rules — minimum quantity, lead time, blackout periods. |
-| `DECISION` | Decides whether replenishment is actually needed. Uses no tool. |
-| `REPLENISHMENT` | Creates a replenishment request that complies with the policies. |
-| `NOTIFICATION` | Drafts the notification email for the depositor. |
-
-The agent stops there. It drafts the email but never sends it — a human approves the
-replenishment (`POST /replenishment/{id}/status/{status}`), and only then the notification goes out.
-
-Depositor policies are plain text stored in MongoDB and retrieved by **vector search**, so the
-agent finds the relevant rule by meaning rather than by an exact key.
+The agent stops at the draft. Only a human approval actually sends the email.
 
 ## Stack
 
 - **Java 25** + **Spring Boot 4.1**
-- **Spring AI 2.0** — chat, tool calling and chat memory
+- **Spring AI 2.0** — chat, tool calling
 - **OpenAI `gpt-4.1`** for reasoning
 - **Voyage AI** for embeddings
-- **MongoDB Atlas** — operational data, chat memory and Atlas Vector Search, in the same database
+- **MongoDB Atlas** Vector Database
 - **Bucket4j** for rate limiting
 - **Docker** on **Google Cloud Run**
 
-## Running locally
+## Running it
+
+You need a MongoDB Atlas cluster, an OpenAI key and a Voyage AI key.
 
 ```bash
 export MONGODB_URI="mongodb+srv://..."
-export OPENAI_BASE_URL="..."
-export GROVE_API_KEY="..."
-export VOYAGE_BASE_URL="..."
-export VOYAGE_API_KEY="..."
+export OPENAI_API_KEY="sk-..."
+export VOYAGE_BASE_URL="https://api.voyageai.com/v1"
+export VOYAGE_API_KEY="pa-..."
 
 mvn spring-boot:run
 ```
 
-Then open http://localhost:8080.
-
-Sample requests for every endpoint live in `src/main/resources/http`.
-
-## Demo limits
-
-The live demo is open to anyone, so usage is capped in `application.yaml`:
-
-```yaml
-wms:
-  limits:
-    enabled: true
-    per-ip-requests-per-minute: 10
-    global-requests-per-day: 100
-    agent-runs-per-day: 50
-    max-policy-text-length: 2000
-```
-
-Set `LIMITS_ENABLED=false` to turn it off while developing.
+Open http://localhost:8080. 

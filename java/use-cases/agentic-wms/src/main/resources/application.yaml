@@ -10,12 +10,10 @@ spring:
     model:
       embedding: none
     openai:
-      custom-headers:
-        api-key: ${GROVE_API_KEY}
-      base-url: ${OPENAI_BASE_URL}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY}
       chat:
-        model: gpt-4.1
-      api-key: ""
+        model: ${OPENAI_CHAT_MODEL:gpt-4.1}
     vectorstore:
       mongodb:
         initialize-schema: true
@@ -26,7 +24,7 @@ spring:
           - type
   data:
     mongodb:
-      auto-index-creation: true
+      auto-index-creation: false
 voyage:
   base-url: ${VOYAGE_BASE_URL}
   api-key: ${VOYAGE_API_KEY}
@@ -47,3 +45,13 @@ wms:
 logging:
   level:
     org.springframework.data.mongodb.core: DEBUG
+---
+spring:
+  config:
+    activate:
+      on-profile: grove
+  ai:
+    openai:
+      api-key: ""
+      custom-headers:
+        api-key: ${GROVE_API_KEY}
