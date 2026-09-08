@@ -21,9 +21,11 @@ public class DepositorPolicyTool {
 
 	private final Logger logger = LoggerFactory.getLogger(DepositorPolicyTool.class);
 	private final DepositorKnowledgeStore depositorKnowledgeStore;
+	private final DepositorCodes depositorCodes;
 
-	DepositorPolicyTool(DepositorKnowledgeStore depositorKnowledgeStore) {
+	DepositorPolicyTool(DepositorKnowledgeStore depositorKnowledgeStore, DepositorCodes depositorCodes) {
 		this.depositorKnowledgeStore = depositorKnowledgeStore;
+		this.depositorCodes = depositorCodes;
 	}
 
 	@Tool(description = """
@@ -33,18 +35,19 @@ public class DepositorPolicyTool {
     	language question about what you need to know.
     """)
 	public String getDepositorPolicies(
-			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM) String depositorCode,
+			@ToolParam(description = DepositorCodes.DEPOSITOR_CODE_PARAM) String depositorCode,
 
 			@ToolParam(description = "Question about the depositor policies, for example "
 					+ "'What are the constraints to request 250 units today?'")
 			String question
 	) {
+		String code = depositorCodes.require(depositorCode);
 
 		List<Document> documents = depositorKnowledgeStore.search(
-				question, depositorCode, REPLENISHMENT_TYPES, TOP_K);
+				question, code, REPLENISHMENT_TYPES, TOP_K);
 
 		if (documents.isEmpty()) {
-			return "No policy registered for depositor " + depositorCode
+			return "No policy registered for depositor " + code
 					+ ". Use standard replenishment criteria.";
 		}
 

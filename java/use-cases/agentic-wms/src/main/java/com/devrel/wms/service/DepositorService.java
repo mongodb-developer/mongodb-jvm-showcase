@@ -39,7 +39,11 @@ public class DepositorService {
 	}
 
 	public Depositor findByCode(String code) {
-		return depositorRepository.findByCode(code).orElse(null);
+		return resolve(code);
+	}
+
+	public List<String> codes() {
+		return depositorRepository.findAll().stream().map(Depositor::code).toList();
 	}
 
 	public DepositorRef toRef(DepositorRef reference) {
@@ -48,7 +52,7 @@ public class DepositorService {
 		}
 
 		Depositor depositor = reference.id() == null
-				? depositorRepository.findByCode(reference.code()).orElse(null)
+				? resolve(reference.code())
 				: depositorRepository.findById(reference.id()).orElse(null);
 
 		if (depositor == null) {
@@ -76,6 +80,19 @@ public class DepositorService {
 		logger.info("Depositor {} updated", saved.id());
 
 		return saved;
+	}
+
+	private Depositor resolve(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+
+		String trimmed = value.trim();
+
+		return depositorRepository.findByCode(trimmed)
+				.or(() -> depositorRepository.findByCodeIgnoreCase(trimmed))
+				.or(() -> depositorRepository.findByNameIgnoreCase(trimmed))
+				.orElse(null);
 	}
 
 	private void validate(Depositor depositor) {

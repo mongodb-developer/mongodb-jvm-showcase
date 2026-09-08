@@ -24,6 +24,7 @@ public class InventoryAnalysisTool {
 	private final InventoryService inventoryService;
 	private final StockMovementService stockMovementService;
 	private final ProductCodes productCodes;
+	private final DepositorCodes depositorCodes;
 	private final ReplenishmentService replenishmentService;
 	private final DepositorService depositorService;
 
@@ -31,11 +32,13 @@ public class InventoryAnalysisTool {
 			InventoryService inventoryService,
 			StockMovementService stockMovementService,
 			ProductCodes productCodes,
+			DepositorCodes depositorCodes,
 			ReplenishmentService replenishmentService,
 			DepositorService depositorService) {
 		this.inventoryService = inventoryService;
 		this.stockMovementService = stockMovementService;
 		this.productCodes = productCodes;
+		this.depositorCodes = depositorCodes;
 		this.replenishmentService = replenishmentService;
 		this.depositorService = depositorService;
 	}
@@ -65,11 +68,11 @@ public class InventoryAnalysisTool {
     """)
 	public List<StockMovement> getStockMovementByDepositor(
 			@ToolParam(description = ProductCodes.PRODUCT_CODE_PARAM) String productCode,
-			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM) String depositorCode) {
+			@ToolParam(description = DepositorCodes.DEPOSITOR_CODE_PARAM) String depositorCode) {
 		logger.info("##TOOL## - Getting stock movement by product {} and depositor {}", productCode, depositorCode);
 
 		return stockMovementService.findByProductCodeAndDepositorCode(
-				productCodes.require(productCode), depositorCode);
+				productCodes.require(productCode), depositorCodes.require(depositorCode));
 	}
 
 	@Tool(description = """
@@ -87,8 +90,8 @@ public class InventoryAnalysisTool {
     	A product covered by a pending request must not be replenished again.
     """)
 	public List<Replenishment> getPendingReplenishments(
-			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM) String depositorCode) {
-		Depositor depositor = depositorService.findByCode(depositorCode);
+			@ToolParam(description = DepositorCodes.DEPOSITOR_CODE_PARAM) String depositorCode) {
+		Depositor depositor = depositorService.findByCode(depositorCodes.require(depositorCode));
 
 		return depositor == null ? List.of() : replenishmentService.findPendingByDepositor(depositor.id());
 	}

@@ -9,4 +9,8 @@ import java.util.Optional;
 @Repository
 public interface DepositorRepository extends MongoRepository<Depositor, String> {
 	Optional<Depositor> findByCode(String code);
+
+	Optional<Depositor> findByCodeIgnoreCase(String code);
+
+	Optional<Depositor> findByNameIgnoreCase(String name);
 }

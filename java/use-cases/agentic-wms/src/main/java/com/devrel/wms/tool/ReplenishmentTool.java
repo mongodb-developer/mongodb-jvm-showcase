@@ -21,14 +21,17 @@ public class ReplenishmentTool {
 
 	private final ReplenishmentService replenishmentService;
 	private final ProductCodes productCodes;
+	private final DepositorCodes depositorCodes;
 	private final DepositorService depositorService;
 
 	ReplenishmentTool(
 			ReplenishmentService replenishmentService,
 			ProductCodes productCodes,
+			DepositorCodes depositorCodes,
 			DepositorService depositorService) {
 		this.replenishmentService = replenishmentService;
 		this.productCodes = productCodes;
+		this.depositorCodes = depositorCodes;
 		this.depositorService = depositorService;
 	}
 
@@ -39,7 +42,7 @@ public class ReplenishmentTool {
     	 The answer reports the created replenishment id and any skipped product.
     """)
 	public String createReplenishment(
-			@ToolParam(description = ProductCodes.DEPOSITOR_CODE_PARAM)
+			@ToolParam(description = DepositorCodes.DEPOSITOR_CODE_PARAM)
 			String depositorCode,
 
 			@ToolParam(description = "Products and quantities that need replenishment. "
@@ -49,7 +52,8 @@ public class ReplenishmentTool {
 			@ToolParam(description = "Short explanation of why replenishment is necessary")
 			String message
 	) {
-		DepositorRef resolved = depositorService.toRef(new DepositorRef(null, depositorCode, null));
+		DepositorRef resolved = depositorService.toRef(
+				new DepositorRef(null, depositorCodes.require(depositorCode), null));
 
 		items.forEach(item -> productCodes.require(item.productCode()));
 
