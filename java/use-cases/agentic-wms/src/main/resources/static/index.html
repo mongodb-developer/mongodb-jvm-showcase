@@ -1975,7 +1975,7 @@ function toggleRun(id) {
 
 async function loadAgentRuns() {
 	const status = document.getElementById('a-filter').value;
-	const runs = (await api('/agent-runs')).filter(run => !status || run.status === status);
+	const runs = (await request('/agent-runs')).filter(run => !status || run.status === status);
 	const target = document.getElementById('a-body');
 
 	target.innerHTML = runs.length
