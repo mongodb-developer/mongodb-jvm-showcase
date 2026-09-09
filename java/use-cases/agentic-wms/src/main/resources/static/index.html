@@ -379,6 +379,20 @@
 		white-space: nowrap;
 	}
 
+	.btn.next-step {
+		animation: next-step-pulse 1.6s ease-in-out infinite;
+	}
+
+	.btn.ghost.next-step {
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+
+	@keyframes next-step-pulse {
+		0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+		50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 0%, transparent); }
+	}
+
 	.task-spin {
 		display: inline-block;
 		width: 11px;
@@ -1698,7 +1712,7 @@ function invoiceActions(invoice, kind, executeLabel, executePath) {
 	const key = invoiceKey(kind, invoice.number);
 
 	const action = (label, path, ghost) =>
-			'<button class="btn ' + (ghost ? 'ghost ' : '') + 'sm" onclick="runAction(\'' + kind + '\',\''
+			'<button class="btn ' + (ghost ? 'ghost ' : '') + 'sm next-step" onclick="runAction(\'' + kind + '\',\''
 			+ esc(invoice.number) + '\',\'' + path + '\')">' + label + '</button>';
 
 	if (invoice.status === 'PENDING') {
@@ -1775,6 +1789,10 @@ async function runAction(kind, number, action) {
 			label: t('action.viewagentrun'),
 			run: () => selectTab('agentruns')
 		});
+	} else if (action === 'check') {
+		const next = kind === 'inbound' ? t('action.complete') : t('action.execute');
+
+		notify(t('toast.next.execute', { number: number, action: next }), 'ok', t('toast.checked', { number: number }));
 	} else if (kind === 'inbound' && action === 'complete') {
 		notify(t('toast.stock.message', { number: number }), 'ok', t('toast.stock.title'), {
 			label: t('action.viewinventory'),
@@ -1842,7 +1860,7 @@ async function createInvoice(kind) {
 	};
 
 	await post('/' + kind + '-invoice', { number, depositor, items });
-	notify(t('toast.invoice.created', { number: number }), 'ok', t('toast.success'));
+	notify(t('toast.next.check', { action: t('action.check') }), 'ok', t('toast.invoice.created', { number: number }));
 	document.getElementById(prefix + '-number').value = '';
 	select.value = '';
 	document.getElementById(prefix + '-items').innerHTML = '';
@@ -2306,6 +2324,9 @@ const I18N = {
 		'toast.agent.title': 'The agent is on it',
 		'toast.agent.message': 'Outbound {number} completed. The replenishment agent woke up on its own and is analysing the stock right now.',
 		'action.viewagentrun': 'Watch it run',
+		'toast.checked': 'Invoice {number} checked',
+		'toast.next.check': 'Next step: click the highlighted {action} button on the invoice row to confirm the items.',
+		'toast.next.execute': 'Next step: click the highlighted {action} button on the invoice row.',
 		'toast.stock.title': 'Stock updated',
 		'toast.stock.message': 'Inbound {number} completed. The items were put away and the stock is already available.',
 		'action.viewinventory': 'See the inventory',
@@ -2446,6 +2467,9 @@ const I18N = {
 		'toast.agent.title': 'O agente assumiu',
 		'toast.agent.message': 'Nota {number} concluída. O agente de reposição acordou sozinho e está analisando o estoque agora.',
 		'action.viewagentrun': 'Acompanhar a execução',
+		'toast.checked': 'Nota {number} conferida',
+		'toast.next.check': 'Próximo passo: clique no botão {action} destacado na linha da nota para conferir os itens.',
+		'toast.next.execute': 'Próximo passo: clique no botão {action} destacado na linha da nota.',
 		'toast.stock.title': 'Estoque atualizado',
 		'toast.stock.message': 'Nota {number} concluída. Os itens foram armazenados e o estoque já está disponível.',
 		'action.viewinventory': 'Ver o estoque',
