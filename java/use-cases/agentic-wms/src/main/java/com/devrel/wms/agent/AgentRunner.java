@@ -32,7 +32,6 @@ public class AgentRunner {
 
 	public AgentRun run(AgentDefinition definition, String reference) {
 		String goal = definition.goal().formatted(reference);
-		List<AgentRun.AgentTask> tasks = new ArrayList<>(plan(definition, goal));
 
 		AgentRun agentRun = agentRunService.save(new AgentRun(
 				null,
@@ -42,8 +41,21 @@ public class AgentRunner {
 				null,
 				LocalDateTime.now(),
 				null,
-				List.copyOf(tasks)
+				List.of()
 		));
+
+		List<AgentRun.AgentTask> tasks;
+
+		try {
+			tasks = new ArrayList<>(plan(definition, goal));
+		} catch (Exception exception) {
+			logger.error("Agent run {} failed while planning goal: {}", agentRun.id(), goal, exception);
+
+			return agentRunService.save(finish(
+					agentRun, List.of(), AgentRun.Status.FAILED, "Failed to create the execution plan"));
+		}
+
+		agentRun = agentRunService.save(withTasks(agentRun, tasks));
 
 		logger.info("Agent run {} started with {} task(s)", agentRun.id(), tasks.size());
 

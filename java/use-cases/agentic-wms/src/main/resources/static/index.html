@@ -1775,6 +1775,11 @@ async function runAction(kind, number, action) {
 			label: t('action.viewagentrun'),
 			run: () => selectTab('agentruns')
 		});
+	} else if (kind === 'inbound' && action === 'complete') {
+		notify(t('toast.stock.message', { number: number }), 'ok', t('toast.stock.title'), {
+			label: t('action.viewinventory'),
+			run: () => selectTab('inventory')
+		});
 	} else {
 		notify(t('toast.invoice.action', { number: number, action: action }), 'ok', t('toast.success'));
 	}
@@ -1964,17 +1969,21 @@ function taskCard(task, index) {
 function runCard(run) {
 	const tasks = run.tasks || [];
 	const done = tasks.filter(task => task.status === 'COMPLETED').length;
+	const planning = !tasks.length && run.status === 'RUNNING';
+	const emptyTasks = planning
+		? '<div class="empty">Planning the tasks<span class="task-spin"></span><br>This may take a few seconds.</div>'
+		: '<div class="empty">No task planned</div>';
 
 	return '<div class="run ' + (openRuns.has(run.id) ? 'open' : '') + '" data-run="' + esc(run.id) + '">' +
 		'<div class="run-head" onclick="toggleRun(\'' + esc(run.id) + '\')">' +
 		'<span class="caret">&#9660;</span>' +
 		'<span class="goal">' + esc(run.reference) + ' <span class="mono">' + esc(run.trigger) + '</span></span>' +
-		'<span class="meta">' + done + '/' + tasks.length + ' tasks &middot; ' + stamp(run.startedAt) +
+		'<span class="meta">' + (planning ? 'planning tasks' : done + '/' + tasks.length + ' tasks') + ' &middot; ' + stamp(run.startedAt) +
 		(run.completedAt ? ' &middot; ' + duration(run.startedAt, run.completedAt) : '') + '</span>' +
 		badge(run.status) +
 		'</div>' +
 		'<div class="run-tasks">' +
-		(tasks.length ? tasks.map(taskCard).join('') : '<div class="empty">No task planned</div>') +
+		(tasks.length ? tasks.map(taskCard).join('') : emptyTasks) +
 		(run.summary ? '<div class="result" style="margin-top:12px"><strong>Summary</strong><br>' + esc(run.summary) + '</div>' : '') +
 		'</div></div>';
 }
@@ -2297,6 +2306,9 @@ const I18N = {
 		'toast.agent.title': 'The agent is on it',
 		'toast.agent.message': 'Outbound {number} completed. The replenishment agent woke up on its own and is analysing the stock right now.',
 		'action.viewagentrun': 'Watch it run',
+		'toast.stock.title': 'Stock updated',
+		'toast.stock.message': 'Inbound {number} completed. The items were put away and the stock is already available.',
+		'action.viewinventory': 'See the inventory',
 		'toast.success': 'Success',
 		'toast.language': 'Language changed to {language}',
 		'flow.count.invoices': '{count} invoice(s)',
@@ -2434,6 +2446,9 @@ const I18N = {
 		'toast.agent.title': 'O agente assumiu',
 		'toast.agent.message': 'Nota {number} concluída. O agente de reposição acordou sozinho e está analisando o estoque agora.',
 		'action.viewagentrun': 'Acompanhar a execução',
+		'toast.stock.title': 'Estoque atualizado',
+		'toast.stock.message': 'Nota {number} concluída. Os itens foram armazenados e o estoque já está disponível.',
+		'action.viewinventory': 'Ver o estoque',
 		'toast.invalid': 'Dados inválidos',
 		'toast.error': 'Erro',
 		'toast.product.updated': 'Produto {code} atualizado',
