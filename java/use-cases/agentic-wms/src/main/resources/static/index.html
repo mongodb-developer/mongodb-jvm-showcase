@@ -781,12 +781,38 @@
 	}
 	@keyframes busy-spin { to { transform: rotate(360deg); } }
 
+	.menu-toggle {
+		display: none;
+		margin-left: auto;
+		background: none;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		color: var(--text-soft);
+		width: 34px;
+		height: 32px;
+		font-size: 16px;
+		line-height: 1;
+		font-family: inherit;
+		cursor: pointer;
+	}
+
+	.menu-toggle:hover { background: var(--surface-2); color: var(--text); }
+
 	@media (max-width: 900px) {
 		.app { flex-direction: column; }
-		aside { width: 100%; flex: none; height: auto; position: static; }
-		nav { flex-direction: row; overflow-x: auto; padding: 8px; }
-		nav .group, .side-foot { display: none; }
-		nav button { width: auto; }
+		aside {
+			width: 100%;
+			flex: none;
+			height: auto;
+			position: sticky;
+			top: 0;
+			z-index: 30;
+			background: var(--surface);
+		}
+		.menu-toggle { display: block; }
+		nav { display: none; max-height: 70vh; }
+		aside.open nav { display: flex; }
+		.side-foot { display: none; }
 		main, .topbar { padding-left: 16px; padding-right: 16px; }
 	}
 </style>
@@ -797,7 +823,7 @@
 
 <div class="app">
 
-	<aside>
+	<aside id="sidebar">
 		<div class="brand">
 			<span class="mark">w</span>
 			<div>
@@ -805,6 +831,8 @@
 				<a class="sub" href="https://github.com/mongodb-developer/mongodb-jvm-showcase"
 						target="_blank" rel="noopener">MongoDB JVM showcase</a>
 			</div>
+			<button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()"
+					aria-label="Menu" aria-expanded="false" aria-controls="tabs">&#9776;</button>
 		</div>
 
 		<nav id="tabs">
@@ -2235,9 +2263,19 @@ const loaders = {
 	overview: loadOverview
 };
 
+function toggleMenu(force) {
+	const sidebar = document.getElementById('sidebar');
+	const open = force === undefined ? !sidebar.classList.contains('open') : force;
+
+	sidebar.classList.toggle('open', open);
+	document.getElementById('menu-toggle').setAttribute('aria-expanded', String(open));
+}
+
 function selectTab(tab) {
 	const button = document.querySelector('nav button[data-tab="' + tab + '"]');
 	if (!button) return;
+
+	toggleMenu(false);
 
 	document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b === button));
 	document.querySelectorAll('section').forEach(s => s.classList.toggle('active', s.id === tab));
