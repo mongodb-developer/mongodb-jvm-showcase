@@ -577,6 +577,15 @@
 	}
 
 	.lede strong { color: var(--text); font-weight: 600; }
+	.lede a, .read-more a { color: var(--accent); text-decoration: none; font-weight: 600; }
+	.lede a:hover, .read-more a:hover { text-decoration: underline; }
+
+	.read-more {
+		margin: 0 0 18px;
+		font-size: 13px;
+		line-height: 1.6;
+		color: var(--muted);
+	}
 
 	.flow {
 		display: flex;
@@ -858,6 +867,9 @@
 		<div class="side-foot">
 			<a href="https://github.com/mongodb-developer/mongodb-jvm-showcase/tree/main/java/use-cases/agentic-wms"
 					target="_blank" rel="noopener">View this project on GitHub</a>
+			<br>
+			<a href="https://foojay.io/today/building-an-agentic-warehouse-management-system-part-1-where-ai-agents-add-value/"
+					target="_blank" rel="noopener">Read how it was built</a>
 		</div>
 	</aside>
 
@@ -876,6 +888,13 @@
 		<main>
 
 		<section id="overview" class="active">
+			<p class="read-more" data-i18n="overview.read.text">
+				Want to know how this project was built? Read the
+				<a href="https://foojay.io/today/building-an-agentic-warehouse-management-system-part-1-where-ai-agents-add-value/"
+						target="_blank" rel="noopener">article</a> written by
+				<a href="https://www.ricardohsmello.com" target="_blank" rel="noopener">Ricardo Mello</a>.
+			</p>
+
 			<div class="card">
 				<div class="card-head"><h2 data-i18n="overview.what">What this is</h2></div>
 				<p class="lede" data-i18n="overview.lede">
@@ -944,6 +963,7 @@
 				<div class="card-head"><h2 data-i18n="overview.start">Start here</h2></div>
 				<div class="steps" id="steps"></div>
 			</div>
+
 		</section>
 
 		<section id="products">
@@ -2533,6 +2553,12 @@ const I18N = {
 				+ 'acordadas com o depositante e decide se vale repor.',
 		'overview.how': 'Como funciona',
 		'overview.start': 'Comece aqui',
+		'overview.read.text': 'Quer saber como este projeto foi construído? Leia o '
+				+ '<a href="https://foojay.io/today/building-an-agentic-warehouse-'
+				+ 'management-system-part-1-where-ai-agents-add-value/" target="_blank" '
+				+ 'rel="noopener">artigo</a> escrito por '
+				+ '<a href="https://www.ricardohsmello.com" target="_blank" '
+				+ 'rel="noopener">Ricardo Mello</a>.',
 
 		'flow.inbound': 'Entrada',
 		'flow.stock': 'Estoque',
