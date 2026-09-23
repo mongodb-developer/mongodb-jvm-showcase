@@ -1,0 +1,43 @@
+### Find All Authors (paginated)
+GET http://localhost:8080/authors?page=0&size=5
+Accept: application/json
+
+### Find By Nationality
+@nationality = American
+GET http://localhost:8080/authors/nationality/{{nationality}}
+Accept: application/json
+
+### Create Author
+POST http://localhost:8080/authors
+Content-Type: application/json
+
+{
+  "name": "Robert C. Martin",
+  "nationality": "American",
+  "birthYear": 1952
+}
+
+### Create Author 2
+POST http://localhost:8080/authors
+Content-Type: application/json
+
+{
+  "name": "Martin Kleppmann",
+  "nationality": "German",
+  "birthYear": 1985
+}
+
+### Update Author
+@idUpdate = REPLACE_WITH_ID
+PUT http://localhost:8080/authors/{{idUpdate}}
+Content-Type: application/json
+
+{
+  "name": "Robert C. Martin",
+  "nationality": "American",
+  "birthYear": 1952
+}
+
+### Delete Author
+@idDelete = REPLACE_WITH_ID
+DELETE http://localhost:8080/authors/{{idDelete}}

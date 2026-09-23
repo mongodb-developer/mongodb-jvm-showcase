@@ -1,0 +1,71 @@
+## Find All books (paginated)
+GET http://localhost:8080/books?page=0&size=5
+Accept: application/json
+
+### Find All Books with min pages equals
+GET http://localhost:8080/books/min-pages/500
+Accept: application/json
+
+### Find By Id
+@id = 6a3559b6cb259680688b9d74
+GET http://localhost:8080/books/{{id}}
+Accept: application/json
+
+
+### Find By Year
+@year = 2008
+GET http://localhost:8080/books/year/{{year}}
+Accept: application/json
+
+### Create Book
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{
+  "title": "Ricas Code",
+  "pages": 431,
+  "year": 2008,
+  "authors": [
+    "Ricardo Mello",
+    "Maria Silva"
+  ]
+}
+
+### Update Book
+@idUpdate = 6a3551be4105f41dede3ef97
+PUT http://localhost:8080/books/{{idUpdate}}
+Content-Type: application/json
+
+{
+  "title": "Ricas Code - Updated",
+  "pages": 464,
+  "year": 2008,
+  "authors": [
+    "Ricardo Mello",
+    "Maria Silva"
+  ]
+}
+
+### Delete Book
+@idDelete = 6a3551be4105f41dede3ef97
+DELETE http://localhost:8080/books/{{idDelete}}
+
+### $set — classify books by page count (short / medium / long)
+GET http://localhost:8080/books/classify?page=0&size=5
+Accept: application/json
+
+### $unwind — expand the authors array and count books per author
+GET http://localhost:8080/books/per-author?page=0&size=5
+Accept: application/json
+
+### $sort — sort books by year (order=asc or order=desc)
+GET http://localhost:8080/books/sort/year?order=desc
+Accept: application/json
+
+### $lookup — books with all their reviews (join with the reviews collection)
+GET http://localhost:8080/books/with-reviews?page=0&size=5
+Accept: application/json
+
+### $limit — top N longest books
+GET http://localhost:8080/books/top/5
+Accept: application/json
