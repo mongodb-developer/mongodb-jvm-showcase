@@ -10,6 +10,7 @@ import com.mongodb.voyage.VoyageConfigProperties;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.springframework.data.domain.Sort;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -41,6 +42,10 @@ public class MovieService {
 	}
 
 	public List<Movie> searchMovies(MovieSearchRequest req) {
+		if (req.query() == null || req.query().isBlank()) {
+			return filterMovies(req);
+		}
+
 		AggregationOperation rankFusion = context -> new Document("$rankFusion",
 				new Document("input",
 						new Document("pipelines",
@@ -53,6 +58,16 @@ public class MovieService {
 						.append("scoreDetails", false));
 
 		Aggregation aggregation = Aggregation.newAggregation(rankFusion);
+
+		return mongoTemplate.aggregate(aggregation, config.vectorCollectionName(), Movie.class).getMappedResults();
+	}
+
+	private List<Movie> filterMovies(MovieSearchRequest req) {
+		Aggregation aggregation = Aggregation.newAggregation(
+				Aggregation.match(req.toCriteria()),
+				Aggregation.sort(Sort.by(Sort.Direction.DESC, "imdb.rating")),
+				Aggregation.limit(config.topK())
+		);
 
 		return mongoTemplate.aggregate(aggregation, config.vectorCollectionName(), Movie.class).getMappedResults();
 	}

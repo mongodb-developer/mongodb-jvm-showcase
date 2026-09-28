@@ -13,15 +13,14 @@ const excludeGenres = document.getElementById('excludeGenres');
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const q = input.value.trim();
-    if (!q) return;
-
     setBusy(true);
     clearUI();
 
     try {
         const genres = [...document.querySelectorAll('.genre:checked')].map(x => x.value);
 
-        const req = { query: q };
+        const req = {};
+        if (q) req.query = q;
         if (yearFromEl?.value) req.yearFrom = Number(yearFromEl.value);
         if (yearToEl?.value) req.yearTo = Number(yearToEl.value);
         if (genres.length) req.genres = genres;
@@ -54,7 +53,7 @@ form.addEventListener('submit', async (e) => {
 function renderChips(req) {
     const items = [];
 
-    items.push(['Search', `${req.query}`]);
+    if (req.query) items.push(['Search', `${req.query}`]);
     if (req.yearFrom != null || req.yearTo != null) items.push(['Year', `${req.yearFrom ?? ''}–${req.yearTo ?? ''}`]);
 
     if (req.genres && req.genres.length) {
@@ -66,7 +65,7 @@ function renderChips(req) {
     }
     if (req.minIMDbRating != null) items.push(['IMDb ≥', req.minIMDbRating]);
     chips.innerHTML = items.map(([k, v]) =>
-        `<span class="badge rounded-pill text-bg-secondary filter-chip">${k}: ${v}</span>`).join('');
+        `<span class="badge rounded-pill filter-chip">${k}: ${v}</span>`).join('');
 }
 
 function movieFields(m) {
@@ -145,7 +144,7 @@ function renderResults(items) {
 
         const btnDetails = document.createElement('button');
         btnDetails.type = 'button';
-        btnDetails.className = 'btn btn-sm btn-outline-primary mt-auto';
+        btnDetails.className = 'btn btn-sm btn-details mt-auto';
         btnDetails.textContent = 'Details';
         btnDetails.addEventListener('click', () => openDetails(m));
         body.appendChild(btnDetails);

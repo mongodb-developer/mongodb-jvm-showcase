@@ -57,8 +57,6 @@ public record MovieSearchRequest(
 		if (f != null && t != null && f > t) {
 			int tmp = f; f = t; t = tmp;
 		}
-		assert f != null;
-		assert t != null;
 		return new YearBounds(f, t);
 	}
 
