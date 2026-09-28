@@ -1,5 +1,9 @@
 # spring-data-mongodb-hybrid-search
 
+Wanna try the application?
+- **Live demo:** [mdb.link/movie-recommendation](https://mdb.link/movie-recommendation)
+
+
 This project is part of the “Beyond Keywords” article series:
 
 - [Beyond Keywords: Implementing Semantic Search in Java With Spring Data (Part 1)](https://dev.to/mongodb/beyond-keywords-implementing-semantic-search-in-java-with-spring-data-part-1-3m68)
