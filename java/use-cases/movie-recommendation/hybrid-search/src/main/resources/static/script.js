@@ -12,6 +12,12 @@ const excludeGenres = document.getElementById('excludeGenres');
 
 const FALLBACK_POSTER = 'https://i.ibb.co/hRGmNYDn/No-image-Available.png';
 
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+});
+
 const placeholderExamples = [
     'A shark terrorizes a small beach town...',
     'A boy discovers on his birthday that he is a wizard...',
