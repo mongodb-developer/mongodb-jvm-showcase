@@ -11,7 +11,7 @@ voyage:
   model: voyage-3-large
   output-dimension: 2048
   vector-index-name: vector_index
-  vector-collection-name: embedded_movies
+  vector-collection-name: movies
   vector-field: plot_embedding_voyage_3_large
   top-k: 8
   num-candidates: 160
