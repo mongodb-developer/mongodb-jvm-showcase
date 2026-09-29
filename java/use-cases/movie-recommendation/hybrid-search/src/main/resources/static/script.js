@@ -10,6 +10,21 @@ const yearToEl = document.getElementById('yearTo');
 const minImdbEl = document.getElementById('minIMDbRating');
 const excludeGenres = document.getElementById('excludeGenres');
 
+const placeholderExamples = [
+    'A shark terrorizes a small beach town...',
+    'A boy discovers on his birthday that he is a wizard...',
+    'Scientists bring dinosaurs back to life on an island...',
+    'A ship hits an iceberg and two lovers from different worlds...',
+    'A man realizes his whole life is a reality TV show...',
+    'Toys come alive when their owner leaves the room...'
+];
+let placeholderIndex = 0;
+setInterval(() => {
+    if (document.activeElement === input || input.value) return;
+    placeholderIndex = (placeholderIndex + 1) % placeholderExamples.length;
+    input.placeholder = placeholderExamples[placeholderIndex];
+}, 3500);
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const q = input.value.trim();
