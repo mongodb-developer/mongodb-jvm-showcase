@@ -10,6 +10,8 @@ const yearToEl = document.getElementById('yearTo');
 const minImdbEl = document.getElementById('minIMDbRating');
 const excludeGenres = document.getElementById('excludeGenres');
 
+const FALLBACK_POSTER = 'https://i.ibb.co/hRGmNYDn/No-image-Available.png';
+
 const placeholderExamples = [
     'A shark terrorizes a small beach town...',
     'A boy discovers on his birthday that he is a wizard...',
@@ -30,6 +32,7 @@ form.addEventListener('submit', async (e) => {
     const q = input.value.trim();
     setBusy(true);
     clearUI();
+    renderSkeletons(8);
 
     try {
         const genres = [...document.querySelectorAll('.genre:checked')].map(x => x.value);
@@ -49,9 +52,11 @@ form.addEventListener('submit', async (e) => {
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(req)
         });
-        if (!resp.ok) new Error('HTTP ' + resp.status);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
 
         const data = await resp.json();
+        results.innerHTML = '';
+        document.getElementById('status').textContent = Array.isArray(data) && data.length ? `${data.length} results` : '';
         if (!Array.isArray(data) || data.length === 0) {
             showAlert('No results found.', 'warning');
             return;
@@ -59,6 +64,7 @@ form.addEventListener('submit', async (e) => {
 
         renderResults(data);
     } catch (err) {
+        results.innerHTML = '';
         showAlert('Error fetching movies: ' + String(err?.message || err), 'danger');
     } finally {
         setBusy(false);
@@ -80,7 +86,7 @@ function renderChips(req) {
     }
     if (req.minIMDbRating != null) items.push(['IMDb ≥', req.minIMDbRating]);
     chips.innerHTML = items.map(([k, v]) =>
-        `<span class="badge rounded-pill filter-chip">${k}: ${v}</span>`).join('');
+        `<span class="filter-chip">${esc(k)}: <strong>${esc(v)}</strong></span>`).join('');
 }
 
 function movieFields(m) {
@@ -90,64 +96,59 @@ function movieFields(m) {
         plot:   pick(m, ['fullplot','fullPlot','plot']) || '',
         rating: m?.imdb?.rating,
         genres: Array.isArray(m?.genres) ? m.genres : [],
-        poster: m?.poster || 'https://i.ibb.co/hRGmNYDn/No-image-Available.png',
+        poster: m?.poster || FALLBACK_POSTER,
     };
 }
 
 function renderResults(items) {
-    for (const m of items) {
-
+    items.forEach((m, i) => {
         const { title, year, plot, rating, genres, poster } = movieFields(m);
 
-        const col = document.createElement('div');
-        col.className = 'col-6 col-md-4 col-lg-3';
+        const card = document.createElement('article');
+        card.className = 'movie-card';
+        card.tabIndex = 0;
+        card.style.animationDelay = `${Math.min(i, 12) * 40}ms`;
+        card.addEventListener('click', () => openDetails(m));
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openDetails(m);
+            }
+        });
 
-        const card = document.createElement('div');
-        card.className = 'card h-100 movie-card shadow-sm';
-
+        const posterWrap = document.createElement('div');
+        posterWrap.className = 'poster-wrap';
         const img = document.createElement('img');
         img.src = poster;
         img.alt = title;
-        img.className = 'movie-poster card-img-top';
-        card.appendChild(img);
+        img.loading = 'lazy';
+        img.className = 'movie-poster';
+        img.onerror = () => { img.onerror = null; img.src = FALLBACK_POSTER; };
+        posterWrap.appendChild(img);
+        if (rating != null) {
+            const badge = document.createElement('span');
+            badge.className = 'rating-badge';
+            badge.textContent = Number(rating).toFixed(1);
+            posterWrap.appendChild(badge);
+        }
+        card.appendChild(posterWrap);
 
         const body = document.createElement('div');
-        body.className = 'card-body d-flex flex-column';
+        body.className = 'card-content';
 
-        const h5 = document.createElement('h5');
-        h5.className = 'movie-title';
-        h5.textContent = title;
-        body.appendChild(h5);
+        const h3 = document.createElement('h3');
+        h3.className = 'movie-title';
+        h3.textContent = title;
+        body.appendChild(h3);
 
-        if (year || rating != null) {
+        const metaParts = [];
+        if (year) metaParts.push(String(year));
+        if (genres.length) metaParts.push(genres.slice(0, 2).join(', '));
+        if (metaParts.length) {
             const meta = document.createElement('div');
             meta.className = 'movie-meta';
-            const parts = [];
-            if (year) parts.push(String(year));
-            if (rating != null) {
-
-                parts.push(`★ ${Number(rating).toFixed(1)}`);
-            }
-            meta.textContent = parts.join(' • ');
+            meta.textContent = metaParts.join(' · ');
             body.appendChild(meta);
-        }
-
-        if (genres.length) {
-            const wrap = document.createElement('div');
-            const maxToShow = 3;
-            genres.slice(0, maxToShow).forEach(g => {
-                const chip = document.createElement('span');
-                chip.className = 'genre-chip';
-                chip.textContent = g;
-                wrap.appendChild(chip);
-            });
-            if (genres.length > maxToShow) {
-                const more = document.createElement('span');
-                more.className = 'genre-chip genre-more';
-                more.textContent = `+${genres.length - maxToShow}`;
-                wrap.appendChild(more);
-            }
-            body.appendChild(wrap);
         }
 
         if (plot) {
@@ -157,17 +158,15 @@ function renderResults(items) {
             body.appendChild(p);
         }
 
-        const btnDetails = document.createElement('button');
-        btnDetails.type = 'button';
-        btnDetails.className = 'btn btn-sm btn-details mt-auto';
-        btnDetails.textContent = 'Details';
-        btnDetails.addEventListener('click', () => openDetails(m));
-        body.appendChild(btnDetails);
-
         card.appendChild(body);
-        col.appendChild(card);
-        results.appendChild(col);
-    }
+        results.appendChild(card);
+    });
+}
+
+function renderSkeletons(count) {
+    results.innerHTML = Array.from({ length: count }, () =>
+        '<div class="skeleton"><div class="poster-wrap"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>'
+    ).join('');
 }
 
 function openDetails(m) {
@@ -222,8 +221,7 @@ function openDetails(m) {
     modalPlot.textContent = plot;
     modalExtra.textContent = '';
 
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function setBusy(isBusy) {
@@ -235,6 +233,7 @@ function clearUI() {
     alerts.innerHTML = '';
     results.innerHTML = '';
     chips.innerHTML = '';
+    document.getElementById('status').textContent = '';
 }
 
 function showAlert(msg, type = 'info') {
