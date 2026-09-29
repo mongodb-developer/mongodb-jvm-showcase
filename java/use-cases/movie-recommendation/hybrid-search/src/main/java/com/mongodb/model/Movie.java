@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document("embedded_movies")
+@Document("movies")
 public record Movie(
 	String title,
 	String year,
