@@ -7,7 +7,7 @@ mongodb:
   application-name: devrel-tutorial-java-hybridsearch
 voyage:
   api-key: ${VOYAGE_API_KEY}
-  base-url: https://api.voyageai.com/v1
+  base-url: ${VOYAGE_BASE_URL:https://api.voyageai.com/v1}
   model: voyage-3-large
   output-dimension: 2048
   vector-index-name: vector_index
