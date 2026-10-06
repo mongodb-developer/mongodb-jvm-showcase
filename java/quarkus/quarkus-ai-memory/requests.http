@@ -1,2 +1,6 @@
 ### Chat sem memória
-GET http://localhost:8080/chat?message=Hello!
+GET http://localhost:8080/chat?sessionId=02&message=My name is Henrique
+
+### Chat sem memória
+GET http://localhost:8080/chat?sessionId=01&message=What's my name?
+
