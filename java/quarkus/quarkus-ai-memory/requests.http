@@ -1,6 +1,8 @@
-### Chat sem memória
-GET http://localhost:8080/chat?sessionId=02&message=My name is Henrique
+### Share your context
+GET http://localhost:8080/chat?sessionId=01&message=I'm a Java developer using Java 21 and Quarkus, and I'm new to reactive programming.
 
-### Chat sem memória
-GET http://localhost:8080/chat?sessionId=01&message=What's my name?
+### Ask a question that depends on the context
+GET http://localhost:8080/chat?sessionId=01&message=How should I call an external REST API in my project?
 
+### Same question, different session: no context
+GET http://localhost:8080/chat?sessionId=02&message=How should I call an external REST API in my project?
