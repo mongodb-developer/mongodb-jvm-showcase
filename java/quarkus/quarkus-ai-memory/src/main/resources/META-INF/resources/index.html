@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Java Mentor</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #001e2b; color: #e8edeb; margin: 0; height: 100vh; display: flex; }
+        aside { width: 280px; background: #061621; border-right: 1px solid #1c2d38; display: flex; flex-direction: column; }
+        .brand { padding: 20px 18px 12px; }
+        .brand h1 { font-size: 18px; margin: 0; color: #00ed64; }
+        .brand p { font-size: 12px; margin: 4px 0 0; color: #889397; }
+        #new { margin: 8px 14px 14px; background: #00ed64; color: #001e2b; border: none; border-radius: 8px; padding: 10px; font-weight: 600; font-size: 14px; cursor: pointer; }
+        #new:hover { background: #71f6ba; }
+        .section { padding: 0 18px 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #889397; }
+        #sessions { flex: 1; overflow-y: auto; padding: 0 8px 12px; margin: 0; list-style: none; }
+        #sessions li { display: flex; align-items: center; gap: 6px; padding: 10px; border-radius: 8px; cursor: pointer; }
+        #sessions li:hover { background: #112733; }
+        #sessions li.active { background: #023430; }
+        #sessions .info { flex: 1; min-width: 0; }
+        #sessions .title { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #sessions .date { font-size: 11px; color: #889397; margin-top: 2px; }
+        #sessions .remove { visibility: hidden; background: none; border: none; color: #889397; cursor: pointer; font-size: 16px; padding: 2px 6px; }
+        #sessions li:hover .remove { visibility: visible; }
+        #sessions .remove:hover { color: #ff6960; }
+        .empty-list { padding: 10px; font-size: 13px; color: #5c6c75; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .top { padding: 16px 24px; border-bottom: 1px solid #1c2d38; font-size: 13px; color: #889397; }
+        .top code { color: #00ed64; }
+        #log { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 12px 16px; border-radius: 12px; max-width: 75%; white-space: pre-wrap; line-height: 1.5; font-size: 15px; }
+        .user { align-self: flex-end; background: #00684a; }
+        .ai { align-self: flex-start; background: #112733; border: 1px solid #1c2d38; }
+        .pending { color: #889397; font-style: italic; }
+        .welcome { margin: auto; text-align: center; color: #889397; max-width: 420px; }
+        .welcome h2 { color: #e8edeb; font-size: 22px; margin-bottom: 8px; }
+        form { display: flex; gap: 10px; padding: 16px 24px 24px; }
+        #message { flex: 1; background: #112733; color: #e8edeb; border: 1px solid #3d4f58; border-radius: 10px; padding: 12px 14px; font-size: 15px; outline: none; }
+        #message:focus { border-color: #00ed64; }
+        #send { background: #00ed64; color: #001e2b; border: none; border-radius: 10px; padding: 0 22px; font-weight: 600; font-size: 15px; cursor: pointer; }
+        #send:disabled { opacity: 0.5; cursor: default; }
+    </style>
+</head>
+<body>
+<aside>
+    <div class="brand">
+        <h1>Java Mentor</h1>
+        <p>Quarkus + LangChain4j + MongoDB</p>
+    </div>
+    <button id="new">+ New conversation</button>
+    <div class="section">Recent</div>
+    <ul id="sessions"></ul>
+</aside>
+<main>
+    <div class="top">Session <code id="current"></code></div>
+    <div id="log"></div>
+    <form id="form">
+        <input id="message" placeholder="Ask your Java mentor..." autocomplete="off" autofocus>
+        <button id="send">Send</button>
+    </form>
+</main>
+<script>
+    const log = document.getElementById("log");
+    const list = document.getElementById("sessions");
+    const input = document.getElementById("message");
+    const send = document.getElementById("send");
+    const current = document.getElementById("current");
+    let sessionId;
+
+    function add(text, cls) {
+        const div = document.createElement("div");
+        div.className = "msg " + cls;
+        div.textContent = text;
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+        return div;
+    }
+
+    function welcome() {
+        log.innerHTML = '<div class="welcome"><h2>Hi, I\'m your Java mentor.</h2>' +
+            'Tell me about your Java version, stack and experience level. I\'ll remember it for this conversation.</div>';
+    }
+
+    function setSession(id) {
+        sessionId = id;
+        current.textContent = id;
+        localStorage.setItem("sessionId", id);
+        document.querySelectorAll("#sessions li").forEach(li => li.classList.toggle("active", li.dataset.id === id));
+    }
+
+    function formatDate(value) {
+        return value ? new Date(value).toLocaleString([], { dateStyle: "short", timeStyle: "short" }) : "";
+    }
+
+    async function loadSessions() {
+        const sessions = await (await fetch("/chat/sessions")).json();
+        list.innerHTML = "";
+        if (sessions.length === 0) {
+            list.innerHTML = '<li class="empty-list">No conversations yet</li>';
+        }
+        sessions.forEach(s => {
+            const li = document.createElement("li");
+            li.dataset.id = s.id;
+            li.innerHTML = '<div class="info"><div class="title"></div><div class="date"></div></div>' +
+                '<button class="remove" title="Delete">&times;</button>';
+            li.querySelector(".title").textContent = s.title;
+            li.querySelector(".date").textContent = formatDate(s.updatedAt);
+            li.addEventListener("click", () => openSession(s.id));
+            li.querySelector(".remove").addEventListener("click", e => { e.stopPropagation(); removeSession(s.id); });
+            list.appendChild(li);
+        });
+        setSession(sessionId);
+    }
+
+    async function openSession(id) {
+        setSession(id);
+        const messages = await (await fetch("/chat/sessions/" + encodeURIComponent(id))).json();
+        log.innerHTML = "";
+        if (messages.length === 0) {
+            welcome();
+        }
+        messages.forEach(m => add(m.text, m.role));
+        input.focus();
+    }
+
+    function newSession() {
+        setSession(crypto.randomUUID().slice(0, 8));
+        welcome();
+        input.focus();
+    }
+
+    async function removeSession(id) {
+        await fetch("/chat/sessions/" + encodeURIComponent(id), { method: "DELETE" });
+        if (id === sessionId) {
+            newSession();
+        }
+        loadSessions();
+    }
+
+    document.getElementById("new").addEventListener("click", newSession);
+
+    document.getElementById("form").addEventListener("submit", async e => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+        log.querySelector(".welcome")?.remove();
+        add(text, "user");
+        input.value = "";
+        send.disabled = true;
+        const pending = add("Thinking...", "ai pending");
+        try {
+            const params = new URLSearchParams({ sessionId, message: text });
+            const res = await fetch("/chat?" + params);
+            pending.textContent = res.ok ? await res.text() : "Error: " + res.status;
+        } catch (err) {
+            pending.textContent = "Error: " + err.message;
+        }
+        pending.classList.remove("pending");
+        send.disabled = false;
+        input.focus();
+        loadSessions();
+    });
+
+    (async () => {
+        const saved = localStorage.getItem("sessionId");
+        if (saved) {
+            await openSession(saved);
+        } else {
+            newSession();
+        }
+        loadSessions();
+    })();
+</script>
+</body>
+</html>
