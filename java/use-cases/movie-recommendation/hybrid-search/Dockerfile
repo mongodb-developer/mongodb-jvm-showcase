@@ -16,21 +16,21 @@ FROM ${RUNTIME_IMAGE}
 
 USER root
 
+# Atualiza CA certificates do SO
 RUN apt-get update \
     && apt-get install -y --only-upgrade ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN for a in \
-      "emsigneccrootcag3 [jdk]" \
-      "comodoaaaca [jdk]" \
-      "emsignrootcag1 [jdk]" \
-      "emsignrootcag2 [jdk]"; do \
-      if keytool -list -cacerts -storepass changeit -alias "$a" >/dev/null 2>&1; then \
-        keytool -delete -cacerts -storepass changeit -alias "$a"; \
-      fi; \
-    done
+RUN keytool -list -cacerts -storepass changeit 2>/dev/null \
+      | sed -nE 's/^(.*), [A-Za-z]{3} [0-9]{1,2}, [0-9]{4}, trustedCertEntry,.*$/\1/p' \
+      | { grep -Ei 'emsign|aaa_certificate|comodoaaa' || true; } \
+      | while IFS= read -r a; do \
+          echo "Removendo: $a"; \
+          keytool -delete -cacerts -storepass changeit -alias "$a"; \
+        done
 
-RUN ! keytool -list -cacerts -storepass changeit | grep -Ei 'emsigneccrootcag3|comodoaaaca'
+# Falha o build se sobrou alguma root afetada
+RUN ! keytool -list -cacerts -storepass changeit | grep -Ei 'emsign|aaa_certificate|comodoaaa'
 
 WORKDIR /app
 
