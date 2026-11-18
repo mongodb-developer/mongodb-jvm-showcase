@@ -38,4 +38,4 @@ EXPOSE 8080
 
 USER 1001
 
-ENTRYPOINT ["sh", "-c", "exec java -jar /app/app.jar --server.port=${PORT:-8080}"]
+ENTRYPOINT ["sh", "-c", "exec java -XX:-UseBASE64Intrinsics -jar /app/app.jar --server.port=${PORT:-8080}"]
