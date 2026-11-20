@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG BUILD_IMAGE=maven:3.9-eclipse-temurin-25
-ARG RUNTIME_IMAGE=eclipse-temurin:25.0.5_8-jre-noble
+ARG RUNTIME_IMAGE=amazoncorretto:25-al2023-headless
 
 FROM ${BUILD_IMAGE} AS build
 
@@ -16,19 +16,9 @@ FROM ${RUNTIME_IMAGE}
 
 USER root
 
-RUN apt-get update \
-    && apt-get install -y --only-upgrade ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN keytool -list -cacerts -storepass changeit 2>/dev/null \
-      | sed -nE 's/^(.*), [A-Za-z]{3} [0-9]{1,2}, [0-9]{4}, trustedCertEntry,.*$/\1/p' \
-      | { grep -Ei 'emsign|aaa_certificate|comodoaaa' || true; } \
-      | while IFS= read -r a; do \
-          echo "Removendo: $a"; \
-          keytool -delete -cacerts -storepass changeit -alias "$a"; \
-        done
-
-RUN ! keytool -list -cacerts -storepass changeit | grep -Ei 'emsign|aaa_certificate|comodoaaa'
+# Update OS security packages
+RUN dnf update -y --security --releasever=latest \
+    && dnf clean all
 
 WORKDIR /app
 
@@ -38,4 +28,4 @@ EXPOSE 8080
 
 USER 1001
 
-ENTRYPOINT ["sh", "-c", "exec java -XX:-UseBASE64Intrinsics -jar /app/app.jar --server.port=${PORT:-8080}"]
+ENTRYPOINT ["sh", "-c", "exec java -jar /app/app.jar --server.port=${PORT:-8080}"]
