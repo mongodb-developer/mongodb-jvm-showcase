@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: hibernate-migration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orders
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
