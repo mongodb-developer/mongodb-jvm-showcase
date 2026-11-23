@@ -1,9 +1,0 @@
-services:
-  postgres:
-    image: postgres:17
-    environment:
-      POSTGRES_DB: orders
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
