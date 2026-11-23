@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import org.bson.types.ObjectId;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "items")
 public class OrderItem {
 	@Id
 	@ObjectIdGenerator
