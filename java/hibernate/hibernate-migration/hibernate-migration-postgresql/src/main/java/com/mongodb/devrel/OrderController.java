@@ -1,5 +1,6 @@
 package com.mongodb.devrel;
 
+import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,5 +16,10 @@ public class OrderController {
 	@PostMapping
 	public Order create(@RequestBody Order order) {
 		return repository.save(order);
+	}
+
+	@GetMapping
+	public List<Order> findByCustomerName(@RequestParam String customerName) {
+		return repository.findByCustomerName(customerName);
 	}
 }

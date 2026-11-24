@@ -20,3 +20,6 @@ Content-Type: application/json
     {"product": "Smartphone", "quantity": 1, "unitPrice": 5149.90}
   ]
 }
+
+### Find by customer name
+GET http://localhost:8080/orders?customerName=Ricardo
