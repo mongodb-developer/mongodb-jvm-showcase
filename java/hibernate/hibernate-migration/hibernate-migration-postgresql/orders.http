@@ -3,7 +3,7 @@ POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "customerName": "Joaquim",
+  "customerName": "Ricardo",
   "items": [
     {"product": "Pencil", "quantity": 1, "unitPrice": 3.50},
     {"product": "Paper", "quantity": 2, "unitPrice": 0.90}
@@ -15,11 +15,17 @@ POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "customerName": "Maria",
+  "customerName": "Thais",
   "items": [
     {"product": "Smartphone", "quantity": 1, "unitPrice": 5149.90}
   ]
 }
+
+### Order by Customer
+GET http://localhost:8080/orders?customerName=Ricardo
+
+### Order by Customer JPQL
+GET http://localhost:8080/orders/search?customerName=Ricardo
 
 ### Revenue by customer
 GET http://localhost:8080/orders/revenue

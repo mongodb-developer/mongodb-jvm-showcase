@@ -7,10 +7,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderService {
 
+	private final OrderRepository repository;
 	private final EntityManager entityManager;
 
-	public OrderService(EntityManager entityManager) {
+	public OrderService(OrderRepository repository, EntityManager entityManager) {
+		this.repository = repository;
 		this.entityManager = entityManager;
+	}
+
+	public Order create(Order order) {
+		return repository.save(order);
+	}
+
+	public List<Order> findByCustomerName(String customerName) {
+		return repository.findByCustomerName(customerName);
+	}
+
+	public List<Order> search(String customerName) {
+		return repository.searchByCustomerName(customerName);
 	}
 
 	public List<Revenue> revenueByCustomer() {

@@ -7,27 +7,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/orders")
 public class OrderController {
 
-	private final OrderRepository repository;
 	private final OrderService service;
 
-	public OrderController(OrderRepository repository, OrderService service) {
-		this.repository = repository;
+	public OrderController(OrderService service) {
 		this.service = service;
 	}
 
 	@PostMapping
 	public Order create(@RequestBody Order order) {
-		return repository.save(order);
+		return service.create(order);
 	}
 
 	@GetMapping
 	public List<Order> findByCustomerName(@RequestParam String customerName) {
-		return repository.findByCustomerName(customerName);
+		return service.findByCustomerName(customerName);
 	}
 
 	@GetMapping("/search")
 	public List<Order> search(@RequestParam String customerName) {
-		return repository.searchByCustomerName(customerName);
+		return service.search(customerName);
 	}
 
 	@GetMapping("/revenue")
