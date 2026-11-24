@@ -1,11 +1,10 @@
 spring:
   application:
     name: hibernate-migration
-  datasource:
-    url: jdbc:postgresql://localhost:5432/orders
-    username: postgres
-    password: postgres
+  mongodb:
+    uri: mongodb://localhost:27017/orders
   jpa:
-    hibernate:
-      ddl-auto: update
+    database-platform: MongoDB
+    properties:
+      com.mongodb.hibernate.semantics.nulls: MQL
     show-sql: true
