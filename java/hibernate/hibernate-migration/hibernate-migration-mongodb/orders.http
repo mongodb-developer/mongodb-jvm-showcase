@@ -3,10 +3,10 @@ POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "customerName": "Maria",
+  "customerName": "jose",
   "items": [
-    {"product": "Pencil", "quantity": 1, "unitPrice": 3.50},
-    {"product": "Paper", "quantity": 2, "unitPrice": 0.90}
+    {"product": "Pencil", "quantity": 1, "unitPrice": 23.50},
+    {"product": "Paper", "quantity": 2, "unitPrice": 30.90}
   ]
 }
 
@@ -15,8 +15,11 @@ POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "customerName": "Ricardo",
+  "customerName": "Maria",
   "items": [
     {"product": "Smartphone", "quantity": 1, "unitPrice": 5149.90}
   ]
 }
+
+### Revenue by customer
+GET http://localhost:8080/orders/revenue

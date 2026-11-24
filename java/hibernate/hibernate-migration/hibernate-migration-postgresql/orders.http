@@ -3,7 +3,7 @@ POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "customerName": "Ricardo",
+  "customerName": "Joaquim",
   "items": [
     {"product": "Pencil", "quantity": 1, "unitPrice": 3.50},
     {"product": "Paper", "quantity": 2, "unitPrice": 0.90}
@@ -21,5 +21,5 @@ Content-Type: application/json
   ]
 }
 
-### Find by customer name
-GET http://localhost:8080/orders?customerName=Ricardo
+### Revenue by customer
+GET http://localhost:8080/orders/revenue
